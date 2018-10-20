@@ -7,7 +7,7 @@ Requires Typescript version `>= 3.0`;
 
 ## API
 
-## `conforms<T>(suspect, typeDescr): suspect is T`
+### `conforms<T>(suspect, typeDescr): suspect is T`
   **You will use this function 95% of the time interacting with this library.**
   It is a two in one: runtime type checker and static type guard.   
   Determines whether the specified suspect type satisfies the restriction of the given type
@@ -64,13 +64,13 @@ Requires Typescript version `>= 3.0`;
     }); // true
      
  ~~~
-## namespace Factory
+### `namespace Factory`
 This namespace provides handy functions that return `TypePredicate`s to use as type descriptions when calling `conforms(suspect, typeDescr)`.
 `TypePredicate` is a function of type:
 
 `(suspect: unknown): boolean`
 
-## `Factory.isNumberWithinRange(min, max)`
+### `Factory.isNumberWithinRange(min, max)`
     
  Returns a predicate that returns *true* if its argument is a number within the range \[`min`, `max`] or \[`max`, `min`] if `min > max`.
  ~~~typescript
@@ -83,10 +83,10 @@ This namespace provides handy functions that return `TypePredicate`s to use as t
     }); // false
  ~~~
  
- ## `Factory.isIntegerWithinRange(min, max)`
+ ### `Factory.isIntegerWithinRange(min, max)`
  The same as `Factory.isNumberWithinRange(min, max)`, but its returned predicate returns *false* if forwarded argument is not an integer.  
  
-  ## `isOneOf<T>(possibleValues: T[])`
+  ### `isOneOf<T>(possibleValues: T[])`
   Returns a predicate that accepts a suspect of `any` type and matches it to
     one of the provided possible values by
     `possibleValues.includes(suspect)`. **Don't confuse it with `new Set(possibleValues)`** when forwarding as a type description to `conforms()` function, because `possibleValues` are not TDs, but values to match with.
@@ -142,7 +142,7 @@ Returns *true* if suspect is a string that is inside a set of `BasicTypeName` ty
     isBasicTypeName('number');  // true
 ~~~
 
-## `isIsoDateString(suspect: unknown)`
+### `isIsoDateString(suspect: unknown)`
 Checks that suspect is a string and it conforms to ISO 8601 format.
 Internally uses ['is-iso-date'](https://www.npmjs.com/package/is-iso-date) npm package. Returns `suspect is string` as a type guard.
 Example taken from [here](https://www.npmjs.com/package/is-iso-date):
