@@ -1,0 +1,34 @@
+{
+    "name": "vee-type-safe",
+    "version": "1.0.0",
+    "description": "Simple TypeScript type checking utility library.",
+    "main":  "build/index.js",
+    "types": "build/index.d.ts",
+    "keywords": [
+        "utility",
+        "utils",
+        "typescript",
+        "typechecks",
+        "type conformance",
+        "duck typing"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Veetaha/vee-type-safe.git"
+    },
+    "scripts": {
+        "test": "mocha build/test/tests.js"
+    },
+    "author": "Vitaliy Kryvenko",
+    "license": "MIT",
+    "dependencies": {
+        "is-iso-date": "latest"
+    },
+    "devDependencies": {
+        "chai": "latest",
+        "mocha": "latest",
+        "@types/chai": "latest",
+        "@types/mocha": "latest",
+        "typescript": "latest"
+    }
+}

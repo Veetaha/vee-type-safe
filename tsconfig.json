@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    /* Basic Options */
+    "outDir": "build",
+    "target": "esnext",
+    "module": "commonjs",
+    "typeRoots": [
+      "node_modules/@types", "declarations"
+    ],
+    "sourceMap":      true,
+    "declaration":    true, /* Generates corresponding '.d.ts' file. */
+    "declarationMap": true, /* Generates a sourcemap for each corresponding '.d.ts' file. */
+    "experimentalDecorators":     true,
+    "strict":                     true,
+    "noUnusedLocals":             true,
+    "noUnusedParameters":         true,
+    "noImplicitAny":              true,
+    "noImplicitThis":             true,
+    "noImplicitReturns":          true,
+    "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
+    /* Module Resolution Options */
+    "moduleResolution": "node"
+  },
+  "files": ["index.ts"],
+  "include": [
+    "./**/*"
+  ],
+  "exclude": ["node_modules/**/*", "build"]
+}
