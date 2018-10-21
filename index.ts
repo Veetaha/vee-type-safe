@@ -33,6 +33,7 @@ export function reinterpret<T>(target: any): T{
 export function typeAssert<T>(_target: any): _target is T {
     return true;
 }
+export function assertNever(_suspect: never) {}
 
 export function isBasicTypeName(suspect: string): suspect is BasicTypeName {
     switch (suspect) {

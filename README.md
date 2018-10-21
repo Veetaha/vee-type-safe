@@ -3,7 +3,7 @@
 
 
 This is a simple TypeScript type checking utility library.
-Requires Typescript version `>= 3.0`;
+Requires Typescript version `>= 3.0`.
 
 ## API
 
@@ -124,6 +124,31 @@ casts like `value as any as T` when a simple `value as T` cast cannot be perform
 ### `typeAssert<T>(value): value is T`
 TypeScript type guard that always returns *true*.
 You may use it in an if statement to assert the proper type in the following code execution path.
+
+### `assertNever(suspect: never)`
+This function is no-op, but it is useful to check whether you have
+ handled all the cases and some code path is unreachable. TypeScript compiler will issue an error if you forward a value not of [`never` type](https://www.typescriptlang.org/docs/handbook/basic-types.html#never) to this function.
+~~~typescript
+const enum Enum {
+    A, B, C
+}
+function fn(en: Enum) {
+    switch (en) {
+        case Enum.A: { /***/ return; }
+        case Enum.B: { /***/ return; }
+        default: {
+            assertNever(en); // compile Error, en is of type Enum.C
+        }
+    }
+}
+//-------------
+const num = 23;
+if (typeof num !== 'number'){
+    assertNever(num); // no error, this code is unreachable
+    // num is of type never here
+}
+~~~ 
+
 
 ~~~typescript
     import { typeAssert } from 'vee-type-safe';
