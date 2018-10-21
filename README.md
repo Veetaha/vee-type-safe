@@ -107,7 +107,7 @@ A shorthand for `{ [key: string]: T; }` type.
 
 ### `interface BasicFunctor`<TArgs, TRetval, TProps>`
 This interface implies a callable `BasicObject<TProps>`, where 
-`TArgs` is a tuple of argument types, `TRetVal` is the return type of this function.
+`TArgs` is a tuple of argument types, `TRetval` is the return type of this function.
 
 ### `type PrimitiveType`
 A set of all primitive types (`null` is treated as a primitive type).
@@ -126,7 +126,16 @@ casts like `value as any as T` when a simple `value as T` cast cannot be perform
 ### `typeAssert<T>(value): value is T`
 TypeScript type guard that always returns *true*.
 You may use it in an if statement to assert the proper type in the following code execution path.
-
+~~~typescript
+    import { typeAssert } from 'vee-type-safe';
+    const enum SomeEnum {
+        A = 0, B, C
+    }
+    const numb: number = 2;
+    if (!typeAssert<SomeEnum>(numb)) { return; }
+    numb; // deduced type is SomeEnum
+    
+~~~
 ### `assertNever(suspect: never)`
 This function is no-op, but it is useful to check whether you have
  handled all the cases and some code path is unreachable. TypeScript compiler will issue an error if you forward a value not of [`never` type](https://www.typescriptlang.org/docs/handbook/basic-types.html#never) to this function.
@@ -151,16 +160,6 @@ if (typeof num !== 'number'){
 }
 ~~~ 
 
-
-~~~typescript
-    import { typeAssert } from 'vee-type-safe';
-    const enum SomeEnum {
-        A = 0, B, C
-    }
-    const numb: number = 2;
-    if (!typeAssert<SomeEnum>(numb)) { return; }
-    numb; // deduced type is SomeEnum
-~~~
 
 ### `isBasicTypeName(suspect): suspect is BasicTypeName`
 Returns *true* if suspect is a string that is inside a set of `BasicTypeName` type set.
