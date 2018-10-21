@@ -68,6 +68,23 @@ Requires Typescript version `>= 3.0`.
     function isOddNumber(suspect: unknown): suspect is number {
         return typeof suspect === 'number' && suspect % 2; 
     }  
+    
+    // Type argument:
+    interface Human {
+        name: string;
+        id:   number;
+    }
+    const HumanTD = {
+        name: 'string',
+        id:   'number'
+    };
+    function tryUseHuman(maybeHuman: unknown) {
+        if (conforms<Human>(maybeHuman, HumanTD)) {
+            // maybeHuman is of type Human here
+            maybeHuman.name;
+            maybeHuman.id;
+        }
+    }
 ~~~
 ### `namespace Factory`
 This namespace provides handy functions that return `TypePredicate`s to use as type descriptions when calling `conforms(suspect, typeDescr)`.
@@ -185,13 +202,37 @@ Example taken from [here](https://www.npmjs.com/package/is-iso-date):
     isIsoDateString( '2015-02-21T00:52Z' );        // true
     isIsoDateString( '2015-02-21T00:52' );         // false
     isIsoDateString( '2015-02-21T00Z' );           // false
+    const someObj = {
+        date: '2015-02-21T00:52Z'
+    };
+    conforms(someObj, {
+        date: isIsoDateString   
+    }); // true
 ~~~
 
 ### Self explanatory functions
-All these functions take `unknown` type argument and return `suspect is number`, which is useful as a type guard.
+All these functions take `unknown` type argument and return `suspect is number`, which is useful as a type guard or when using as a type description.
 
 * `isInteger(suspect)`
 * `isPositiveInteger(suspect)`
 * `isPositiveNumber(suspect)`
 * `isZeroOrPositiveInteger(suspect)`
 * `isZeroOrPositiveNumber(suspect)`
+~~~typescript
+conforms(
+    {
+           prop: 'lala',
+           prop2: true,
+           obj: {
+               obj: [23, false]
+           },
+           someIDontCareProperty: null // excess properties are ok
+    },
+    {
+           prop: 'string',
+           prop2: 'boolean',
+           obj: {
+               obj: ['number', 'boolean'] // claims a fixed length tuple
+           }
+    }); // true
+~~~
