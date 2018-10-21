@@ -32,38 +32,41 @@ Requires Typescript version `>= 3.0`;
                    each `suspect[key]` conforms to `typeDescr[key]`. ([Excess properties in `suspect`
                    do not matter](https://en.wikipedia.org/wiki/Duck_typing)).
      * Else returns *false*.
- 
- ~~~typescript  
+     
+~~~typescript  
     conforms(
     {
            prop: 'lala',
            prop2: true,
            obj: {
-               obj: [23, 43]
+               obj: [23, false]
            },
-           someExcessProperty: null
+           someIDontCareProperty: null // excess properties are ok
     },
     {
            prop: 'string',
            prop2: 'boolean',
            obj: {
-               obj: ['number', 'number']
+               obj: ['number', 'boolean'] // claims a fixed length tuple
            }
     }); // true
     
     conforms(
     {
-         strArr: ['Pinkie', 'Promise'],
+         strArr: ['Pinkie', 'Promise', 'some', 'strings'],
          oneOf: 2
          custom: 43
     }, 
     {
-         prop: ['string'],
-         oneof: new Set([0, 1, 2, 3, 4])
-         custom: suspect => typeof suspect === 'number' && [58, 4, 43].includes(suspect)
+         strArr: ['string'],                   // claims an array of any length
+         oneOf: new Set(['boolean', 'number']),// claims to be one of these types
+         custom: isOddNumber                   // custom type predicate function
     }); // true
-     
- ~~~
+    
+    function isOddNumber(suspect: unknown): suspect is number {
+        return typeof suspect === 'number' && suspect % 2; 
+    }  
+~~~
 ### `namespace Factory`
 This namespace provides handy functions that return `TypePredicate`s to use as type descriptions when calling `conforms(suspect, typeDescr)`.
 `TypePredicate` is a function of type:
@@ -83,10 +86,10 @@ This namespace provides handy functions that return `TypePredicate`s to use as t
     }); // false
  ~~~
  
- ### `Factory.isIntegerWithinRange(min, max)`
+### `Factory.isIntegerWithinRange(min, max)`
  The same as `Factory.isNumberWithinRange(min, max)`, but its returned predicate returns *false* if forwarded argument is not an integer.  
  
-  ### `isOneOf<T>(possibleValues: T[])`
+### `isOneOf<T>(possibleValues: T[])`
   Returns a predicate that accepts a suspect of `any` type and matches it to
     one of the provided possible values by
     `possibleValues.includes(suspect)`. **Don't confuse it with `new Set(possibleValues)`** when forwarding as a type description to `conforms()` function, because `possibleValues` are not TDs, but values to match with.
@@ -98,9 +101,7 @@ This namespace provides handy functions that return `TypePredicate`s to use as t
  
 
 ### `interface BasicObject<T>`
-A shorthand for `{
-  [key: string]: T;  
-}` type
+A shorthand for `{ [key: string]: T; }` type.
 
 ### `interface BasicFunctor`<TArgs, TRetval, TProps>`
 This interface implies a callable `BasicObject<TProps>`, where 
@@ -147,17 +148,17 @@ Checks that suspect is a string and it conforms to ISO 8601 format.
 Internally uses ['is-iso-date'](https://www.npmjs.com/package/is-iso-date) npm package. Returns `suspect is string` as a type guard.
 Example taken from [here](https://www.npmjs.com/package/is-iso-date):
 ~~~typescript
- isIsoDateString(8888); // false
- isIsoDateString({
-    iso: '2015-02-21T00:52:43.822Z'
- }); // false
-isIsoDateString( '2015-02-21T00:52:43.822Z' ); // true
-isIsoDateString( '2015-02-21T00:52:43.822' );  // false
-isIsoDateString( '2015-02-21T00:52:43Z' );     // true
-isIsoDateString( '2015-02-21T00:52:43' );      // false
-isIsoDateString( '2015-02-21T00:52Z' );        // true
-isIsoDateString( '2015-02-21T00:52' );         // false
-isIsoDateString( '2015-02-21T00Z' );           // false
+    isIsoDateString(8888); // false
+    isIsoDateString({
+       iso: '2015-02-21T00:52:43.822Z'
+    }); // false
+    isIsoDateString( '2015-02-21T00:52:43.822Z' ); // true
+    isIsoDateString( '2015-02-21T00:52:43.822' );  // false
+    isIsoDateString( '2015-02-21T00:52:43Z' );     // true
+    isIsoDateString( '2015-02-21T00:52:43' );      // false
+    isIsoDateString( '2015-02-21T00:52Z' );        // true
+    isIsoDateString( '2015-02-21T00:52' );         // false
+    isIsoDateString( '2015-02-21T00Z' );           // false
 ~~~
 
 ### Self explanatory functions
