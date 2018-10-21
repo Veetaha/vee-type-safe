@@ -53,11 +53,13 @@ Requires Typescript version `>= 3.0`.
     
     conforms(
     {
+         arr: ['array', null, 'of any type', 8888 ],
          strArr: ['Pinkie', 'Promise', 'some', 'strings'],
-         oneOf: 2
+         oneOf: 2,
          custom: 43
     }, 
     {
+         arr: [],                              // claims an array of any type
          strArr: ['string'],                   // claims an array of any length
          oneOf: new Set(['boolean', 'number']),// claims to be one of these types
          custom: isOddNumber                   // custom type predicate function
