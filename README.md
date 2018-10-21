@@ -220,19 +220,12 @@ All these functions take `unknown` type argument and return `suspect is number`,
 * `isZeroOrPositiveNumber(suspect)`
 ~~~typescript
 conforms(
-    {
-           prop: 'lala',
-           prop2: true,
-           obj: {
-               obj: [23, false]
-           },
-           someIDontCareProperty: null // excess properties are ok
-    },
-    {
-           prop: 'string',
-           prop2: 'boolean',
-           obj: {
-               obj: ['number', 'boolean'] // claims a fixed length tuple
-           }
-    }); // true
+{
+    id: 2,
+    volume: 22.5
+},
+{
+    id:    isPositiveInteger,
+    money: isZeroOrPositiveNumber
+}); // true
 ~~~
