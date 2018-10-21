@@ -95,7 +95,7 @@ export function conforms<T = unknown>(suspect: unknown, typeDescr: TypeDescripti
             return false;
         }
         if (!typeDescr.length) {
-            throw new Error('type description array requires at least one item');
+            return true;
         }
         if (typeDescr.length === 1) {
             return suspect.every((item: unknown) => conforms(item, typeDescr[0]));

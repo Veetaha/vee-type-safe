@@ -55,6 +55,11 @@ describe('conforms', () => {
             ['boolean', 'object', 'number', 'string']
         ));
     });
+    it ('should return true if type description is an empty array, and suspect is array of any type', () => {
+        assert.isTrue(conforms([1, 2, null, false], []));
+        assert.isFalse(conforms({ someObj: true}, []));
+        assert.isTrue(conforms([], []));
+    });
 
     it('should take empty arrays and empty objects apart', () => {
         assert.isTrue(conforms([], ['string']));

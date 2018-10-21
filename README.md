@@ -27,7 +27,7 @@ Requires Typescript version `>= 3.0`;
                    TD at `typeDescr[0]`.
         * If `typeDescr.length > 1`. Returns *true* if `suspect.length === typeDescr.length`
                    and each `suspect[i]` conforms to `typeDescr[i]` type description.
-        * If `typeDescr.length === 0`. Throws Error.
+        * If `typeDescr.length === 0`. Returns *true*.
      * If `isBasicObject(typeDescr)`. Returns *true* if `isBasicObject(suspect)` and
                    each `suspect[key]` conforms to `typeDescr[key]`. ([Excess properties in `suspect`
                    do not matter](https://en.wikipedia.org/wiki/Duck_typing)).
