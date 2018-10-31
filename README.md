@@ -34,57 +34,59 @@ Requires Typescript version `>= 3.0`.
      * Else returns *false*.
      
 ~~~typescript  
-    conforms(
-    {
-           prop: 'lala',
-           prop2: true,
-           obj: {
-               obj: [23, false]
-           },
-           someIDontCareProperty: null // excess properties are ok
-    },
-    {
-           prop: 'string',
-           prop2: 'boolean',
-           obj: {
-               obj: ['number', 'boolean'] // claims a fixed length tuple
-           }
-    }); // true
-    
-    conforms(
-    {
-         arr: ['array', null, 'of any type', 8888 ],
-         strArr: ['Pinkie', 'Promise', 'some', 'strings'],
-         oneOf: 2,
-         custom: 43
-    }, 
-    {
-         arr: [],                              // claims an array of any type
-         strArr: ['string'],                   // claims an array of any length
-         oneOf: new Set(['boolean', 'number']),// claims to be one of these types
-         custom: isOddNumber                   // custom type predicate function
-    }); // true
-    
-    function isOddNumber(suspect: unknown): suspect is number {
-        return typeof suspect === 'number' && suspect % 2; 
-    }  
-    
-    // Type argument:
-    interface Human {
-        name: string;
-        id:   number;
+import { conforms } from 'vee-type-safe';
+
+conforms(
+{
+       prop: 'lala',
+       prop2: true,
+       obj: {
+           obj: [23, false]
+       },
+       someIDontCareProperty: null // excess properties are ok
+},
+{
+       prop: 'string',
+       prop2: 'boolean',
+       obj: {
+           obj: ['number', 'boolean'] // claims a fixed length tuple
+       }
+}); // true
+
+conforms(
+{
+     arr: ['array', null, 'of any type', 8888 ],
+     strArr: ['Pinkie', 'Promise', 'some', 'strings'],
+     oneOf: 2,
+     custom: 43
+}, 
+{
+     arr: [],                              // claims an array of any type
+     strArr: ['string'],                   // claims an array of any length
+     oneOf: new Set(['boolean', 'number']),// claims to be one of these types
+     custom: isOddNumber                   // custom type predicate function
+}); // true
+
+function isOddNumber(suspect: unknown): suspect is number {
+    return typeof suspect === 'number' && suspect % 2; 
+}  
+
+// Type argument:
+interface Human {
+    name: string;
+    id:   number;
+}
+const HumanTD = {
+    name: 'string',
+    id:   'number'
+};
+function tryUseHuman(maybeHuman: unknown) {
+    if (conforms<Human>(maybeHuman, HumanTD)) {
+        // maybeHuman is of type Human here
+        maybeHuman.name;
+        maybeHuman.id;
     }
-    const HumanTD = {
-        name: 'string',
-        id:   'number'
-    };
-    function tryUseHuman(maybeHuman: unknown) {
-        if (conforms<Human>(maybeHuman, HumanTD)) {
-            // maybeHuman is of type Human here
-            maybeHuman.name;
-            maybeHuman.id;
-        }
-    }
+}
 ~~~
 ### `namespace Factory`
 This namespace provides handy functions that return `TypePredicate`s to use as type descriptions when calling `conforms(suspect, typeDescr)`.
@@ -96,13 +98,15 @@ This namespace provides handy functions that return `TypePredicate`s to use as t
     
  Returns a predicate that returns *true* if its argument is a number within the range \[`min`, `max`] or \[`max`, `min`] if `min > max`.
  ~~~typescript
-    conforms(
-    {
-        num: 32
-    },
-    {
-        num: Factory.isNumberWithinRange(0, 5)    
-    }); // false
+ import { Factory, conforms } from 'vee-type-safe';
+ 
+ conforms(
+ {
+     num: 32
+ },
+ {
+     num: Factory.isNumberWithinRange(0, 5)    
+ }); // false
  ~~~
  
 ### `Factory.isIntegerWithinRange(min, max)`
@@ -113,9 +117,11 @@ This namespace provides handy functions that return `TypePredicate`s to use as t
     one of the provided possible values by
     `possibleValues.includes(suspect)`. **Don't confuse it with `new Set(possibleValues)`** when forwarding as a type description to `conforms()` function, because `possibleValues` are not TDs, but values to match with.
 ~~~typescript
-    conforms(2, isOneOf([0, 1, 2, 3])); // true
-    conforms(2, new Set([0, 1, 2, 3])); // compile error
-    // Set<numbers> is not a Set<TypeDescritpion>
+import { conforms } from 'vee-type-safe';
+
+conforms(2, isOneOf([0, 1, 2, 3])); // true
+conforms(2, new Set([0, 1, 2, 3])); // compile error
+// Set<numbers> is not a Set<TypeDescritpion>
 ~~~ 
  
 
@@ -157,6 +163,7 @@ You may use it in an if statement to assert the proper type in the following cod
 This function is no-op, but it is useful to check whether you have
  handled all the cases and some code path is unreachable. TypeScript compiler will issue an error if you forward a value not of [`never` type](https://www.typescriptlang.org/docs/handbook/basic-types.html#never) to this function.
 ~~~typescript
+import { assertNever } from 'vee-type-safe';
 const enum Enum {
     A, B, C
 }
@@ -181,9 +188,11 @@ if (typeof num !== 'number'){
 ### `isBasicTypeName(suspect): suspect is BasicTypeName`
 Returns *true* if suspect is a string that is inside a set of `BasicTypeName` type set.
 ~~~typescript
-    isBasicTypeName('null');    // false
-    isBasicTypeName(' number'); // false
-    isBasicTypeName('number');  // true
+import { isBasicTypeName } from 'vee-type-safe';
+
+isBasicTypeName('null');    // false
+isBasicTypeName(' number'); // false
+isBasicTypeName('number');  // true
 ~~~
 
 ### `isIsoDateString(suspect: unknown)`
@@ -191,23 +200,24 @@ Checks that suspect is a string and it conforms to ISO 8601 format.
 Internally uses ['is-iso-date'](https://www.npmjs.com/package/is-iso-date) npm package. Returns `suspect is string` as a type guard.
 Example taken from [here](https://www.npmjs.com/package/is-iso-date):
 ~~~typescript
-    isIsoDateString(8888); // false
-    isIsoDateString({
-       iso: '2015-02-21T00:52:43.822Z'
-    }); // false
-    isIsoDateString( '2015-02-21T00:52:43.822Z' ); // true
-    isIsoDateString( '2015-02-21T00:52:43.822' );  // false
-    isIsoDateString( '2015-02-21T00:52:43Z' );     // true
-    isIsoDateString( '2015-02-21T00:52:43' );      // false
-    isIsoDateString( '2015-02-21T00:52Z' );        // true
-    isIsoDateString( '2015-02-21T00:52' );         // false
-    isIsoDateString( '2015-02-21T00Z' );           // false
-    const someObj = {
-        date: '2015-02-21T00:52Z'
-    };
-    conforms(someObj, {
-        date: isIsoDateString   
-    }); // true
+import { isIsoDateString, conforms } from 'vee-type-safe';
+isIsoDateString(8888); // false
+isIsoDateString({
+   iso: '2015-02-21T00:52:43.822Z'
+}); // false
+isIsoDateString( '2015-02-21T00:52:43.822Z' ); // true
+isIsoDateString( '2015-02-21T00:52:43.822' );  // false
+isIsoDateString( '2015-02-21T00:52:43Z' );     // true
+isIsoDateString( '2015-02-21T00:52:43' );      // false
+isIsoDateString( '2015-02-21T00:52Z' );        // true
+isIsoDateString( '2015-02-21T00:52' );         // false
+isIsoDateString( '2015-02-21T00Z' );           // false
+const someObj = {
+    date: '2015-02-21T00:52Z'
+};
+conforms(someObj, {
+    date: isIsoDateString   
+}); // true
 ~~~
 
 ### Self explanatory functions
@@ -219,6 +229,7 @@ All these functions take `unknown` type argument and return `suspect is number`,
 * `isZeroOrPositiveInteger(suspect)`
 * `isZeroOrPositiveNumber(suspect)`
 ~~~typescript
+import { conforms } from 'vee-type-safe';
 conforms(
 {
     id: 2,
@@ -228,4 +239,20 @@ conforms(
     id:    isPositiveInteger,
     money: isZeroOrPositiveNumber
 }); // true
+~~~
+
+
+### `defaultIfNotConforms<T>(typeDescr, suspect, defaultVal): T`
+Checks whether `suspect` conforms to the given type description (`typeDescr`) and returns it if `conforms(suspect, typeDescr)`, otherwise returns `defaultVal`.
+* `typeDescr: TypeDescription` - TD suspect may conform to. `defaultVal` **must** conform to this TD
+* `suspect: unknown` value to provide default for
+* `defaultVal: T` value that conforms to `typeDescr` that is returned by this function if `!conforms(suspect, typeDescr)`
+~~~typescript
+import { defaultIfNotConforms } from 'vee-type-safe';
+
+const idStr = '22';
+const id = defaultIfNotConforms()
+
+
+
 ~~~

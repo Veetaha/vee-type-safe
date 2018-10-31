@@ -149,6 +149,20 @@ export function isIsoDateString(suspect: unknown): suspect is string {
     return typeof suspect === 'string' && isISODate(suspect);
 }
 
+/**
+ * Checks whether suspect conforms to the given type description and returns it if yes,
+ * otherwise returns the default value.
+ * @param typeDescr Type description suspect may conform to, defaultVal MUST conform to this TD
+ * @param suspect Value of unknown type to provide default value for
+ * @param defaultVal Value that conforms to typeDescr TD that is returned by this function if !conforms(suspect, typeDescr)
+ */
+export function defaultIfNotConforms<T>(
+    typeDescr: TypeDescription, suspect: unknown, defaultVal: T
+): T {
+    return conforms<T>(suspect, typeDescr) ? suspect : defaultVal;
+}
+
+
 export namespace Factory {
     /**
      * Returns a predicate which checks its suspect to be a number within the range [min, max].
@@ -185,5 +199,4 @@ export namespace Factory {
     export function isOneOf<T>(possibleValues: T[]){
         return (suspect: any): suspect is T => possibleValues.includes(suspect);
     }
-
 }

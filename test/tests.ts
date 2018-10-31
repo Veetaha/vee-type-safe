@@ -1,6 +1,6 @@
 import { describe, it }  from 'mocha';
 import { assert }        from 'chai';
-import { conforms, TypeDescription  } from '../index';
+import { conforms, defaultIfNotConforms, isPositiveInteger, TypeDescription  } from '../index';
 describe('conforms', () => {
     it('should work as typeof when being forwarded a primitive type name as type description', () => {
         // tslint:disable-next-line no-magic-numbers
@@ -104,3 +104,36 @@ describe('conforms', () => {
         }));
     });
 });
+
+describe('defaultIfNotConforms', () => {
+    it(`should return default value if suspect doesn't conform to given TD`, () => {
+        assert.equal(
+            defaultIfNotConforms('number', null, 1),
+            1
+        );
+        const defaultObj = {ojb: 'str'};
+        assert.equal(
+            defaultIfNotConforms(
+            { ojb: 'string'}, { jjj: 'st'}, defaultObj
+            ),
+            defaultObj
+        );
+        assert.equal(
+            defaultIfNotConforms(isPositiveInteger, 0, 78),
+            78
+        );
+    });
+
+    it(`should return suspect value if it conforms to given TD`, () => {
+       assert.equal(defaultIfNotConforms(
+           'string', 'sus', 'strdefault'
+           ),
+           'sus'
+       );
+       assert.equal(defaultIfNotConforms(
+           isPositiveInteger, 32, 1
+           ),32
+       );
+    });
+});
+
