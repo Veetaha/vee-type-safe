@@ -157,11 +157,20 @@ export function exactlyConforms<T = unknown>(suspect: unknown, typeDescr: TypeDe
     if (!isBasicObject(suspect) || Array.isArray(suspect)) {
         return false;
     }
-    const suspectPropsLength = Object.getOwnPropertyNames(suspect).length;
-    const tdProps            = Object.getOwnPropertyNames(typeDescr);
-    return tdProps.length === suspectPropsLength &&
-           tdProps.every(propName => exactlyConforms(suspect[propName], typeDescr[propName])
-    );
+    const susProps = Object.getOwnPropertyNames(suspect);
+    const tdProps  = Object.getOwnPropertyNames(typeDescr);
+    let i = susProps.length;
+    return tdProps.length >= susProps.length &&
+        tdProps.every(propName => {
+            if (propName in suspect){
+                if (!exactlyConforms(suspect[propName], typeDescr[propName])){
+                    return false;
+                }
+                --i;
+                return true;
+            }
+            return exactlyConforms(undefined, typeDescr[propName]);
+        }) && !i;
 }
 
 

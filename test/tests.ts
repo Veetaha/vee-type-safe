@@ -1,6 +1,6 @@
 import { describe, it }  from 'mocha';
 import { assert }        from 'chai';
-import { conforms, defaultIfNotConforms, isPositiveInteger, TypeDescription  } from '../index';
+import { conforms, defaultIfNotConforms, isPositiveInteger, TypeDescription, exactlyConforms, optional  } from '../index';
 describe('conforms', () => {
     it('should work as typeof when being forwarded a primitive type name as type description', () => {
         // tslint:disable-next-line no-magic-numbers
@@ -137,3 +137,50 @@ describe('defaultIfNotConforms', () => {
     });
 });
 
+
+describe('exactlyConforms', () => {
+    it(`should return false for excess properties`, () => {
+        assert.isFalse(exactlyConforms(
+        {
+            prop: 1,
+            ex: true
+        },
+        {
+            prop: 'number'
+        }
+        ));
+    });
+
+    it(`should return true if TD allows optional properties`, () => {
+        assert.isTrue(exactlyConforms(
+        {
+            prop: 's'
+        },
+        {
+            prop: s => typeof s === 'string' && s === 's',
+            opt: optional('number')
+        }  
+        ));
+        assert.isTrue(exactlyConforms(
+        {
+            prop: 's'
+        },
+        {
+            prop: s => typeof s === 'string' && s === 's',
+            opt: optional('number'),
+            opt2: optional('string')
+        }  
+        ));
+
+        assert.isTrue(exactlyConforms(
+        {
+            prop: 's',
+            opt: 23
+        },
+        {
+            prop: s => typeof s === 'string' && s === 's',
+            opt: optional('number')
+        }  
+        ));
+    });
+});
