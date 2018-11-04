@@ -110,13 +110,15 @@ exactlyConforms(suspect, td) === false;
 
 
 
-### `namespace Factory`
-This namespace provides handy functions that return `TypePredicate`s to use as type descriptions when calling `conforms(suspect, typeDescr)`.
+### Factory functions
+ (previously were in namespace Factory)
+  
+Factory functions return `TypePredicate`s to use as type descriptions when calling `conforms(suspect, typeDescr)`.
 `TypePredicate` is a function of type:
 
 `(suspect: unknown): boolean`
 
-### `Factory.isNumberWithinRange(min, max)`
+### `isNumberWithinRange(min, max)`
     
  Returns a predicate that returns *true* if its argument is a number within the range \[`min`, `max`] or \[`max`, `min`] if `min > max`.
  ~~~typescript
@@ -131,10 +133,10 @@ This namespace provides handy functions that return `TypePredicate`s to use as t
  }); // false
  ~~~
  
-### `Factory.isIntegerWithinRange(min, max)`
+### `isIntegerWithinRange(min, max)`
  The same as `Factory.isNumberWithinRange(min, max)`, but its returned predicate returns *false* if forwarded argument is not an integer.
  
-### `Factory.optional(typeDescr: TypeDescription)`
+### `optional(typeDescr: TypeDescription)`
 Retuns `TypePredicate` which retuns `typeof suspect === 'undefined' || conforms(typeDescr)`, which you may use as a type description for optional object properties. This predicate is effectively the same as calling `conforms(suspect, new Set<TypeDescription>([typeDescr, 'undefined']));`
 ~~~typescript
 import { conforms, Factory } from 'vee-type-safe';
@@ -169,7 +171,16 @@ conforms(2, isOneOf([0, 1, 2, 3])); // true
 conforms(2, new Set([0, 1, 2, 3])); // compile error
 // Set<numbers> is not a Set<TypeDescritpion>
 ~~~ 
+
+### `makeTdWithOptionalProps(srcTypeDescr: TypeDescrObjMap)`
+Returns a new `TypeDescrObjMap` (which is assignable to `TypeDescription`) object that is composed of `srcTypeDescr` properties wrapped as
  
+ `result[propName] = optional(srcTypeDescr[propName])`
+ 
+ for each `propName` in `srcTypeDescr` own property names.
+ 
+ 
+### Type definitions
 
 ### `interface BasicObject<T>`
 A shorthand for `{ [key: string]: T; }` type.

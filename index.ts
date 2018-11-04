@@ -226,50 +226,59 @@ export function defaultIfNotConforms<T>(
 }
 
 
-export namespace Factory {
 
-    /**
-     * A shorthand for `conforms(suspect, new Set<TypeDescription>('undefined', typeDescr))`
-     * @param typeDescr
-     */
-    export function optional<T>(typeDescr: TypeDescription) {
-        return (suspect: unknown): suspect is T =>  typeof suspect === 'undefined' ||
-                                                    conforms(suspect, typeDescr);
-    }
+export function makeTdWithOptionalProps(typeDescr: TypeDescrObjMap) {
+    return Object.getOwnPropertyNames(typeDescr)
+                 .reduce((newTd, propName) => {
+                        newTd[propName] = optional(typeDescr[propName]);
+                        return newTd;
+                     },
+                     {} as TypeDescrObjMap
+                 );
+}
 
-    /**
-     * Returns a predicate which checks its suspect to be a number within the range [min, max].
-     * @param min Minimum value suspect can be.
-     * @param max Maximum value suspect can be.
-     */
-    export function isNumberWithinRange(min: number, max: number) {
-        return (suspect: unknown): suspect is number => typeof suspect === 'number' &&
-            (min > max
-                ? (max <= suspect && suspect <= min)
-                : (min <= suspect && suspect <= max));
-    }
 
-    /**
-     * Returns a predicate which checks its suspect to be an integer within the range [min, max].
-     * @param min Minimum value suspect can be.
-     * @param max Maximum value suspect can be.
-     */
-    export function isIntegerWithinRange(min: number, max: number) {
-        return (suspect: unknown): suspect is number => isInteger(suspect) &&
-            (min > max
-                ? (max <= suspect && suspect <= min)
-                : (min <= suspect && suspect <= max));
-    }
+/**
+ * A shorthand for `conforms(suspect, new Set<TypeDescription>('undefined', typeDescr))`
+ * @param typeDescr
+ */
+export function optional<T>(typeDescr: TypeDescription) {
+    return (suspect: unknown): suspect is T =>  typeof suspect === 'undefined' ||
+                                                conforms(suspect, typeDescr);
+}
 
-    /**
-     * Returns a predicate that accepts a suspect of any type and matches it to
-     * one of the provided possible values by
-     * ~~~typescript
-     * possibleValues.includes(suspect)
-     * ~~~
-     * @param possibleValues Array with values of any type, suspect is matched to.
-     */
-    export function isOneOf<T>(possibleValues: T[]){
-        return (suspect: any): suspect is T => possibleValues.includes(suspect);
-    }
+/**
+ * Returns a predicate which checks its suspect to be a number within the range [min, max].
+ * @param min Minimum value suspect can be.
+ * @param max Maximum value suspect can be.
+ */
+export function isNumberWithinRange(min: number, max: number) {
+    return (suspect: unknown): suspect is number => typeof suspect === 'number' &&
+        (min > max
+            ? (max <= suspect && suspect <= min)
+            : (min <= suspect && suspect <= max));
+}
+
+/**
+ * Returns a predicate which checks its suspect to be an integer within the range [min, max].
+ * @param min Minimum value suspect can be.
+ * @param max Maximum value suspect can be.
+ */
+export function isIntegerWithinRange(min: number, max: number) {
+    return (suspect: unknown): suspect is number => isInteger(suspect) &&
+        (min > max
+            ? (max <= suspect && suspect <= min)
+            : (min <= suspect && suspect <= max));
+}
+
+/**
+ * Returns a predicate that accepts a suspect of any type and matches it to
+ * one of the provided possible values by
+ * ~~~typescript
+ * possibleValues.includes(suspect)
+ * ~~~
+ * @param possibleValues Array with values of any type, suspect is matched to.
+ */
+export function isOneOf<T>(possibleValues: T[]){
+    return (suspect: any): suspect is T => possibleValues.includes(suspect);
 }
