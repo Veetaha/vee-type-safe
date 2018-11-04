@@ -172,16 +172,35 @@ export function isInteger(suspect: unknown): suspect is number {
 export function isPositiveInteger(suspect: unknown): suspect is number {
     return isInteger(suspect) && suspect > 0;
 }
+export function isNegativeInteger(suspect: unknown): suspect is number {
+    return typeof isInteger(suspect) && suspect < 0
+}
 export function isPositiveNumber(suspect: unknown): suspect is number {
     return typeof suspect === 'number' && suspect > 0;
+}
+export function isNegativeNumber(suspect: unknown): suspect is number {
+    return typeof suspect === 'number' && suspect < 0;
 }
 export function isZeroOrPositiveInteger(suspect: unknown): suspect is number {
     return isPositiveInteger(suspect) || suspect === 0;
 }
-
+export function isZeroOrNegativeInteger(suspect: unknown): suspect is number {
+    return isNegativeInteger(suspect) || suspect === 0;
+}
 export function isZeroOrPositiveNumber(suspect: unknown): suspect is number {
     return isPositiveNumber(suspect) || suspect === 0;
 }
+export function isZeroOrNegativeNumber(suspect: unknown): suspect is number {
+    return isNegativeNumber(suspect) || suspect === 0;
+}
+export function isZero(suspect: unknown): suspect is 0 {
+    return typeof suspect === 'number' && suspect === 0;
+}
+
+
+
+
+
 
 /**
  * Checks that suspect is a string and it conforms to ISO 8601 format.
@@ -208,6 +227,16 @@ export function defaultIfNotConforms<T>(
 
 
 export namespace Factory {
+
+    /**
+     * A shorthand for new Set[typeDescr, 'undefined']
+     * @param typeDescr
+     */
+    export function optional<T>(typeDescr: TypeDescription) {
+        return (suspect: unknown): suspect is T =>  typeof suspect === 'undefined' ||
+                                                    conforms(suspect, typeDescr);
+    }
+
     /**
      * Returns a predicate which checks its suspect to be a number within the range [min, max].
      * @param min Minimum value suspect can be.

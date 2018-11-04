@@ -132,7 +132,31 @@ This namespace provides handy functions that return `TypePredicate`s to use as t
  ~~~
  
 ### `Factory.isIntegerWithinRange(min, max)`
- The same as `Factory.isNumberWithinRange(min, max)`, but its returned predicate returns *false* if forwarded argument is not an integer.  
+ The same as `Factory.isNumberWithinRange(min, max)`, but its returned predicate returns *false* if forwarded argument is not an integer.
+ 
+### `Factory.optional(typeDescr: TypeDescription)`
+Retuns `TypePredicate` which retuns `typeof suspect === 'undefined' || conforms(typeDescr)`, which you may use as a type description for optional object properties. This predicate is effectively the same as calling `conforms(suspect, new Set<TypeDescription>([typeDescr, 'undefined']));`
+~~~typescript
+import { conforms, Factory } from 'vee-type-safe';
+conforms(
+{
+    prop: 'str'
+},{
+    prop: Factory.optional('number')
+}) 
+// return false because the property is not undefined, 
+// but doesn't conform to 'number' type
+conforms(
+{
+    prop: -23
+},{
+    prop: Factory.optional(isNegativeInteger)
+});
+// returns true because the property is not undefined
+// and conforms to isNegativeInteger restriction
+~~~
+ 
+   
  
 ### `isOneOf<T>(possibleValues: T[])`
   Returns a predicate that accepts a suspect of `any` type and matches it to
@@ -247,9 +271,13 @@ All these functions take `unknown` type argument and return `suspect is number`,
 
 * `isInteger(suspect)`
 * `isPositiveInteger(suspect)`
+* `isNegativeInteger(suspect)`
 * `isPositiveNumber(suspect)`
+* `isNegativeNumber(suspect)`
 * `isZeroOrPositiveInteger(suspect)`
+* `isZeroOrNegativeInteger(suspect)`
 * `isZeroOrPositiveNumber(suspect)`
+* `isZeroOrNegativeNumber(suspect)`
 ~~~typescript
 import { conforms } from 'vee-type-safe';
 conforms(
