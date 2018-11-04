@@ -173,7 +173,7 @@ export function isPositiveInteger(suspect: unknown): suspect is number {
     return isInteger(suspect) && suspect > 0;
 }
 export function isNegativeInteger(suspect: unknown): suspect is number {
-    return typeof isInteger(suspect) && suspect < 0
+    return isInteger(suspect) && suspect < 0
 }
 export function isPositiveNumber(suspect: unknown): suspect is number {
     return typeof suspect === 'number' && suspect > 0;
@@ -229,7 +229,7 @@ export function defaultIfNotConforms<T>(
 export namespace Factory {
 
     /**
-     * A shorthand for new Set[typeDescr, 'undefined']
+     * A shorthand for `conforms(suspect, new Set<TypeDescription>('undefined', typeDescr))`
      * @param typeDescr
      */
     export function optional<T>(typeDescr: TypeDescription) {
