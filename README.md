@@ -8,7 +8,7 @@ Requires Typescript version `>= 3.0`.
 ## API
 
 ### `conforms<T>(suspect, typeDescr): suspect is T`
-  **You will use this function 95% of the time interacting with this library.**
+  **You will use this function or `exactlyConforms()` 95% of the time interacting with this library.**
   It is a two in one: runtime type checker and static type guard.   
   Determines whether the specified suspect type satisfies the restriction of the given type
   description (TD). (Seeing example below first may be helpful).
@@ -88,6 +88,27 @@ function tryUseHuman(maybeHuman: unknown) {
     }
 }
 ~~~
+
+### `exactlyConforms<T>(suspect, typeDescr): suspect is T`
+This function is the same as `conforms()`, but returns *false* for suspect object that has excess properties (those, that are not present in type description object).
+~~~typescript
+conforms(23, 'number') === exactlyConforms(23, 'number');
+const suspect = {
+    listedInt: 7,
+    listedStr: 'readme',
+    unlistedProp: ['some', 'excess', 'prop', 'value']
+}
+const td: TypeDescription = {
+    listedInt: isPositiveInteger,
+    listedStr: 'string'
+}
+conforms(suspect, td) === true;
+exactlyConforms(suspect, td) === false;
+~~~
+
+
+
+
 ### `namespace Factory`
 This namespace provides handy functions that return `TypePredicate`s to use as type descriptions when calling `conforms(suspect, typeDescr)`.
 `TypePredicate` is a function of type:

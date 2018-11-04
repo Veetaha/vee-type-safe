@@ -122,6 +122,50 @@ export function conforms<T = unknown>(suspect: unknown, typeDescr: TypeDescripti
     ));
 }
 
+export function exactlyConforms<T = unknown>(suspect: unknown, typeDescr: TypeDescription)
+    : suspect is T {
+    //
+    if (typeof typeDescr === 'string') {
+        return typeof suspect === typeDescr;
+    }
+    if (typeof typeDescr === 'function') {
+        return Boolean((typeDescr as TypePredicate)(suspect));
+    }
+    if (Array.isArray(typeDescr)) {
+        if (!Array.isArray(suspect)) {
+            return false;
+        }
+        if (!typeDescr.length) {
+            return true;
+        }
+        if (typeDescr.length === 1) {
+            return suspect.every((item: unknown) => exactlyConforms(item, typeDescr[0]));
+        }
+        if (typeDescr.length !== suspect.length) {
+            return false;
+        }
+        return typeDescr.every((itemDescr, i) => exactlyConforms(suspect[i], itemDescr));
+    }
+    if (typeDescr instanceof Set) {
+        for (const possibleTypeDescr of typeDescr) {
+            if (exactlyConforms(suspect, possibleTypeDescr)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    if (!isBasicObject(suspect) || Array.isArray(suspect)) {
+        return false;
+    }
+    const suspectPropsLength = Object.getOwnPropertyNames(suspect).length;
+    const tdProps            = Object.getOwnPropertyNames(typeDescr);
+    return tdProps.length === suspectPropsLength &&
+           tdProps.every(propName => exactlyConforms(suspect[propName], typeDescr[propName])
+    );
+}
+
+
+
 export function isInteger(suspect: unknown): suspect is number {
     return typeof suspect === 'number' && Number.isInteger(suspect);
 }
