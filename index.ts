@@ -162,14 +162,11 @@ export function exactlyConforms<T = unknown>(suspect: unknown, typeDescr: TypeDe
     let i = susProps.length;
     return tdProps.length >= susProps.length &&
         tdProps.every(propName => {
-            if (propName in suspect){
-                if (!exactlyConforms(suspect[propName], typeDescr[propName])){
-                    return false;
-                }
-                --i;
-                return true;
+            if (!exactlyConforms(suspect[propName], typeDescr[propName])){
+                return false;
             }
-            return exactlyConforms(undefined, typeDescr[propName]);
+            i -= Number(propName in suspect);
+            return true;
         }) && !i;
 }
 
@@ -290,4 +287,227 @@ export function isIntegerWithinRange(min: number, max: number) {
  */
 export function isOneOf<T>(possibleValues: T[]){
     return (suspect: any): suspect is T => possibleValues.includes(suspect);
+}
+
+interface FailedMatchArgument {
+    path:        string[], 
+    expectedTd:  TypeDescription, 
+    actualValue: unknown
+}
+
+export class MatchInfo {
+    path?:        string[];
+    expectedTd?:  TypeDescription;
+    actualValue?: unknown;
+
+    get matched() { return !this.path; }
+    constructor(failure?: FailedMatchArgument) { 
+        if (failure) {
+            this.path        = failure.path;
+            this.expectedTd  = failure.expectedTd;
+            this.actualValue = failure.actualValue;
+        }
+    }
+
+    private static isJsIdentifier(suspect: string) {
+        return /^[\w$_][\w\d$_]*$/.test(suspect);
+    }
+    
+    pathString() {
+        return !this.path ? 'root' : this.path.reduce((result, currentPart) =>  
+            result                                +
+            MatchInfo.isJsIdentifier(currentPart) ?
+            `.${currentPart}`                     :
+            Number.isNaN(+currentPart)            ? 
+            `['${currentPart}']`                  :
+            `[${+currentPart}]`
+        , 'root');
+    }
+    toErrorString() {
+        if (!this.matched) {
+            return '';
+        }
+        try {
+            return `Value (${JSON.stringify(this.actualValue)}) at path '${
+                    this.pathString()
+                }' doesn't conform to the given type description (\n${
+                    stringifyTd(this.expectedTd!)
+                })`
+        } catch (err) {
+            return `Value at path '${
+                this.pathString()
+            }' doesn't conform to the given type description (\n${
+                stringifyTd(this.expectedTd!)
+            })`
+        }
+    }
+}
+export type FailedMatchInfo = Required<MatchInfo>;
+
+export class ExactMatchInfo extends MatchInfo {
+    constructor(failedMatchArgument?: FailedMatchArgument){
+        super(failedMatchArgument);
+    }
+    toErrorString() {
+        if (!this.matched) {
+            return '';
+        }
+        try {
+            return `Value (${JSON.stringify(this.actualValue)}) at path '${
+                    this.pathString()
+                }' doesn't exactly conform to the given type description (\n${
+                    stringifyTd(this.expectedTd!)
+                })`
+        } catch (err) {
+            return `Value at path '${
+                this.pathString()
+            }' doesn't exactly conform to the given type description (\n${
+                stringifyTd(this.expectedTd!)
+            })`
+        }
+    }
+}
+
+
+class TypeMatcher {
+    private static readonly TrueMatch = new MatchInfo;
+
+    protected currentPath: string[] = [];
+
+    protected falseMatch(actualValue: unknown, expectedTd: TypeDescription) {
+        return new MatchInfo({ actualValue, expectedTd, path: this.currentPath });
+    }
+
+    protected trueMatch() {
+        return TypeMatcher.TrueMatch;
+    }
+
+    protected matchArray(
+        suspect: unknown[], 
+        getTd: (index: number) => TypeDescription
+    ) {
+        for (let i = 0; i < suspect.length; ++i) {
+            this.currentPath.push(String(i));
+            const result = this.match(suspect[i], getTd(i));
+            if (!result.matched) {
+                return result
+            }
+            this.currentPath.pop();
+        }
+        return this.trueMatch();
+    }
+
+    protected matchSet(suspect: unknown, typeDescr: TypeDescrSet) {
+        for (const possibleTypeDescr of typeDescr) {
+            const matchRes = this.match(suspect, possibleTypeDescr)
+            if (!matchRes.matched) {
+                return matchRes;
+            }
+        }
+        return this.trueMatch();
+    }
+
+    protected matchObject(suspect: BasicObject, typeDescr: TypeDescrObjMap) {
+        for (const propName of Object.getOwnPropertyNames(typeDescr)) {
+            this.currentPath.push(propName);
+            const matchRes = this.match(suspect[propName], typeDescr[propName]);
+            if (!matchRes.matched) {
+                return matchRes;
+            }
+            this.currentPath.pop();
+        }
+        return this.trueMatch();
+    }
+    match(suspect: unknown, typeDescr: TypeDescription): MatchInfo {
+        if (typeof typeDescr === 'string') {
+            return typeof suspect === typeDescr ?
+                this.trueMatch() : this.falseMatch(suspect, typeDescr);
+        }
+        if (typeof typeDescr === 'function') {
+            return (typeDescr as TypePredicate)(suspect) ?
+                this.trueMatch() : this.falseMatch(suspect, typeDescr);
+        }
+        if (Array.isArray(typeDescr)) {
+            if (!Array.isArray(suspect)) {
+                return this.falseMatch(suspect, typeDescr);
+            }
+            if (!typeDescr.length) {
+                return this.trueMatch();
+            }
+            if (typeDescr.length === 1) {
+                return this.matchArray(suspect, () => typeDescr[0]);
+            }
+            return typeDescr.length !== suspect.length ?
+                   this.falseMatch(suspect, typeDescr) :
+                   this.matchArray(suspect, i => typeDescr[i]);
+        }
+        if (typeDescr instanceof Set) {
+            return this.matchSet(suspect, typeDescr);
+        }
+        if (!isBasicObject(suspect) || Array.isArray(suspect)) {
+            return this.falseMatch(suspect, typeDescr);
+        }
+        return this.matchObject(suspect, typeDescr);
+    }
+
+}
+
+class ExactTypeMatcher extends TypeMatcher {
+    private static readonly TrueExactMatch = new ExactMatchInfo;
+
+    protected matchObject(suspect: BasicObject, typeDescr: TypeDescrObjMap) {
+        const susProps = Object.getOwnPropertyNames(suspect);
+        const tdProps  = Object.getOwnPropertyNames(typeDescr);
+        let i = susProps.length;
+        if (tdProps.length < susProps.length) {
+            return this.falseMatch(suspect, typeDescr);
+        };
+        for (const propName of tdProps) {
+            this.currentPath.push(propName);
+            const matchRes = this.match(undefined, typeDescr[propName]);
+            if (!matchRes.matched) {
+                return matchRes;
+            }
+            i -= Number(propName in suspect);
+            this.currentPath.pop();
+        }
+        return i ? this.falseMatch(suspect, typeDescr) : this.trueMatch();
+    }
+    protected trueMatch() {
+        return ExactTypeMatcher.TrueExactMatch;
+    }
+    protected falseMatch(actualValue: unknown, expectedTd: TypeDescription) {
+        return new ExactMatchInfo({ 
+            actualValue, 
+            expectedTd,
+            path: this.currentPath
+        });
+    }
+
+}
+
+export function match(
+    suspect: unknown, 
+    typeDescr: TypeDescription
+): MatchInfo {
+    return (new TypeMatcher).match(suspect, typeDescr);
+}
+
+export function exactMatch(
+    suspect: unknown, 
+    typeDescr: TypeDescription
+): MatchInfo {
+    return (new ExactTypeMatcher).match(suspect, typeDescr);
+}
+
+export function stringifyTd(typeDescr: TypeDescription): string {
+    return !isBasicObject(typeDescr)            ? 
+            typeDescr                           : 
+            typeDescr instanceof Function       ?
+            `<${typeDescr.name}>`               :
+            typeDescr instanceof Set            ?
+            [...typeDescr.values()].map(stringifyTd).join(' | ') :
+            JSON.stringify(typeDescr, (_key, value: TypeDescription) => 
+                stringifyTd(value)
+            );
 }
