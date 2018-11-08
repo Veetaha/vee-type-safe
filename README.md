@@ -8,6 +8,184 @@ Requires Typescript version `>= 3.0`.
 
 ## API
 
+## v 2.0
+
+*(Pleese, see v 1.0 API in the first place if you are not familiar with this library)*
+
+### `match(suspect: unknown, typeDescr: TypeDescription): MatchInfo`
+
+Returns a `MatchInfo` object (description is bellow) stores an information whether `conforms(suspect, typeDescr)` and if not, why and where is its invalid property.
+This is a powerful tool to generate useful error messages while validating value shape type.
+~~~typescript
+    const untrustedJson = {
+        client: 'John Doe',
+        walletNumber: null
+    };
+    const ExpectedJsonTD: TypeDescription = {
+        client: 'string',
+        walletNumber: num => typeof num === 'string' && /\d{16}/.test(num)
+    };
+
+    const typeInfo = match(untrustedJson, ExpectedJsonTD);
+    if (!typeInfo.matched) {
+        // logs: [ 'walletNumber' ] null [Function: walletNumber]
+        console.log(typeInfo.path, typeInfo.actualValue, typeInfo.expectedTd);
+
+
+        throw new Error(typeInfo.toErrorString());
+    }
+    // process client
+~~~
+
+
+### `exactlyMatch(suspect: unknown, typeDescr: TypeDescription): ExactMatchInfo`
+
+Works the same way as `match(suspect, typeDescr)` but returns a failed match info if `suspect` or its child objects contain excess properties that are not listed in `typeDescr`.
+
+~~~typescript
+    const untrustedJson = /* ... */;
+    const ExpectedJsonTD: TypeDescription = /* ... */;
+    const dbDocument = /* ... */
+
+    const typeInfo = exactlyMatch(untrustedJson, ExpectedJsonTD);
+    if (!typeInfo.matched) {
+        throw new Error(typeInfo.toErrorString());
+    }
+    // now you may safely assign untrustedJson to dbDocument:
+    dbDocument = { ...dbDocument, ...untrustedJson  }
+    // dbDocument = Object.assign(dbDocument, untrustedJson)
+~~~
+
+stringifyTd(typeDescr: TypeDescription)
+
+Retuns a string representation of `TypeDescription` which is written in TypeScript type declaration syntax, but if typeDescr is a `TypePredicate` function its name is return enclosed in angle brackets `<isIsoDate>`
+
+### `tryMatch(suspect: unknown, typeDescr: TypeDescription)`
+### `tryExactlyMatch(suspect: unknown, typeDescr: TypeDescription)`
+
+These functions return nothing. They throw `TypeMismatchError` if their `suspect` failed to match to the given `typeDescr`.
+
+`TypeMismatchError` is an instance of `Error` with `typeMismatch: FailedMatchInfo` property.
+
+`FailedMatchError` is just a `MatchEror` with required `path`, `actualValue` and `expectedTd` properties.
+
+
+### class MatchInfo
+
+Represents the result of running `match(suspect, typeDescr)`
+or `exactlyMatch(suspect, typeDescr)` (the result of the second one is derived from `MatchInfo`) functions.
+It contains an information wether `suspect` conforms to the given `typeDescr` or not, the actual value, expected type description and a property path to unexpected value type.
+
+### properties
+
+* `matched: boolean` - *true* if the match was successful (i.e. `conforms(suspect, typeDescr) === true`), *false* otherwise. If it is *true*, then no `path`, `actualValue` and `expectedTd` properties are present in this `MatchInfo` object.
+
+* `path?: PathArray` - an array of numbers and strings which defines a path to suspect's invalid `actualValue`. E.g. if `suspect.foo.bar[3][5]` failed to match to the `expectedTd`, then `path` would be `[ 'foo', 'bar', 3, 5 ]`
+
+* `expectedTd?: TypeDescription` - `TypeDescription` that `actualValue` was expected to conform to.
+
+* `actualValue?: unknown` - value which failed to conform to the `expectedTd`.
+
+### methods
+
+### `pathString()`
+
+Returns `path` converted to a human readable JavaScript property access notation string if match was failed. If match was successful retuns an empty string.
+Retuned string begins with the `'root'` as the root object to access the properties.
+~~~typescript
+const info = match(
+    {
+        foo: {
+            bar: {
+                'twenty two': [
+                    { prop: 'str' }, 
+                    { prop: -23 }
+                ]
+            }
+        }
+    },
+    { foo: { bar: { 'twenty two': [ { prop: 'string' } ] } } }
+);
+
+info.pathString() === `root.foo.bar['twenty two'][1].prop`
+~~~
+
+### `toErrorString()`
+
+Returns a string of form:
+
+*value (`JSON.stringify(actualValue)`) at path '`pathString()`' doesn't conform to the given type description (`stringifyTd(expectedTd)`)*
+
+If `JSON.stringify(actualValue)` throws an error, it is excluded from the returned string. Returns an empty string if match was successful.
+
+*Note:* derived `ExactMatchInfo` class only adds a word *exactly* before *conform* in the string.
+
+## vee-type-safe/express
+This is a library for *ExpressJS* routing middleware functions.
+
+### `matchType(getRequestProperty, typeDescr, makeError?)`
+
+Returns `express.Handler` that matches the value returned by `getRequestProperty(req)` to `typeDescr` and if it fails, calls `next(makeError(failedTypeInfo))`.
+Thus you can be sure that the property of `express.Request` object was type checked before using it in your middleware.
+
+Does type matching via core library `match` function.
+
+* `getRequestProperty: (req: express.Request) => unknown` - this function returns a suspect to match to `typeDescr`
+* `typeDescr` - type description that the value returned by `getRequestProperty(req)` must match to
+* `makeError?: (failInfo: FailedMatchInfo) => unknown` - it is an optional function which makes a custom error to forward to `next()`, by default this function retuns `BadTypeStatusError`
+
+`BadTypeStatusError` is an instance of `TypeMismatchError` that has a `status: number` property, which is http *BAD_REQUEST* by default.
+
+~~~typescript
+    import * as express      from 'express';
+    import * as ExpressTypes from 'vee-type-safe/express'
+    import * as Types        from 'vee-type-safe';
+    const router = express.Router();
+    router.get('api/v1/messages',
+        ExpressTypes.matchType(
+            req => req.body, // or ExpressTypes.ReqBody
+            {
+                filters: ['string'],
+                page:  Types.isPositiveInteger,
+                limit: Types.isPositiveInteger
+            },
+            failInfo => new MyCustomError(failInfo.path, failInfo.actualValue)
+        ),
+        (req, res, next) => {
+            /* your middleware, where you can trust to req.body */
+            const filters = req.body.filters.join();
+            // ...
+        }
+    );
+~~~
+
+There is a list of handy functions to specify as `getRequestProperty` argument:
+* `ReqBody(req)    => req.body`
+* `ReqParams(req)  => req.params`
+* `ReqQuery(req)   => req.query`
+* `ReqCookies(req) => req.cookies`
+* `ReqHeaders(req) => req.headers`
+~~~typescript
+    import * as ExpressTypes from 'vee-type-safe/express';
+    /* ... */
+    router.get('api/v1/users/',
+        ExpressTypes.matchType(ExpressTypes.ReqQuery, { title: 'string' }),
+        (req, res, next) => {
+            const title: string = req.query.title; // now you are sure
+            /* ... */
+        }
+    );
+~~~
+
+
+### `exactlyMatchType(getRequestProperty, typeDescr, makeError?)`
+
+The same as `matchType()`, but does type matching via core library `exactlyMatch` function.
+
+
+
+## v 1.0
+
 ### `conforms<T>(suspect, typeDescr): suspect is T`
   **You will use this function or `exactlyConforms()` 95% of the time interacting with this library.**
   It is a two in one: runtime type checker and static type guard.   
@@ -122,29 +300,29 @@ Factory functions return `TypePredicate`s to use as type descriptions when calli
     
  Returns a predicate that returns *true* if its argument is a number within the range \[`min`, `max`] or \[`max`, `min`] if `min > max`.
  ~~~typescript
- import { Factory, conforms } from 'vee-type-safe';
+ import { conforms } from 'vee-type-safe';
  
  conforms(
  {
      num: 32
  },
  {
-     num: Factory.isNumberWithinRange(0, 5)    
+     num: isNumberWithinRange(0, 5)    
  }); // false
  ~~~
  
 ### `isIntegerWithinRange(min, max)`
- The same as `Factory.isNumberWithinRange(min, max)`, but its returned predicate returns *false* if forwarded argument is not an integer.
+ The same as `isNumberWithinRange(min, max)`, but its returned predicate returns *false* if forwarded argument is not an integer.
  
 ### `optional(typeDescr: TypeDescription)`
 Retuns `TypePredicate` which retuns `typeof suspect === 'undefined' || conforms(typeDescr)`, which you may use as a type description for optional object properties. This predicate is effectively the same as calling `conforms(suspect, new Set<TypeDescription>([typeDescr, 'undefined']));`
 ~~~typescript
-import { conforms, Factory } from 'vee-type-safe';
+import { conforms } from 'vee-type-safe';
 conforms(
 {
     prop: 'str'
 },{
-    prop: Factory.optional('number')
+    prop: optional('number')
 }) 
 // return false because the property is not undefined, 
 // but doesn't conform to 'number' type
@@ -152,7 +330,7 @@ conforms(
 {
     prop: -23
 },{
-    prop: Factory.optional(isNegativeInteger)
+    prop: optional(isNegativeInteger)
 });
 // returns true because the property is not undefined
 // and conforms to isNegativeInteger restriction
@@ -273,7 +451,7 @@ const someObj = {
     date: '2015-02-21T00:52Z'
 };
 conforms(someObj, {
-    date: isIsoDateString   
+    date: isIsoDateString
 }); // true
 ~~~
 
@@ -311,9 +489,8 @@ Checks whether `suspect` conforms to the given type description (`typeDescr`) an
 ~~~typescript
 import { defaultIfNotConforms } from 'vee-type-safe';
 
-const idStr = '22';
-const id = defaultIfNotConforms()
-
-
-
+const id = defaultIfNotConforms(isPositiveInteger, parseInt('-1'), 0);
+// id === 0;
+const id2 = defaultIfNotConforms(isPositiveInteger, parseInt('444'), 0);
+// id2 === 444
 ~~~

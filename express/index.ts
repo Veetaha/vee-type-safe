@@ -1,23 +1,42 @@
-import * as Types from '../index';
-import * as express from 'express';
+import * as Types     from '../index';
+import * as express   from 'express';
 import * as HttpCodes from 'http-status-codes';
 
-export class BadTypeError extends Error {    
+export class BadTypeStatusError extends Types.TypeMismatchError {    
     constructor(
-        public failedTypeMatch: Types.FailedMatchInfo,
+        typeMismatch: Types.FailedMatchInfo,
         public status = HttpCodes.BAD_REQUEST
     ) { 
-        super(failedTypeMatch.toErrorString());
-     }
+        super(typeMismatch);
+    }
 }
 
-export function checkTypeMatch(
-    reqProperty: string, 
+export type RequestPropertyGetter = (req: express.Request) => unknown;
+export type ErrorMaker = (failedMatchInfo: Types.FailedMatchInfo) => unknown;
+
+export function ReqBody(req: express.Request) {
+    return req.body;
+}
+export function ReqParams(req: express.Request) {
+    return req.params;
+}
+export function ReqQuery(req: express.Request) {
+    return req.query;
+}
+export function ReqCookies(req: express.Request) {
+    return req.cookies;
+}
+export function ReqHeaders(req: express.Request) {
+    return req.headers;
+}
+
+export function matchType(
+    getRequestProperty: RequestPropertyGetter, 
     typeDescr: Types.TypeDescription,
-    makeError = (failedMatch: Types.FailedMatchInfo) => new BadTypeError(failedMatch)
+    makeError: ErrorMaker = (failedMatch: Types.FailedMatchInfo) => new BadTypeStatusError(failedMatch)
 ) {
-    return ((req: Types.BasicObject, _res, next) => {
-        const matchInfo = Types.match(req[reqProperty], typeDescr);
+    return ((req, _res, next) => {
+        const matchInfo = Types.match(getRequestProperty(req), typeDescr);
         if (!matchInfo.matched) {
             return next(makeError(matchInfo as Types.FailedMatchInfo));
         }
@@ -25,13 +44,13 @@ export function checkTypeMatch(
     }) as express.Handler;
 }
 
-export function checkTypeExactMatch(
-    reqProperty: string, 
+export function exactlyMatchType(
+    getRequestProperty: RequestPropertyGetter, 
     typeDescr: Types.TypeDescription,
-    makeError = (failedMatch: Types.FailedMatchInfo) => new BadTypeError(failedMatch)
+    makeError: ErrorMaker = (failedMatch: Types.FailedMatchInfo) => new BadTypeStatusError(failedMatch)
 ) {
-    return ((req: Types.BasicObject, _res, next) => {
-        const matchInfo = Types.exactMatch(req[reqProperty], typeDescr);
+    return ((req, _res, next) => {
+        const matchInfo = Types.exactlyMatch(getRequestProperty(req), typeDescr);
         if (!matchInfo.matched) {
             return next(makeError(matchInfo as Types.FailedMatchInfo));
         }

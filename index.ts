@@ -289,14 +289,16 @@ export function isOneOf<T>(possibleValues: T[]){
     return (suspect: any): suspect is T => possibleValues.includes(suspect);
 }
 
+export type PathArray = (string | number)[];
+
 interface FailedMatchArgument {
-    path:        string[], 
+    path:        PathArray, 
     expectedTd:  TypeDescription, 
     actualValue: unknown
 }
 
 export class MatchInfo {
-    path?:        string[];
+    path?:        PathArray;
     expectedTd?:  TypeDescription;
     actualValue?: unknown;
 
@@ -310,33 +312,33 @@ export class MatchInfo {
     }
 
     private static isJsIdentifier(suspect: string) {
-        return /^[\w$_][\w\d$_]*$/.test(suspect);
+        return /^[a-zA-Z$_][\w\d$_]*$/.test(suspect);
     }
     
     pathString() {
-        return !this.path ? 'root' : this.path.reduce((result, currentPart) =>  
-            result                                +
-            MatchInfo.isJsIdentifier(currentPart) ?
-            `.${currentPart}`                     :
-            Number.isNaN(+currentPart)            ? 
-            `['${currentPart}']`                  :
-            `[${+currentPart}]`
-        , 'root');
+        return !this.path ? '' : this.path.reduce((result, currentPart) => {
+            if (typeof currentPart === 'string') {
+                return result + (MatchInfo.isJsIdentifier(currentPart) ? 
+                        `.${currentPart}` : `['${currentPart}']`
+                       );
+            }
+            return result + `[${currentPart}]`;
+        }, 'root');
     }
     toErrorString() {
-        if (!this.matched) {
+        if (this.matched) {
             return '';
         }
         try {
-            return `Value (${JSON.stringify(this.actualValue)}) at path '${
+            return `Value (${JSON.stringify(this.actualValue)}) at '${
                     this.pathString()
-                }' doesn't conform to the given type description (\n${
+                }' doesn't conform to the given type description (${
                     stringifyTd(this.expectedTd!)
                 })`
         } catch (err) {
-            return `Value at path '${
+            return `value at '${
                 this.pathString()
-            }' doesn't conform to the given type description (\n${
+            }' doesn't conform to the given type description (${
                 stringifyTd(this.expectedTd!)
             })`
         }
@@ -349,19 +351,19 @@ export class ExactMatchInfo extends MatchInfo {
         super(failedMatchArgument);
     }
     toErrorString() {
-        if (!this.matched) {
+        if (this.matched) {
             return '';
         }
         try {
-            return `Value (${JSON.stringify(this.actualValue)}) at path '${
+            return `value (${JSON.stringify(this.actualValue)}) at '${
                     this.pathString()
-                }' doesn't exactly conform to the given type description (\n${
+                }' doesn't exactly conform to the given type description (${
                     stringifyTd(this.expectedTd!)
                 })`
         } catch (err) {
-            return `Value at path '${
+            return `value at '${
                 this.pathString()
-            }' doesn't exactly conform to the given type description (\n${
+            }' doesn't exactly conform to the given type description (${
                 stringifyTd(this.expectedTd!)
             })`
         }
@@ -372,10 +374,10 @@ export class ExactMatchInfo extends MatchInfo {
 class TypeMatcher {
     private static readonly TrueMatch = new MatchInfo;
 
-    protected currentPath: string[] = [];
+    protected currentPath: (string | number)[] = [];
 
     protected falseMatch(actualValue: unknown, expectedTd: TypeDescription) {
-        return new MatchInfo({ actualValue, expectedTd, path: this.currentPath });
+        return new MatchInfo({ actualValue, expectedTd, path: [...this.currentPath] });
     }
 
     protected trueMatch() {
@@ -387,12 +389,12 @@ class TypeMatcher {
         getTd: (index: number) => TypeDescription
     ) {
         for (let i = 0; i < suspect.length; ++i) {
-            this.currentPath.push(String(i));
+            this.currentPath.push(i);
             const result = this.match(suspect[i], getTd(i));
+            this.currentPath.pop();
             if (!result.matched) {
                 return result
             }
-            this.currentPath.pop();
         }
         return this.trueMatch();
     }
@@ -400,21 +402,21 @@ class TypeMatcher {
     protected matchSet(suspect: unknown, typeDescr: TypeDescrSet) {
         for (const possibleTypeDescr of typeDescr) {
             const matchRes = this.match(suspect, possibleTypeDescr)
-            if (!matchRes.matched) {
+            if (matchRes.matched) {
                 return matchRes;
             }
         }
-        return this.trueMatch();
+        return this.falseMatch(suspect, typeDescr);
     }
 
     protected matchObject(suspect: BasicObject, typeDescr: TypeDescrObjMap) {
         for (const propName of Object.getOwnPropertyNames(typeDescr)) {
             this.currentPath.push(propName);
             const matchRes = this.match(suspect[propName], typeDescr[propName]);
+            this.currentPath.pop();
             if (!matchRes.matched) {
                 return matchRes;
             }
-            this.currentPath.pop();
         }
         return this.trueMatch();
     }
@@ -424,7 +426,7 @@ class TypeMatcher {
                 this.trueMatch() : this.falseMatch(suspect, typeDescr);
         }
         if (typeof typeDescr === 'function') {
-            return (typeDescr as TypePredicate)(suspect) ?
+            return typeDescr(suspect) ?
                 this.trueMatch() : this.falseMatch(suspect, typeDescr);
         }
         if (Array.isArray(typeDescr)) {
@@ -458,18 +460,18 @@ class ExactTypeMatcher extends TypeMatcher {
     protected matchObject(suspect: BasicObject, typeDescr: TypeDescrObjMap) {
         const susProps = Object.getOwnPropertyNames(suspect);
         const tdProps  = Object.getOwnPropertyNames(typeDescr);
-        let i = susProps.length;
         if (tdProps.length < susProps.length) {
             return this.falseMatch(suspect, typeDescr);
-        };
+        }
+        let i = susProps.length;
         for (const propName of tdProps) {
             this.currentPath.push(propName);
-            const matchRes = this.match(undefined, typeDescr[propName]);
+            const matchRes = this.match(suspect[propName], typeDescr[propName]);
+            this.currentPath.pop();
             if (!matchRes.matched) {
                 return matchRes;
             }
             i -= Number(propName in suspect);
-            this.currentPath.pop();
         }
         return i ? this.falseMatch(suspect, typeDescr) : this.trueMatch();
     }
@@ -486,21 +488,40 @@ class ExactTypeMatcher extends TypeMatcher {
 
 }
 
-export function match(
-    suspect: unknown, 
-    typeDescr: TypeDescription
-): MatchInfo {
+export class TypeMismatchError extends Error {
+    constructor(public typeMismatch: FailedMatchInfo
+    ) { 
+        super(typeMismatch.toErrorString());
+    }
+}
+
+export function match(suspect: unknown, typeDescr: TypeDescription) {
     return (new TypeMatcher).match(suspect, typeDescr);
 }
 
-export function exactMatch(
-    suspect: unknown, 
-    typeDescr: TypeDescription
-): MatchInfo {
+export function exactlyMatch(suspect: unknown, typeDescr: TypeDescription) {
     return (new ExactTypeMatcher).match(suspect, typeDescr);
 }
 
-export function stringifyTd(typeDescr: TypeDescription): string {
+export function tryMatch(suspect: unknown, typeDescr: TypeDescription) {
+    const matched = match(suspect, typeDescr);
+    if (!matched.matched) {
+        throw new TypeMismatchError(matched as FailedMatchInfo);
+    }
+}
+
+export function tryExactlyMatch(suspect: unknown, typeDescr: TypeDescription) {
+    const matched = exactlyMatch(suspect, typeDescr);
+    if (!matched.matched) {
+        throw new TypeMismatchError(matched as FailedMatchInfo);
+    }
+}
+
+function stringifyTd(typeDescr: TypeDescription): string  {
+    return stringifyTdImpl(typeDescr).replace(/\\n|\\"|"/g, substr => substr === '\\n' ? '\n' : '');
+}
+
+function stringifyTdImpl(typeDescr: TypeDescription): string {
     return !isBasicObject(typeDescr)            ? 
             typeDescr                           : 
             typeDescr instanceof Function       ?
@@ -508,6 +529,10 @@ export function stringifyTd(typeDescr: TypeDescription): string {
             typeDescr instanceof Set            ?
             [...typeDescr.values()].map(stringifyTd).join(' | ') :
             JSON.stringify(typeDescr, (_key, value: TypeDescription) => 
-                stringifyTd(value)
-            );
+                value instanceof Function || 
+                value instanceof Set       ? 
+                stringifyTdImpl(value)     :
+                value
+            , 4);
 }
+

@@ -1,6 +1,6 @@
 {
     "name": "vee-type-safe",
-    "version": "1.0.16",
+    "version": "2.0.0",
     "description": "Simple TypeScript type checking utility library.",
     "main": "build/index.js",
     "types": "build/index.d.ts",
@@ -17,7 +17,7 @@
         "url": "https://github.com/Veetaha/vee-type-safe.git"
     },
     "scripts": {
-        "test": "mocha build/test/tests.js"
+        "test": "tsc && mocha build/test/tests.js"
     },
     "author": "Vitaliy Kryvenko",
     "license": "MIT",
