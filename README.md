@@ -14,7 +14,7 @@ Requires Typescript version `>= 3.0`.
 
 ### `match(suspect: unknown, typeDescr: TypeDescription): MatchInfo`
 
-Returns a `MatchInfo` object (description is bellow) stores an information whether `conforms(suspect, typeDescr)` and if not, why and where is its invalid property.
+Returns a `MatchInfo` object (description is bellow) that stores an information whether `conforms(suspect, typeDescr)` and if not, why and where its invalid property is.
 This is a powerful tool to generate useful error messages while validating value shape type.
 ~~~typescript
     const untrustedJson = {
@@ -55,10 +55,6 @@ Works the same way as `match(suspect, typeDescr)` but returns a failed match inf
     dbDocument = { ...dbDocument, ...untrustedJson  }
     // dbDocument = Object.assign(dbDocument, untrustedJson)
 ~~~
-
-stringifyTd(typeDescr: TypeDescription)
-
-Retuns a string representation of `TypeDescription` which is written in TypeScript type declaration syntax, but if typeDescr is a `TypePredicate` function its name is return enclosed in angle brackets `<isIsoDate>`
 
 ### `tryMatch(suspect: unknown, typeDescr: TypeDescription)`
 ### `tryExactlyMatch(suspect: unknown, typeDescr: TypeDescription)`
@@ -141,12 +137,11 @@ Does type matching via core library `match` function.
     import * as ExpressTypes from 'vee-type-safe/express'
     import * as Types        from 'vee-type-safe';
     const router = express.Router();
-    router.get('api/v1/messages',
+    router.post('api/v1/messages',
         ExpressTypes.matchType(
             req => req.body, // or ExpressTypes.ReqBody
             {
                 filters: ['string'],
-                page:  Types.isPositiveInteger,
                 limit: Types.isPositiveInteger
             },
             failInfo => new MyCustomError(failInfo.path, failInfo.actualValue)
@@ -180,7 +175,7 @@ There is a list of handy functions to specify as `getRequestProperty` argument:
 
 ### `exactlyMatchType(getRequestProperty, typeDescr, makeError?)`
 
-The same as `matchType()`, but does type matching via core library `exactlyMatch` function.
+The same middleware factory as `matchType()`, but does type matching via core library `exactlyMatch` function.
 
 
 
