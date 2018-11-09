@@ -1,6 +1,6 @@
 {
     "version": "0.0.0",
-    "name": "internal-express",
+    "name": "@internal/express",
     "dependencies": {
         "express": "latest",
         "@types/express": "latest",
