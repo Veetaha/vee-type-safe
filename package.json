@@ -17,8 +17,7 @@
         "url": "https://github.com/Veetaha/vee-type-safe.git"
     },
     "scripts": {
-        "test": "tsc && mocha build/test/tests.js",
-        "postinstall": "cd express && npm i"
+        "test": "tsc && mocha build/test/tests.js"
     },
     "author": "Vitaliy Kryvenko",
     "license": "MIT",
