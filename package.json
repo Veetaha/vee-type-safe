@@ -1,6 +1,6 @@
 {
     "name": "vee-type-safe",
-    "version": "2.0.15",
+    "version": "2.1.0",
     "description": "Simple TypeScript type checking utility library.",
     "main": "build/index.js",
     "types": "build/index.d.ts",
