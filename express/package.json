@@ -2,7 +2,10 @@
     "version": "0.0.0",
     "name": "internal-express",
     "dependencies": {
-        "vee-type-safe": "file:.."        
+        "vee-type-safe": "file:..",
+        "express": "latest",
+        "@types/express": "latest",
+        "@types/node": "latest"
     },
     "main": "../build/express/index.js",
     "types": "../build/express/index.d.ts"
