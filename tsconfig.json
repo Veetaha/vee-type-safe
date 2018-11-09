@@ -22,9 +22,6 @@
     /* Module Resolution Options */
     "moduleResolution": "node"
   },
-  "files": ["index.ts"],
-  "include": [
-    "./**/*"
-  ],
+  "files": ["index.ts", "express.ts", "declarations/is-iso-date.d.ts"],
   "exclude": ["node_modules/**/*", "build"]
 }
