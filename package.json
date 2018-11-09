@@ -33,8 +33,5 @@
         "@types/mocha": "latest",
         "chai": "latest",
         "mocha": "latest"
-    },
-    "subPackages": [
-        "express"
-    ]
+    }
 }
