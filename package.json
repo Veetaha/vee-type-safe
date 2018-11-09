@@ -1,6 +1,6 @@
 {
     "name": "vee-type-safe",
-    "version": "2.0.9",
+    "version": "2.0.10",
     "description": "Simple TypeScript type checking utility library.",
     "main": "build/index.js",
     "types": "build/index.d.ts",
@@ -22,10 +22,10 @@
     "author": "Vitaliy Kryvenko",
     "license": "MIT",
     "dependencies": {
-        "is-iso-date": "latest",
+        "@internal/express": "file:express",
         "http-status-codes": "latest",
-        "typescript": "latest",
-        "@internal/express": "file:express"
+        "is-iso-date": "latest",
+        "typescript": "latest"
     },
     "devDependencies": {
         "chai": "latest",
