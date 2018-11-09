@@ -25,7 +25,8 @@
     "dependencies": {
         "is-iso-date": "latest",
         "http-status-codes": "latest",
-        "typescript": "latest"
+        "typescript": "latest",
+        "@internal/express": "file:./express"
     },
     "devDependencies": {
         "chai": "latest",
