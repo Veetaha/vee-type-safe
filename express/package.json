@@ -2,7 +2,6 @@
     "version": "0.0.0",
     "name": "internal-express",
     "dependencies": {
-        "vee-type-safe": "file:..",
         "express": "latest",
         "@types/express": "latest",
         "@types/node": "latest"
