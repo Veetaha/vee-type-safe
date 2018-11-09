@@ -23,14 +23,14 @@
     "license": "MIT",
     "dependencies": {
         "is-iso-date": "latest",
-        "http-status-codes": "latest"
+        "http-status-codes": "latest",
+        "@types/express": "latest",
+        "typescript": "latest"
     },
     "devDependencies": {
         "chai": "latest",
         "mocha": "latest",
         "@types/chai": "latest",
-        "@types/mocha": "latest",
-        "@types/express": "latest",
-        "typescript": "latest"
+        "@types/mocha": "latest"
     }
 }

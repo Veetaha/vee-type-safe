@@ -10,8 +10,7 @@ import {
     match,
     exactlyMatch,
     MatchInfo,
-    PathArray,
-    isIsoDateString
+    PathArray
 } from '../index';
 import { deepStrictEqual } from 'assert';
 describe('conforms', () => {
