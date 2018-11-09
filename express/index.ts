@@ -1,4 +1,4 @@
-import * as Types     from './index';
+import * as Types     from '../index';
 import * as express   from 'express';
 import * as HttpCodes from 'http-status-codes';
 
