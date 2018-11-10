@@ -179,7 +179,7 @@ export function isPositiveInteger(suspect: unknown): suspect is number {
     return isInteger(suspect) && suspect > 0;
 }
 export function isNegativeInteger(suspect: unknown): suspect is number {
-    return isInteger(suspect) && suspect < 0
+    return isInteger(suspect) && suspect < 0;
 }
 export function isPositiveNumber(suspect: unknown): suspect is number {
     return typeof suspect === 'number' && suspect > 0;
@@ -292,9 +292,9 @@ export function isOneOf<T>(possibleValues: T[]){
 export type PathArray = (string | number)[];
 
 interface FailedMatchArgument {
-    path:        PathArray, 
-    expectedTd:  TypeDescription, 
-    actualValue: unknown
+    path:        PathArray;
+    expectedTd:  TypeDescription;
+    actualValue: unknown;
 }
 
 export class MatchInfo {
@@ -322,7 +322,7 @@ export class MatchInfo {
                         `.${currentPart}` : `['${currentPart}']`
                        );
             }
-            return result + `[${currentPart}]`;
+            return `${result}[${currentPart}]`;
         }, 'root');
     }
     toErrorString() {
@@ -334,13 +334,13 @@ export class MatchInfo {
                     this.pathString()
                 }' doesn't conform to the given type description (${
                     stringifyTd(this.expectedTd!)
-                })`
+                })`;
         } catch (err) {
             return `value at '${
                 this.pathString()
             }' doesn't conform to the given type description (${
                 stringifyTd(this.expectedTd!)
-            })`
+            })`;
         }
     }
 }
@@ -356,16 +356,16 @@ export class ExactMatchInfo extends MatchInfo {
         }
         try {
             return `value (${JSON.stringify(this.actualValue)}) at '${
-                    this.pathString()
-                }' doesn't exactly conform to the given type description (${
-                    stringifyTd(this.expectedTd!)
-                })`
+                this.pathString()
+            }' doesn't exactly conform to the given type description (${
+                stringifyTd(this.expectedTd!)
+            })`;
         } catch (err) {
             return `value at '${
                 this.pathString()
             }' doesn't exactly conform to the given type description (${
                 stringifyTd(this.expectedTd!)
-            })`
+            })`;
         }
     }
 }
@@ -380,6 +380,7 @@ class TypeMatcher {
         return new MatchInfo({ actualValue, expectedTd, path: [...this.currentPath] });
     }
 
+    // tslint:disable-next-line:prefer-function-over-method
     protected trueMatch() {
         return TypeMatcher.TrueMatch;
     }
@@ -393,7 +394,7 @@ class TypeMatcher {
             const result = this.match(suspect[i], getTd(i));
             this.currentPath.pop();
             if (!result.matched) {
-                return result
+                return result;
             }
         }
         return this.trueMatch();
@@ -401,7 +402,7 @@ class TypeMatcher {
 
     protected matchSet(suspect: unknown, typeDescr: TypeDescrSet) {
         for (const possibleTypeDescr of typeDescr) {
-            const matchRes = this.match(suspect, possibleTypeDescr)
+            const matchRes = this.match(suspect, possibleTypeDescr);
             if (matchRes.matched) {
                 return matchRes;
             }
@@ -475,6 +476,7 @@ class ExactTypeMatcher extends TypeMatcher {
         }
         return i ? this.falseMatch(suspect, typeDescr) : this.trueMatch();
     }
+    // tslint:disable-next-line:prefer-function-over-method
     protected trueMatch() {
         return ExactTypeMatcher.TrueExactMatch;
     }

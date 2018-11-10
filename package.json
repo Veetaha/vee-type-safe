@@ -24,14 +24,15 @@
     "dependencies": {
         "http-status-codes": "latest",
         "is-iso-date": "latest",
-        "typescript": "latest",
         "@types/express": "latest",
-        "@types/node": "latest"
+        "@types/node": "latest",
+        "typescript": "^3.1.6"
     },
     "devDependencies": {
         "@types/chai": "latest",
         "@types/mocha": "latest",
         "chai": "latest",
-        "mocha": "latest"
+        "mocha": "latest",
+        "tslint": "^5.11.0"
     }
 }
