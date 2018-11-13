@@ -42,7 +42,7 @@ Requires Typescript version `>= 3.0`.
   </p>
   <h2 class="doc-heading">Remarks</h2>
   <p>This function will be useful when serializing your objects as data holders using generic JSON.stringify() and you don&#x27;t want any excess properties to be exposed to the serialized representation.</p>
-  <pre class="doc-fenced-code"><code
+  <pre class="doc-fenced-code"><code language="typescript"
   >import * as Vts from &#x27;vee-type-safe&#x27;;
 const userDocument = {
     _id: &#x27;someid85&#x27;,
