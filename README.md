@@ -8,6 +8,55 @@ Requires Typescript version `>= 3.0`.
 
 ## API
 
+### V 2.2.0
+<div> 
+  <h2 class="doc-heading">Summary</h2>
+  <p>Takes given properties from the object and returns them as a new object.</p>
+  <h2 class="doc-heading">Parameters</h2>
+  <table class="doc-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>sourceObject</td>
+        <td>
+          <p>Source object to take data from.</p>
+        </td>
+      </tr>
+      <tr>
+        <td>propertyNames</td>
+        <td>
+          <p>Array of property names to include to the returend object.</p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <h2 class="doc-heading">Return Value</h2>
+  <p>New object that is a shallow copy of 
+    <code class="doc-code-span">sourceObject</code> with the properties given as 
+    <code class="doc-code-span">propertyNames</code> array.
+  </p>
+  <h2 class="doc-heading">Remarks</h2>
+  <p>This function will be useful when serializing your objects as data holders using generic JSON.stringify() and you don&#x27;t want any excess properties to be exposed to the serialized representation.</p>
+  <pre class="doc-fenced-code">
+    <code>import * as Vts from &#x27;vee-type-safe&#x27;;
+const userDocument = {
+    _id: &#x27;someid85&#x27;,
+    name: &#x27;Kuzya&#x27;,
+    secretInfo: 42
+};
+JSON.stringify(userDocument);
+// {_id:&quot;someid85&quot;,name:&quot;Kuzya&quot;,secretInfo:42}
+JSON.stringify(take(userDocument, [&#x27;_id&#x27;, &#x27;name&#x27;]));
+// {_id:&quot;someid85&quot;,name:&quot;Kuzya&quot;}
+</code>
+  </pre> 
+</div>
+
 ## v 2.0
 
 *(Pleese, see v 1.0 API in the first place if you are not familiar with this library)*

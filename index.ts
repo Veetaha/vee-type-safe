@@ -549,3 +549,47 @@ function stringifyTdImpl(typeDescr: TypeDescription): string {
             , 4);
 }
 
+export type PropNamesArray<TObject extends BasicObject> = (keyof TObject)[];
+export type Take<
+    TSourceObject extends BasicObject, 
+    TPropNames    extends PropNamesArray<TSourceObject>
+> = { 
+    [TProperty in TPropNames[number]]: TSourceObject[TProperty];
+};
+
+/**
+ * Takes given properties from the object and returns them as a new object.
+ *  
+ * @param sourceObject - Source object to take data from.
+ * @param propertyNames - Array of property names to include to the returend object.
+ * @returns New object that is a shallow copy of `sourceObject` 
+ * with the properties given as `propertyNames` array.
+ *
+ * @remarks This function will be useful when serializing
+ * your objects as data holders using generic JSON.stringify() and you
+ * don't want any excess properties to be exposed to the serialized 
+ * representation.
+ * ```ts
+ * import * as Vts from 'vee-type-safe';
+ * const userDocument = {
+ *     _id: 'someid85',
+ *     name: 'Kuzya',
+ *     secretInfo: 42
+ * };
+ * JSON.stringify(userDocument); 
+ * // {_id:"someid85",name:"Kuzya",secretInfo:42}
+ * JSON.stringify(take(userDocument, ['_id', 'name']));
+ * // {_id:"someid85",name:"Kuzya"}
+ * ```
+ */
+export function take<
+    TSourceObject extends BasicObject, 
+    TPropNames   extends PropNamesArray<TSourceObject>
+>(
+    sourceObject: TSourceObject, propertyNames: TPropNames
+): Take<TSourceObject, TPropNames> {
+    return propertyNames.reduce((newObject, propertyName) => {
+        newObject[propertyName] = sourceObject[propertyName];
+        return newObject;
+    }, {} as Take<TSourceObject, TPropNames>);
+}
