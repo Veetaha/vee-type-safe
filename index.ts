@@ -584,7 +584,7 @@ export type Take<
  */
 export function take<
     TSourceObject extends BasicObject, 
-    TPropNames   extends PropNamesArray<TSourceObject>
+    TPropNames    extends PropNamesArray<TSourceObject>
 >(
     sourceObject: TSourceObject, propertyNames: TPropNames
 ): Take<TSourceObject, TPropNames> {
@@ -592,4 +592,24 @@ export function take<
         newObject[propertyName] = sourceObject[propertyName];
         return newObject;
     }, {} as Take<TSourceObject, TPropNames>);
+}
+
+export type MappedObject<TSourceObject extends BasicObject, MappedValue> = {
+    [TSourceObjectKey in keyof TSourceObject]: MappedValue;
+};
+
+
+
+/**
+ * The same as `take(sourceObject, Object.getOwnPropertyNames(keysObject))`,
+ * but with stronger typing.
+ */
+export function takeFromKeys<
+    TKeysObject   extends BasicObject,
+    TSourceObject extends MappedObject<TKeysObject, any>
+>(sourceObject: TSourceObject, keysObj: TKeysObject) {
+    return take(
+        sourceObject, 
+        Object.getOwnPropertyNames(keysObj) as PropNamesArray<TKeysObject>
+    );
 }
