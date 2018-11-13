@@ -249,8 +249,9 @@ export function makeTdWithOptionalProps(typeDescr: TypeDescrObjMap) {
  * @param typeDescr
  */
 export function optional<T>(typeDescr: TypeDescription) {
-    return (suspect: unknown): suspect is T =>  typeof suspect === 'undefined' ||
-                                                conforms(suspect, typeDescr);
+    return function optional_value(suspect: unknown): suspect is T {
+        return typeof suspect === 'undefined' || conforms(suspect, typeDescr);
+    };
 }
 
 /**
@@ -259,10 +260,12 @@ export function optional<T>(typeDescr: TypeDescription) {
  * @param max Maximum value suspect can be.
  */
 export function isNumberWithinRange(min: number, max: number) {
-    return (suspect: unknown): suspect is number => typeof suspect === 'number' &&
-        (min > max
-            ? (max <= suspect && suspect <= min)
-            : (min <= suspect && suspect <= max));
+    return function isNumberWithinTheGivenRange(suspect: unknown): suspect is number {
+        return typeof suspect === 'number' && (
+        min > max                          ?
+        (max <= suspect && suspect <= min) :
+        (min <= suspect && suspect <= max)    );
+    };
 }
 
 /**
@@ -271,10 +274,12 @@ export function isNumberWithinRange(min: number, max: number) {
  * @param max Maximum value suspect can be.
  */
 export function isIntegerWithinRange(min: number, max: number) {
-    return (suspect: unknown): suspect is number => isInteger(suspect) &&
-        (min > max
-            ? (max <= suspect && suspect <= min)
-            : (min <= suspect && suspect <= max));
+    return function isIntegerWithinTheGivenRange(suspect: unknown): suspect is number { 
+        return isInteger(suspect)          && (
+        min > max                          ? 
+        (max <= suspect && suspect <= min) :
+        (min <= suspect && suspect <= max)    );
+    };
 }
 
 /**
@@ -286,7 +291,9 @@ export function isIntegerWithinRange(min: number, max: number) {
  * @param possibleValues Array with values of any type, suspect is matched to.
  */
 export function isOneOf<T>(possibleValues: T[]){
-    return (suspect: any): suspect is T => possibleValues.includes(suspect);
+    return function isOneOfTheGivenPossibleValues(suspect: any): suspect is T { 
+        return possibleValues.includes(suspect);
+    };
 }
 
 export type PathArray = (string | number)[];
@@ -376,13 +383,17 @@ class TypeMatcher {
 
     protected currentPath: (string | number)[] = [];
 
-    protected falseMatch(actualValue: unknown, expectedTd: TypeDescription) {
-        return new MatchInfo({ actualValue, expectedTd, path: [...this.currentPath] });
-    }
 
     // tslint:disable-next-line:prefer-function-over-method
     protected trueMatch() {
         return TypeMatcher.TrueMatch;
+    }
+    protected falseMatch(actualValue: unknown, expectedTd: TypeDescription) {
+        return new MatchInfo({ 
+            actualValue, 
+            expectedTd, 
+            path: [ ...this.currentPath ] 
+        });
     }
 
     protected matchArray(
@@ -484,7 +495,7 @@ class ExactTypeMatcher extends TypeMatcher {
         return new ExactMatchInfo({ 
             actualValue, 
             expectedTd,
-            path: this.currentPath
+            path: [ ...this.currentPath ]
         });
     }
 
