@@ -583,7 +583,7 @@ export type Take<
  * ```
  */
 export function take<
-    TSourceObject extends BasicObject, 
+    TSourceObject extends BasicObject<any>, 
     TPropNames    extends PropNamesArray<TSourceObject>
 >(
     sourceObject: TSourceObject, propertyNames: TPropNames
@@ -594,7 +594,7 @@ export function take<
     }, {} as Take<TSourceObject, TPropNames>);
 }
 
-export type MappedObject<TSourceObject extends BasicObject, MappedValue> = {
+export type MappedObject<TSourceObject extends BasicObject<any>, MappedValue> = {
     [TSourceObjectKey in keyof TSourceObject]: MappedValue;
 };
 
@@ -605,7 +605,7 @@ export type MappedObject<TSourceObject extends BasicObject, MappedValue> = {
  * but with stronger typing.
  */
 export function takeFromKeys<
-    TKeysObject   extends BasicObject,
+    TKeysObject   extends BasicObject<any>,
     TSourceObject extends MappedObject<TKeysObject, any>
 >(sourceObject: TSourceObject, keysObj: TKeysObject) {
     return take(
