@@ -1,0 +1,596 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>vee-type-safe</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">vee-type-safe</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> vee-type-safe</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="vee-type-safe">vee-type-safe</h1>
+				<p><a href="https://badge.fury.io/js/vee-type-safe"><img src="https://badge.fury.io/js/vee-type-safe.svg" alt="npm version"></a>
+				<a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg" alt="TypeScript"></a></p>
+				<p>This is a simple TypeScript type checking utility library.
+				Requires Typescript version <code>&gt;= 3.0</code>.</p>
+				<h2 id="api">API</h2>
+				<h3 id="v-2-2-0">V 2.2.0</h3>
+				<div>
+					<h2 class="doc-heading">Summary</h2>
+					<p>Takes given properties from the object and returns them as a new object.</p>
+					<h2 class="doc-heading">Parameters</h2>
+					<table class="doc-table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Description</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>sourceObject</td>
+								<td>
+									<p>Source object to take data from.</p>
+								</td>
+							</tr>
+							<tr>
+								<td>propertyNames</td>
+								<td>
+									<p>Array of property names to include to the returend object.</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<h2 class="doc-heading">Return Value</h2>
+					<p>New object that is a shallow copy of
+						<code class="doc-code-span">sourceObject</code> with the properties given as
+						<code class="doc-code-span">propertyNames</code> array.
+					</p>
+					<h2 class="doc-heading">Remarks</h2>
+					<p>This function will be useful when serializing your objects as data holders using generic JSON.stringify() and you don&#x27;t want any excess properties to be exposed to the serialized representation.</p>
+					<pre class="doc-fenced-code"><code language="typescript"
+  >import * as Vts from &#x27;vee-type-safe&#x27;;
+const userDocument = {
+    _id: &#x27;someid85&#x27;,
+    name: &#x27;Kuzya&#x27;,
+    secretInfo: 42
+};
+JSON.stringify(userDocument);
+// {_id:&quot;someid85&quot;,name:&quot;Kuzya&quot;,secretInfo:42}
+JSON.stringify(take(userDocument, [&#x27;_id&#x27;, &#x27;name&#x27;]));
+// {_id:&quot;someid85&quot;,name:&quot;Kuzya&quot;}
+</code>
+  </pre> 
+				</div>
+				<h2 id="v-2-0">v 2.0</h2>
+				<p><em>(Pleese, see v 1.0 API in the first place if you are not familiar with this library)</em></p>
+				<h3 id="match-suspect-unknown-typedescr-typedescription-matchinfo"><code>match(suspect: unknown, typeDescr: TypeDescription): MatchInfo</code></h3>
+				<p>Returns a <code>MatchInfo</code> object (description is bellow) that stores an information whether <code>conforms(suspect, typeDescr)</code> and if not, why and where its invalid property is.
+				This is a powerful tool to generate useful error messages while validating value shape type.</p>
+				<pre><code class="language-typescript">    <span class="hljs-keyword">const</span> untrustedJson = {
+        client: <span class="hljs-string">'John Doe'</span>,
+        walletNumber: <span class="hljs-literal">null</span>
+    };
+    <span class="hljs-keyword">const</span> ExpectedJsonTD: TypeDescription = {
+        client: <span class="hljs-string">'string'</span>,
+        walletNumber: <span class="hljs-function"><span class="hljs-params">num</span> =&gt;</span> <span class="hljs-keyword">typeof</span> num === <span class="hljs-string">'string'</span> &amp;&amp; <span class="hljs-regexp">/\d{16}/</span>.test(num)
+    };
+
+    <span class="hljs-keyword">const</span> typeInfo = match(untrustedJson, ExpectedJsonTD);
+    <span class="hljs-keyword">if</span> (!typeInfo.matched) {
+        <span class="hljs-comment">// logs: [ 'walletNumber' ] null [Function: walletNumber]</span>
+        <span class="hljs-built_in">console</span>.log(typeInfo.path, typeInfo.actualValue, typeInfo.expectedTd);
+
+
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(typeInfo.toErrorString());
+    }
+    <span class="hljs-comment">// process client</span></code></pre>
+				<h3 id="exactlymatch-suspect-unknown-typedescr-typedescription-exactmatchinfo"><code>exactlyMatch(suspect: unknown, typeDescr: TypeDescription): ExactMatchInfo</code></h3>
+				<p>Works the same way as <code>match(suspect, typeDescr)</code> but returns a failed match info if <code>suspect</code> or its child objects contain excess properties that are not listed in <code>typeDescr</code>.</p>
+				<pre><code class="language-typescript">    <span class="hljs-keyword">const</span> untrustedJson = <span class="hljs-comment">/* ... */</span>;
+    <span class="hljs-keyword">const</span> ExpectedJsonTD: TypeDescription = <span class="hljs-comment">/* ... */</span>;
+    <span class="hljs-keyword">const</span> dbDocument = <span class="hljs-comment">/* ... */</span>
+
+    <span class="hljs-keyword">const</span> typeInfo = exactlyMatch(untrustedJson, ExpectedJsonTD);
+    <span class="hljs-keyword">if</span> (!typeInfo.matched) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(typeInfo.toErrorString());
+    }
+    <span class="hljs-comment">// now you may safely assign untrustedJson to dbDocument:</span>
+    dbDocument = { ...dbDocument, ...untrustedJson  }
+    <span class="hljs-comment">// dbDocument = Object.assign(dbDocument, untrustedJson)</span></code></pre>
+				<h3 id="trymatch-suspect-unknown-typedescr-typedescription-"><code>tryMatch(suspect: unknown, typeDescr: TypeDescription)</code></h3>
+				<h3 id="tryexactlymatch-suspect-unknown-typedescr-typedescription-"><code>tryExactlyMatch(suspect: unknown, typeDescr: TypeDescription)</code></h3>
+				<p>These functions return nothing. They throw <code>TypeMismatchError</code> if their <code>suspect</code> failed to match to the given <code>typeDescr</code>.</p>
+				<p><code>TypeMismatchError</code> is an instance of <code>Error</code> with <code>typeMismatch: FailedMatchInfo</code> property.</p>
+				<p><code>FailedMatchError</code> is just a <code>MatchEror</code> with required <code>path</code>, <code>actualValue</code> and <code>expectedTd</code> properties.</p>
+				<h3 id="class-matchinfo">class MatchInfo</h3>
+				<p>Represents the result of running <code>match(suspect, typeDescr)</code>
+					or <code>exactlyMatch(suspect, typeDescr)</code> (the result of the second one is derived from <code>MatchInfo</code>) functions.
+				It contains an information wether <code>suspect</code> conforms to the given <code>typeDescr</code> or not, the actual value, expected type description and a property path to unexpected value type.</p>
+				<h3 id="properties">properties</h3>
+				<ul>
+					<li><p><code>matched: boolean</code> - <em>true</em> if the match was successful (i.e. <code>conforms(suspect, typeDescr) === true</code>), <em>false</em> otherwise. If it is <em>true</em>, then no <code>path</code>, <code>actualValue</code> and <code>expectedTd</code> properties are present in this <code>MatchInfo</code> object.</p>
+					</li>
+					<li><p><code>path?: PathArray</code> - an array of numbers and strings which defines a path to suspect&#39;s invalid <code>actualValue</code>. E.g. if <code>suspect.foo.bar[3][5]</code> failed to match to the <code>expectedTd</code>, then <code>path</code> would be <code>[ &#39;foo&#39;, &#39;bar&#39;, 3, 5 ]</code></p>
+					</li>
+					<li><p><code>expectedTd?: TypeDescription</code> - <code>TypeDescription</code> that <code>actualValue</code> was expected to conform to.</p>
+					</li>
+					<li><p><code>actualValue?: unknown</code> - value which failed to conform to the <code>expectedTd</code>.</p>
+					</li>
+				</ul>
+				<h3 id="methods">methods</h3>
+				<h3 id="pathstring-"><code>pathString()</code></h3>
+				<p>Returns <code>path</code> converted to a human readable JavaScript property access notation string if match was failed. If match was successful retuns an empty string.
+				Retuned string begins with the <code>&#39;root&#39;</code> as the root object to access the properties.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> info = match(
+    {
+        foo: {
+            bar: {
+                <span class="hljs-string">'twenty two'</span>: [
+                    { prop: <span class="hljs-string">'str'</span> }, 
+                    { prop: <span class="hljs-number">-23</span> }
+                ]
+            }
+        }
+    },
+    { foo: { bar: { <span class="hljs-string">'twenty two'</span>: [ { prop: <span class="hljs-string">'string'</span> } ] } } }
+);
+
+info.pathString() === <span class="hljs-string">`root.foo.bar['twenty two'][1].prop`</span></code></pre>
+				<h3 id="toerrorstring-"><code>toErrorString()</code></h3>
+				<p>Returns a string of form:</p>
+				<p><em>value (<code>JSON.stringify(actualValue)</code>) at path &#39;<code>pathString()</code>&#39; doesn&#39;t conform to the given type description (<code>stringifyTd(expectedTd)</code>)</em></p>
+				<p>If <code>JSON.stringify(actualValue)</code> throws an error, it is excluded from the returned string. Returns an empty string if match was successful.</p>
+				<p><em>Note:</em> derived <code>ExactMatchInfo</code> class only adds a word <em>exactly</em> before <em>conform</em> in the string.</p>
+				<h2 id="vee-type-safe-express">vee-type-safe/express</h2>
+				<p>This is a library for <em>ExpressJS</em> routing middleware functions.</p>
+				<h3 id="matchtype-getrequestproperty-typedescr-makeerror-"><code>matchType(getRequestProperty, typeDescr, makeError?)</code></h3>
+				<p>Returns <code>express.Handler</code> that matches the value returned by <code>getRequestProperty(req)</code> to <code>typeDescr</code> and if it fails, calls <code>next(makeError(failedTypeInfo))</code>.
+				Thus you can be sure that the property of <code>express.Request</code> object was type checked before using it in your middleware.</p>
+				<p>Does type matching via core library <code>match</code> function.</p>
+				<ul>
+					<li><code>getRequestProperty: (req: express.Request) =&gt; unknown</code> - this function returns a suspect to match to <code>typeDescr</code></li>
+					<li><code>typeDescr</code> - type description that the value returned by <code>getRequestProperty(req)</code> must match to</li>
+					<li><code>makeError?: (failInfo: FailedMatchInfo) =&gt; unknown</code> - it is an optional function which makes a custom error to forward to <code>next()</code>, by default this function retuns <code>BadTypeStatusError</code></li>
+				</ul>
+				<p><code>BadTypeStatusError</code> is an instance of <code>TypeMismatchError</code> that has a <code>status: number</code> property, which is http <em>BAD_REQUEST</em> by default.</p>
+				<pre><code class="language-typescript">    <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> express      <span class="hljs-keyword">from</span> <span class="hljs-string">'express'</span>;
+    <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> ExpressTypes <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe/express'</span>
+    <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Types        <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+    <span class="hljs-keyword">const</span> router = express.Router();
+    router.post(<span class="hljs-string">'api/v1/messages'</span>,
+        ExpressTypes.matchType(
+            <span class="hljs-function"><span class="hljs-params">req</span> =&gt;</span> req.body, <span class="hljs-comment">// or ExpressTypes.ReqBody</span>
+            {
+                filters: [<span class="hljs-string">'string'</span>],
+                limit: Types.isPositiveInteger
+            },
+            <span class="hljs-function"><span class="hljs-params">failInfo</span> =&gt;</span> <span class="hljs-keyword">new</span> MyCustomError(failInfo.path, failInfo.actualValue)
+        ),
+        <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+            <span class="hljs-comment">/* your middleware, where you can trust to req.body */</span>
+            <span class="hljs-keyword">const</span> filters = req.body.filters.join();
+            <span class="hljs-comment">// ...</span>
+        }
+    );</code></pre>
+				<p>There is a list of handy functions to specify as <code>getRequestProperty</code> argument:</p>
+				<ul>
+					<li><code>ReqBody(req)    =&gt; req.body</code></li>
+					<li><code>ReqParams(req)  =&gt; req.params</code></li>
+					<li><code>ReqQuery(req)   =&gt; req.query</code></li>
+					<li><code>ReqCookies(req) =&gt; req.cookies</code></li>
+					<li><code>ReqHeaders(req) =&gt; req.headers</code><pre><code class="language-typescript">  <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> ExpressTypes <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe/express'</span>;
+  <span class="hljs-comment">/* ... */</span>
+  router.get(<span class="hljs-string">'api/v1/users/'</span>,
+      ExpressTypes.matchType(ExpressTypes.ReqQuery, { title: <span class="hljs-string">'string'</span> }),
+      <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+          <span class="hljs-keyword">const</span> title: <span class="hljs-built_in">string</span> = req.query.title; <span class="hljs-comment">// now you are sure</span>
+          <span class="hljs-comment">/* ... */</span>
+      }
+  );</code></pre>
+					</li>
+				</ul>
+				<h3 id="exactlymatchtype-getrequestproperty-typedescr-makeerror-"><code>exactlyMatchType(getRequestProperty, typeDescr, makeError?)</code></h3>
+				<p>The same middleware factory as <code>matchType()</code>, but does type matching via core library <code>exactlyMatch</code> function.</p>
+				<h2 id="v-1-0">v 1.0</h2>
+				<h3 id="conformst-suspect-typedescr-suspect-is-t"><code>conforms&lt;T&gt;(suspect, typeDescr): suspect is T</code></h3>
+				<p>  <strong>You will use this function or <code>exactlyConforms()</code> 95% of the time interacting with this library.</strong>
+					It is a two in one: runtime type checker and static type guard.<br>  Determines whether the specified suspect type satisfies the restriction of the given type
+				description (TD). (Seeing example below first may be helpful).</p>
+				<ul>
+					<li><code>T</code> is a TypeScript type suspect is treated as, if this function returns <em>true</em>.</li>
+					<li><p><code>suspect</code> is a value of <code>unknown</code> type to be tested for conformance according to TD.</p>
+					</li>
+					<li><p><code>typeDescr</code> is a value of <code>TypeDescription</code> type. </p>
+						<ul>
+							<li>If <code>isBasicTypeName(typeDescr)</code>.
+							Returns <code>typeof suspect === typeDescr</code>.</li>
+							<li>If <code>typeDescr</code> is a <code>TypePredicate</code> function. Returns <code>Boolean(typeDescr(suspect))</code>.</li>
+							<li>If <code>typeDescr instanceof Set&lt;TD&gt;</code>.
+							Returns <em>true</em> if suspect conforms to at least one of the given TDs in the <code>Set</code>.</li>
+							<li>If <code>Array.isArray(typeDescr)</code> returns <em>false</em> if <code>!Array.isArray(suspect)</code> <ul>
+									<li>If <code>typeDescr.length === 1</code>. Returns <em>true</em> if each of suspect&#39;s items conforms to the given<pre><code>     TD at `typeDescr[<span class="hljs-number">0</span>]`.</code></pre></li>
+									<li>If <code>typeDescr.length &gt; 1</code>. Returns <em>true</em> if <code>suspect.length === typeDescr.length</code><pre><code>     <span class="hljs-keyword">and</span> each `suspect[i]` conforms <span class="hljs-keyword">to</span> `typeDescr[i]`<span class="hljs-built_in"> type </span>description.</code></pre></li>
+									<li>If <code>typeDescr.length === 0</code>. Returns <em>true</em>.<ul>
+											<li>If <code>isBasicObject(typeDescr)</code>. Returns <em>true</em> if <code>isBasicObject(suspect)</code> and<pre><code>   each `suspect[key]` conforms to `typeDescr[key]`. ([Excess properties <span class="hljs-keyword">in</span> `suspect`
+   do not matter](https:<span class="hljs-comment">//en.wikipedia.org/wiki/Duck_typing)).</span></code></pre></li>
+											<li>Else returns <em>false</em>.</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+
+conforms(
+{
+       prop: <span class="hljs-string">'lala'</span>,
+       prop2: <span class="hljs-literal">true</span>,
+       obj: {
+           obj: [<span class="hljs-number">23</span>, <span class="hljs-literal">false</span>]
+       },
+       someIDontCareProperty: <span class="hljs-literal">null</span> <span class="hljs-comment">// excess properties are ok</span>
+},
+{
+       prop: <span class="hljs-string">'string'</span>,
+       prop2: <span class="hljs-string">'boolean'</span>,
+       obj: {
+           obj: [<span class="hljs-string">'number'</span>, <span class="hljs-string">'boolean'</span>] <span class="hljs-comment">// claims a fixed length tuple</span>
+       }
+}); <span class="hljs-comment">// true</span>
+
+conforms(
+{
+     arr: [<span class="hljs-string">'array'</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">'of any type'</span>, <span class="hljs-number">8888</span> ],
+     strArr: [<span class="hljs-string">'Pinkie'</span>, <span class="hljs-string">'Promise'</span>, <span class="hljs-string">'some'</span>, <span class="hljs-string">'strings'</span>],
+     oneOf: <span class="hljs-number">2</span>,
+     custom: <span class="hljs-number">43</span>
+}, 
+{
+     arr: [],                              <span class="hljs-comment">// claims an array of any type</span>
+     strArr: [<span class="hljs-string">'string'</span>],                   <span class="hljs-comment">// claims an array of any length</span>
+     oneOf: <span class="hljs-keyword">new</span> Set([<span class="hljs-string">'boolean'</span>, <span class="hljs-string">'number'</span>]),<span class="hljs-comment">// claims to be one of these types</span>
+     custom: isOddNumber                   <span class="hljs-comment">// custom type predicate function</span>
+}); <span class="hljs-comment">// true</span>
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isOddNumber</span>(<span class="hljs-params">suspect: unknown</span>): <span class="hljs-title">suspect</span> <span class="hljs-title">is</span> <span class="hljs-title">number</span> </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">typeof</span> suspect === <span class="hljs-string">'number'</span> &amp;&amp; suspect % <span class="hljs-number">2</span>; 
+}  
+
+<span class="hljs-comment">// Type argument:</span>
+<span class="hljs-keyword">interface</span> Human {
+    name: <span class="hljs-built_in">string</span>;
+    id:   <span class="hljs-built_in">number</span>;
+}
+<span class="hljs-keyword">const</span> HumanTD = {
+    name: <span class="hljs-string">'string'</span>,
+    id:   <span class="hljs-string">'number'</span>
+};
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tryUseHuman</span>(<span class="hljs-params">maybeHuman: unknown</span>) </span>{
+    <span class="hljs-keyword">if</span> (conforms&lt;Human&gt;(maybeHuman, HumanTD)) {
+        <span class="hljs-comment">// maybeHuman is of type Human here</span>
+        maybeHuman.name;
+        maybeHuman.id;
+    }
+}</code></pre>
+				<h3 id="exactlyconformst-suspect-typedescr-suspect-is-t"><code>exactlyConforms&lt;T&gt;(suspect, typeDescr): suspect is T</code></h3>
+				<p>This function is the same as <code>conforms()</code>, but returns <em>false</em> for suspect object that has excess properties (those, that are not present in type description object).</p>
+				<pre><code class="language-typescript">conforms(<span class="hljs-number">23</span>, <span class="hljs-string">'number'</span>) === exactlyConforms(<span class="hljs-number">23</span>, <span class="hljs-string">'number'</span>);
+<span class="hljs-keyword">const</span> suspect = {
+    listedInt: <span class="hljs-number">7</span>,
+    listedStr: <span class="hljs-string">'readme'</span>,
+    unlistedProp: [<span class="hljs-string">'some'</span>, <span class="hljs-string">'excess'</span>, <span class="hljs-string">'prop'</span>, <span class="hljs-string">'value'</span>]
+}
+<span class="hljs-keyword">const</span> td: TypeDescription = {
+    listedInt: isPositiveInteger,
+    listedStr: <span class="hljs-string">'string'</span>
+}
+conforms(suspect, td) === <span class="hljs-literal">true</span>;
+exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</code></pre>
+				<h3 id="factory-functions">Factory functions</h3>
+				<p> (previously were in namespace Factory)</p>
+				<p>Factory functions return <code>TypePredicate</code>s to use as type descriptions when calling <code>conforms(suspect, typeDescr)</code>.
+				<code>TypePredicate</code> is a function of type:</p>
+				<p><code>(suspect: unknown): boolean</code></p>
+				<h3 id="isnumberwithinrange-min-max-"><code>isNumberWithinRange(min, max)</code></h3>
+				<p> Returns a predicate that returns <em>true</em> if its argument is a number within the range [<code>min</code>, <code>max</code>] or [<code>max</code>, <code>min</code>] if <code>min &gt; max</code>.</p>
+				<pre><code class="language-typescript"> <span class="hljs-keyword">import</span> { conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+
+ conforms(
+ {
+     num: <span class="hljs-number">32</span>
+ },
+ {
+     num: isNumberWithinRange(<span class="hljs-number">0</span>, <span class="hljs-number">5</span>)    
+ }); <span class="hljs-comment">// false</span></code></pre>
+				<h3 id="isintegerwithinrange-min-max-"><code>isIntegerWithinRange(min, max)</code></h3>
+				<p> The same as <code>isNumberWithinRange(min, max)</code>, but its returned predicate returns <em>false</em> if forwarded argument is not an integer.</p>
+				<h3 id="optional-typedescr-typedescription-"><code>optional(typeDescr: TypeDescription)</code></h3>
+				<p>Retuns <code>TypePredicate</code> which retuns <code>typeof suspect === &#39;undefined&#39; || conforms(typeDescr)</code>, which you may use as a type description for optional object properties. This predicate is effectively the same as calling <code>conforms(suspect, new Set&lt;TypeDescription&gt;([typeDescr, &#39;undefined&#39;]));</code></p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+conforms(
+{
+    prop: <span class="hljs-string">'str'</span>
+},{
+    prop: optional(<span class="hljs-string">'number'</span>)
+}) 
+<span class="hljs-comment">// return false because the property is not undefined, </span>
+<span class="hljs-comment">// but doesn't conform to 'number' type</span>
+conforms(
+{
+    prop: <span class="hljs-number">-23</span>
+},{
+    prop: optional(isNegativeInteger)
+});
+<span class="hljs-comment">// returns true because the property is not undefined</span>
+<span class="hljs-comment">// and conforms to isNegativeInteger restriction</span></code></pre>
+				<h3 id="isoneoft-possiblevalues-t-"><code>isOneOf&lt;T&gt;(possibleValues: T[])</code></h3>
+				<p>  Returns a predicate that accepts a suspect of <code>any</code> type and matches it to
+					one of the provided possible values by
+				<code>possibleValues.includes(suspect)</code>. <strong>Don&#39;t confuse it with <code>new Set(possibleValues)</code></strong> when forwarding as a type description to <code>conforms()</code> function, because <code>possibleValues</code> are not TDs, but values to match with.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+
+conforms(<span class="hljs-number">2</span>, isOneOf([<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])); <span class="hljs-comment">// true</span>
+conforms(<span class="hljs-number">2</span>, <span class="hljs-keyword">new</span> Set([<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])); <span class="hljs-comment">// compile error</span>
+<span class="hljs-comment">// Set&lt;numbers&gt; is not a Set&lt;TypeDescritpion&gt;</span></code></pre>
+				<h3 id="maketdwithoptionalprops-srctypedescr-typedescrobjmap-"><code>makeTdWithOptionalProps(srcTypeDescr: TypeDescrObjMap)</code></h3>
+				<p>Returns a new <code>TypeDescrObjMap</code> (which is assignable to <code>TypeDescription</code>) object that is composed of <code>srcTypeDescr</code> properties wrapped as</p>
+				<p> <code>result[propName] = optional(srcTypeDescr[propName])</code></p>
+				<p> for each <code>propName</code> in <code>srcTypeDescr</code> own property names.</p>
+				<h3 id="type-definitions">Type definitions</h3>
+				<h3 id="interface-basicobjectt"><code>interface BasicObject&lt;T&gt;</code></h3>
+				<p>A shorthand for <code>{ [key: string]: T; }</code> type.</p>
+				<h3 id="interface-basicfunctortargs-tretval-tprops-"><code>interface BasicFunctor</code>&lt;TArgs, TRetval, TProps&gt;`</h3>
+				<p>This interface implies a callable <code>BasicObject&lt;TProps&gt;</code>, where
+				<code>TArgs</code> is a tuple of argument types, <code>TRetval</code> is the return type of this function.</p>
+				<h3 id="type-primitivetype"><code>type PrimitiveType</code></h3>
+				<p>A set of all primitive types (<code>null</code> is treated as a primitive type).</p>
+				<h3 id="type-basictypename"><code>type BasicTypeName</code></h3>
+				<p>A set of strings which are in <code>typeof</code> operator domain (<code>&#39;string&#39; | &#39;boolean&#39; | &#39;object&#39; ...</code>).</p>
+				<h3 id="isbasicobject-suspect-"><code>isBasicObject(suspect)</code></h3>
+				<p>Returns <em>true</em> if suspect is truthy (e.g. not <code>null</code>) and <code>typeof suspect === &#39;object&#39;</code> or <code>&#39;function&#39;</code>.</p>
+				<h3 id="reinterprett-value-"><code>reinterpret&lt;T&gt;(value)</code></h3>
+				<p>C++ style operator, a syntactic sugar for writing
+				casts like <code>value as any as T</code> when a simple <code>value as T</code> cast cannot be performed. Use it with caution!</p>
+				<h3 id="typeassertt-value-value-is-t"><code>typeAssert&lt;T&gt;(value): value is T</code></h3>
+				<p>TypeScript type guard that always returns <em>true</em>.
+				You may use it in an if statement to assert the proper type in the following code execution path.</p>
+				<pre><code class="language-typescript">    <span class="hljs-keyword">import</span> { typeAssert } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+    <span class="hljs-keyword">const</span> <span class="hljs-keyword">enum</span> SomeEnum {
+        A = <span class="hljs-number">0</span>, B, C
+    }
+    <span class="hljs-keyword">const</span> numb: <span class="hljs-built_in">number</span> = <span class="hljs-number">2</span>;
+    <span class="hljs-keyword">if</span> (!typeAssert&lt;SomeEnum&gt;(numb)) { <span class="hljs-keyword">return</span>; }
+    numb; <span class="hljs-comment">// deduced type is SomeEnum</span>
+</code></pre>
+				<h3 id="assertnever-suspect-never-"><code>assertNever(suspect: never)</code></h3>
+				<p>This function is no-op, but it is useful to check whether you have
+				handled all the cases and some code path is unreachable. TypeScript compiler will issue an error if you forward a value not of <a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#never"><code>never</code> type</a> to this function.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { assertNever } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">enum</span> Enum {
+    A, B, C
+}
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fn</span>(<span class="hljs-params">en: Enum</span>) </span>{
+    <span class="hljs-keyword">switch</span> (en) {
+        <span class="hljs-keyword">case</span> Enum.A: { <span class="hljs-comment">/***/</span> <span class="hljs-keyword">return</span>; }
+        <span class="hljs-keyword">case</span> Enum.B: { <span class="hljs-comment">/***/</span> <span class="hljs-keyword">return</span>; }
+        <span class="hljs-keyword">default</span>: {
+            assertNever(en); <span class="hljs-comment">// compile Error, en is of type Enum.C</span>
+        }
+    }
+}
+<span class="hljs-comment">//-------------</span>
+<span class="hljs-keyword">const</span> num = <span class="hljs-number">23</span>;
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> num !== <span class="hljs-string">'number'</span>){
+    assertNever(num); <span class="hljs-comment">// no error, this code is unreachable</span>
+    <span class="hljs-comment">// num is of type never here</span>
+}</code></pre>
+				<h3 id="isbasictypename-suspect-suspect-is-basictypename"><code>isBasicTypeName(suspect): suspect is BasicTypeName</code></h3>
+				<p>Returns <em>true</em> if suspect is a string that is inside a set of <code>BasicTypeName</code> type set.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { isBasicTypeName } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+
+isBasicTypeName(<span class="hljs-string">'null'</span>);    <span class="hljs-comment">// false</span>
+isBasicTypeName(<span class="hljs-string">' number'</span>); <span class="hljs-comment">// false</span>
+isBasicTypeName(<span class="hljs-string">'number'</span>);  <span class="hljs-comment">// true</span></code></pre>
+				<h3 id="isisodatestring-suspect-unknown-"><code>isIsoDateString(suspect: unknown)</code></h3>
+				<p>Checks that suspect is a string and it conforms to ISO 8601 format.
+					Internally uses <a href="https://www.npmjs.com/package/is-iso-date">&#39;is-iso-date&#39;</a> npm package. Returns <code>suspect is string</code> as a type guard.
+				Example taken from <a href="https://www.npmjs.com/package/is-iso-date">here</a>:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { isIsoDateString, conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+isIsoDateString(<span class="hljs-number">8888</span>); <span class="hljs-comment">// false</span>
+isIsoDateString({
+   iso: <span class="hljs-string">'2015-02-21T00:52:43.822Z'</span>
+}); <span class="hljs-comment">// false</span>
+isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43.822Z'</span> ); <span class="hljs-comment">// true</span>
+isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43.822'</span> );  <span class="hljs-comment">// false</span>
+isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43Z'</span> );     <span class="hljs-comment">// true</span>
+isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43'</span> );      <span class="hljs-comment">// false</span>
+isIsoDateString( <span class="hljs-string">'2015-02-21T00:52Z'</span> );        <span class="hljs-comment">// true</span>
+isIsoDateString( <span class="hljs-string">'2015-02-21T00:52'</span> );         <span class="hljs-comment">// false</span>
+isIsoDateString( <span class="hljs-string">'2015-02-21T00Z'</span> );           <span class="hljs-comment">// false</span>
+<span class="hljs-keyword">const</span> someObj = {
+    date: <span class="hljs-string">'2015-02-21T00:52Z'</span>
+};
+conforms(someObj, {
+    date: isIsoDateString
+}); <span class="hljs-comment">// true</span></code></pre>
+				<h3 id="self-explanatory-functions">Self explanatory functions</h3>
+				<p>All these functions take <code>unknown</code> type argument and return <code>suspect is number</code>, which is useful as a type guard or when using as a type description.</p>
+				<ul>
+					<li><code>isInteger(suspect)</code></li>
+					<li><code>isPositiveInteger(suspect)</code></li>
+					<li><code>isNegativeInteger(suspect)</code></li>
+					<li><code>isPositiveNumber(suspect)</code></li>
+					<li><code>isNegativeNumber(suspect)</code></li>
+					<li><code>isZeroOrPositiveInteger(suspect)</code></li>
+					<li><code>isZeroOrNegativeInteger(suspect)</code></li>
+					<li><code>isZeroOrPositiveNumber(suspect)</code></li>
+					<li><code>isZeroOrNegativeNumber(suspect)</code><pre><code class="language-typescript"><span class="hljs-keyword">import</span> { conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+conforms(
+{
+  id: <span class="hljs-number">2</span>,
+  volume: <span class="hljs-number">22.5</span>
+},
+{
+  id:    isPositiveInteger,
+  money: isZeroOrPositiveNumber
+}); <span class="hljs-comment">// true</span></code></pre>
+					</li>
+				</ul>
+				<h3 id="defaultifnotconformst-typedescr-suspect-defaultval-t"><code>defaultIfNotConforms&lt;T&gt;(typeDescr, suspect, defaultVal): T</code></h3>
+				<p>Checks whether <code>suspect</code> conforms to the given type description (<code>typeDescr</code>) and returns it if <code>conforms(suspect, typeDescr)</code>, otherwise returns <code>defaultVal</code>.</p>
+				<ul>
+					<li><code>typeDescr: TypeDescription</code> - TD suspect may conform to. <code>defaultVal</code> <strong>must</strong> conform to this TD</li>
+					<li><code>suspect: unknown</code> value to provide default for</li>
+					<li><code>defaultVal: T</code> value that conforms to <code>typeDescr</code> that is returned by this function if <code>!conforms(suspect, typeDescr)</code>
+						~~~typescript
+					import { defaultIfNotConforms } from &#39;vee-type-safe&#39;;</li>
+				</ul>
+				<p>const id = defaultIfNotConforms(isPositiveInteger, parseInt(&#39;-1&#39;), 0);
+					// id === 0;
+					const id2 = defaultIfNotConforms(isPositiveInteger, parseInt(&#39;444&#39;), 0);
+					// id2 === 444
+				~~~</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_index_.html">"index"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

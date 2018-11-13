@@ -17,7 +17,8 @@
         "url": "https://github.com/Veetaha/vee-type-safe.git"
     },
     "scripts": {
-        "test": "tsc && mocha build/test/tests.js"
+        "test": "tsc && mocha build/test/tests.js",
+        "docs": "./node_modules/.bin/typedoc --options typedoc.json index.ts"
     },
     "author": "Vitaliy Kryvenko",
     "license": "MIT",
@@ -33,6 +34,7 @@
         "@types/mocha": "latest",
         "chai": "latest",
         "mocha": "latest",
-        "tslint": "^5.11.0"
+        "tslint": "^5.11.0",
+        "typedoc": "^0.13.0"
     }
 }
