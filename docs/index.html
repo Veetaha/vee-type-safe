@@ -210,9 +210,14 @@ info.pathString() === <span class="hljs-string">`root.foo.bar['twenty two'][1].p
 					</li>
 					<li><p><code>typeDescr</code> is a value of <code>TypeDescription</code> type. </p>
 						<ul>
-							<li>If <code>isBasicTypeName(typeDescr)</code>.
-							Returns <code>typeof suspect === typeDescr</code>.</li>
-							<li>If <code>typeDescr</code> is a <code>TypePredicate</code> function. Returns <code>Boolean(typeDescr(suspect))</code>.</li>
+							<li><p>If <code>isBasicTypeName(typeDescr)</code>.
+								Returns <code>typeof suspect === typeDescr</code>.</p>
+							</li>
+							<li><p>If it is a <code>RegExp</code>, then returns
+								<code>typeof suspect === &#39;string&#39; &amp;&amp; typeDescr.test(suspect)</code>.</p>
+							</li>
+							<li><p>If <code>typeDescr</code> is a <code>TypePredicate</code> function. Returns <code>Boolean(typeDescr(suspect))</code>.</p>
+							</li>
 							<li>If <code>typeDescr instanceof Set&lt;TD&gt;</code>.
 							Returns <em>true</em> if suspect conforms to at least one of the given TDs in the <code>Set</code>.</li>
 							<li>If <code>Array.isArray(typeDescr)</code> returns <em>false</em> if <code>!Array.isArray(suspect)</code> <ul>
