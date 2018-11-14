@@ -195,6 +195,10 @@ The same middleware factory as `matchType()`, but does type matching via core li
   * `typeDescr` is a value of `TypeDescription` type. 
     * If `isBasicTypeName(typeDescr)`. 
       Returns `typeof suspect === typeDescr`.
+
+    * If it is a `RegExp`, then returns
+      `typeof suspect === 'string' && typeDescr.test(suspect)`.
+
     * If `typeDescr` is a `TypePredicate` function. Returns `Boolean(typeDescr(suspect))`.
     * If `typeDescr instanceof Set<TD>`.
       Returns *true* if suspect conforms to at least one of the given TDs in the `Set`.

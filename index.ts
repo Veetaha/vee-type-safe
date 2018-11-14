@@ -51,7 +51,7 @@ export interface TypeDescrSet    extends Set<TypeDescription>
 {}
 export type TypePredicate   = (suspect: unknown) => boolean;
 export type TypeDescription = TypeDescrObjMap | TypeDescrArray | TypePredicate |
-                                 TypeDescrSet | BasicTypeName;
+                                 TypeDescrSet | BasicTypeName  | RegExp;
 
 /**
  * Determines whether the specified suspect type satisfies the restriction of the given type
@@ -60,7 +60,10 @@ export type TypeDescription = TypeDescrObjMap | TypeDescrArray | TypePredicate |
  * @param suspect   Entity of unknown type to be tested for conformance according to TD.
  * @param typeDescr If it is a basic JavaScript typename string (should satisfy typeof operator
  *                  domain definition), then function returns "typeof suspect === typeDescr".
- *
+ *          
+ *                  If it is a `RegExp`, then returns
+ *                  `typeof suspect === 'string' && typeDescr.test(suspect)`.
+ * 
  *                  Else if it is a Set<TD>, returns true if suspect conforms to at
  *                  least one of the given TDs in Set.
  *
@@ -90,6 +93,9 @@ export function conforms<T = unknown>(suspect: unknown, typeDescr: TypeDescripti
     }
     if (typeof typeDescr === 'function') {
         return Boolean((typeDescr as TypePredicate)(suspect));
+    }
+    if (typeDescr instanceof RegExp) {
+        return typeof suspect === 'string' && typeDescr.test(suspect);
     }
     if (Array.isArray(typeDescr)) {
         if (!Array.isArray(suspect)) {
@@ -130,6 +136,9 @@ export function exactlyConforms<T = unknown>(suspect: unknown, typeDescr: TypeDe
     }
     if (typeof typeDescr === 'function') {
         return Boolean((typeDescr as TypePredicate)(suspect));
+    }
+    if (typeDescr instanceof RegExp) {
+        return typeof suspect === 'string' && typeDescr.test(suspect);
     }
     if (Array.isArray(typeDescr)) {
         if (!Array.isArray(suspect)) {
@@ -441,6 +450,10 @@ class TypeMatcher {
             return typeDescr(suspect) ?
                 this.trueMatch() : this.falseMatch(suspect, typeDescr);
         }
+        if (typeDescr instanceof RegExp) {
+            return typeof suspect === 'string' && typeDescr.test(suspect) ?
+                this.trueMatch() : this.falseMatch(suspect, typeDescr);
+        }
         if (Array.isArray(typeDescr)) {
             if (!Array.isArray(suspect)) {
                 return this.falseMatch(suspect, typeDescr);
@@ -541,6 +554,8 @@ function stringifyTdImpl(typeDescr: TypeDescription): string {
             `<${typeDescr.name}>`               :
             typeDescr instanceof Set            ?
             [...typeDescr.values()].map(stringifyTd).join(' | ') :
+            typeDescr instanceof RegExp         ?
+            typeDescr.source                    :
             JSON.stringify(typeDescr, (_key, value: TypeDescription) => 
                 value instanceof Function || 
                 value instanceof Set       ? 
