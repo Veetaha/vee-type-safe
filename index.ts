@@ -613,6 +613,15 @@ export type MappedObject<TSourceObject extends BasicObject<any>, MappedValue> = 
     [TSourceObjectKey in keyof TSourceObject]: MappedValue;
 };
 
+export type ReplaceProperty<
+    TSourceObject extends BasicObject,
+    TPropName extends keyof TSourceObject,
+    TNewPropType
+> = {
+    [Key in keyof TSourceObject]:
+    Key extends TPropName ? TNewPropType : TSourceObject[Key];
+};
+
 
 
 /**
