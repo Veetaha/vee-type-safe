@@ -580,7 +580,8 @@ export type Take<
  * @returns New object that is a shallow copy of `sourceObject` 
  * with the properties given as `propertyNames` array.
  *
- * @remarks This function will be useful when serializing
+ * @remarks 
+ * This function will be useful when serializing
  * your objects as data holders using generic JSON.stringify() and you
  * don't want any excess properties to be exposed to the serialized 
  * representation.
@@ -636,4 +637,20 @@ export function takeFromKeys<
         sourceObject, 
         Object.getOwnPropertyNames(keysObj) as PropNamesArray<TKeysObject>
     );
+}
+
+
+/**
+ * Returns true if `suspect` is a string of BSON object id format.
+ *  
+ * @param suspect - Value of unknown type to validate.
+ * @remarks 
+ * BSON format is the format used by MongoDB documents.
+ * This function doesn't depend on any libarary at all.
+ * You can safely validate id's even on the client side.
+ * The `RegExp` for this fucntion was taken from ['bson'](https://www.npmjs.com/package/bson)
+ * npm package.
+ */
+export function isValidBsonObjectIdString(suspect: unknown) {
+    return typeof suspect === 'string' && /^[0-9a-fA-F]{24}$/.test(suspect);
 }
