@@ -3,6 +3,12 @@ import isISODate = require('is-iso-date');
 export interface BasicObject<TValue = unknown> {
     [key: string]: TValue;
 }
+export type BasicObjectMap<
+    TKey extends string | number | symbol = string, 
+    TValue = unknown
+> = {
+    [key in TKey]: TValue;
+};
 
 export interface BasicFunctor<
     TArgs extends any[]  = unknown[],
@@ -703,4 +709,37 @@ export function takeFromKeys<
  */
 export function isValidBsonObjectIdString(suspect: unknown): suspect is string {
     return typeof suspect === 'string' && /^[0-9a-fA-F]{24}$/.test(suspect);
+}
+
+/**
+ * Returns a `TypePredicate` that checks whether given string enum values include 
+ * its suspect.
+ * 
+ * @param typeStringScriptEnum typescript string enumeration get values from
+ * 
+ * @remarks
+ * Beware that this function accepts only string enums, e.g.:
+ * ```ts
+ * import * as Vts from 'vee-type-safe';
+ * enum UserRole {
+ *      Guest    = 'guest',
+ *      Standart = 'standart',
+ *      Admin    = 'admin'
+ * }
+ * enum UserRoleNumber {
+ *      Guest, Standart, Admin // implicit values: 0, 1, 2
+ * }
+ * 
+ * Vts.mismatch({ role: 'guest' }, { role: Vts.isInEnum(UserRole) }); // ok
+ * Vts.mismatch({ role: 0 }, { role: Vts.isInEnum(UserRoleNumber) }); // compile error
+ * 
+ * ```
+ * 
+ */
+export function isInEnum<
+    TEnum extends BasicObjectMap<keyof TEnum, string>
+>(typeStringScriptEnum: TEnum) { 
+    const enumValues = Object.values(typeStringScriptEnum);
+    return (suspect: unknown): suspect is TEnum[keyof TEnum] => 
+        typeof suspect === 'string' && enumValues.includes(suspect);
 }
