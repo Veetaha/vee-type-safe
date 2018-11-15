@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>MatchInfo | vee-type-safe</title>
+	<title>MismatchInfo | vee-type-safe</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -57,31 +57,36 @@
 					<a href="../modules/_index_.html">&quot;index&quot;</a>
 				</li>
 				<li>
-					<a href="_index_.matchinfo.html">MatchInfo</a>
+					<a href="_index_.mismatchinfo.html">MismatchInfo</a>
 				</li>
 			</ul>
-			<h1>Class MatchInfo</h1>
+			<h1>Class MismatchInfo</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<dl class="tsd-comment-tags">
-						<dt>deprecated</dt>
-						<dd><p>Use MismatchInfo instead</p>
-						</dd>
-					</dl>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">MatchInfo</span>
+						<span class="target">MismatchInfo</span>
+						<ul class="tsd-hierarchy">
+							<li>
+								<a href="_index_.failedmatchinfo.html" class="tsd-signature-type">FailedMatchInfo</a>
+							</li>
+							<li>
+								<a href="_index_.duckmismatchinfo.html" class="tsd-signature-type">DuckMismatchInfo</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel">
+				<h3>Implements</h3>
+				<ul class="tsd-hierarchy">
+					<li><a href="../interfaces/_index_.mismatchinfodata.html" class="tsd-signature-type">MismatchInfoData</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -91,28 +96,22 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_index_.matchinfo.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_index_.mismatchinfo.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_index_.matchinfo.html#actualvalue" class="tsd-kind-icon">actual<wbr>Value</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_index_.matchinfo.html#expectedtd" class="tsd-kind-icon">expected<wbr>Td</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_index_.matchinfo.html#path" class="tsd-kind-icon">path</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Accessors</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_index_.matchinfo.html#matched" class="tsd-kind-icon">matched</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_index_.mismatchinfo.html#actualvalue" class="tsd-kind-icon">actual<wbr>Value</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_index_.mismatchinfo.html#expectedtd" class="tsd-kind-icon">expected<wbr>Td</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_index_.mismatchinfo.html#path" class="tsd-kind-icon">path</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_index_.matchinfo.html#pathstring" class="tsd-kind-icon">path<wbr>String</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_index_.matchinfo.html#toerrorstring" class="tsd-kind-icon">to<wbr>Error<wbr>String</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_index_.mismatchinfo.html#pathstring" class="tsd-kind-icon">path<wbr>String</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_index_.mismatchinfo.html#toerrorstring" class="tsd-kind-icon">to<wbr>Error<wbr>String</a></li>
 							</ul>
 						</section>
 					</div>
@@ -124,22 +123,22 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Match<wbr>Info<span class="tsd-signature-symbol">(</span>mismatchData<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_index_.mismatchinfodata.html" class="tsd-signature-type">MismatchInfoData</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_index_.matchinfo.html" class="tsd-signature-type">MatchInfo</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Mismatch<wbr>Info<span class="tsd-signature-symbol">(</span>mismatchData<span class="tsd-signature-symbol">: </span><a href="../interfaces/_index_.mismatchinfodata.html" class="tsd-signature-type">MismatchInfoData</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_index_.mismatchinfo.html" class="tsd-signature-type">MismatchInfo</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L404">index.ts:404</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L319">index.ts:319</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> mismatchData: <a href="../interfaces/_index_.mismatchinfodata.html" class="tsd-signature-type">MismatchInfoData</a></h5>
+									<h5>mismatchData: <a href="../interfaces/_index_.mismatchinfodata.html" class="tsd-signature-type">MismatchInfoData</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_index_.matchinfo.html" class="tsd-signature-type">MatchInfo</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_index_.mismatchinfo.html" class="tsd-signature-type">MismatchInfo</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -148,53 +147,36 @@
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="actualvalue" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> actual<wbr>Value</h3>
+					<h3>actual<wbr>Value</h3>
 					<div class="tsd-signature tsd-kind-icon">actual<wbr>Value<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unknown</span></div>
 					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_index_.mismatchinfodata.html">MismatchInfoData</a>.<a href="../interfaces/_index_.mismatchinfodata.html#actualvalue">actualValue</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L401">index.ts:401</a></li>
+							<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L319">index.ts:319</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="expectedtd" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> expected<wbr>Td</h3>
+					<h3>expected<wbr>Td</h3>
 					<div class="tsd-signature tsd-kind-icon">expected<wbr>Td<span class="tsd-signature-symbol">:</span> <a href="../modules/_index_.html#typedescription" class="tsd-signature-type">TypeDescription</a></div>
 					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_index_.mismatchinfodata.html">MismatchInfoData</a>.<a href="../interfaces/_index_.mismatchinfodata.html#expectedtd">expectedTd</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L400">index.ts:400</a></li>
+							<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L318">index.ts:318</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="path" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> path</h3>
+					<h3>path</h3>
 					<div class="tsd-signature tsd-kind-icon">path<span class="tsd-signature-symbol">:</span> <a href="../modules/_index_.html#patharray" class="tsd-signature-type">PathArray</a></div>
 					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_index_.mismatchinfodata.html">MismatchInfoData</a>.<a href="../interfaces/_index_.mismatchinfodata.html#path">path</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L399">index.ts:399</a></li>
+							<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L317">index.ts:317</a></li>
 						</ul>
 					</aside>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Accessors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
-					<a name="matched" class="tsd-anchor"></a>
-					<h3>matched</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> matched<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L402">index.ts:402</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-						</li>
-					</ul>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -209,7 +191,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L414">index.ts:414</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L331">index.ts:331</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span>
@@ -229,7 +211,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L420">index.ts:420</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b3b5876/index.ts#L343">index.ts:343</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -254,28 +236,25 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-external-module">
-						<a href="_index_.matchinfo.html" class="tsd-kind-icon">Match<wbr>Info</a>
+						<a href="_index_.mismatchinfo.html" class="tsd-kind-icon">Mismatch<wbr>Info</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="_index_.matchinfo.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="_index_.mismatchinfo.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_index_.matchinfo.html#actualvalue" class="tsd-kind-icon">actual<wbr>Value</a>
+								<a href="_index_.mismatchinfo.html#actualvalue" class="tsd-kind-icon">actual<wbr>Value</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_index_.matchinfo.html#expectedtd" class="tsd-kind-icon">expected<wbr>Td</a>
+								<a href="_index_.mismatchinfo.html#expectedtd" class="tsd-kind-icon">expected<wbr>Td</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_index_.matchinfo.html#path" class="tsd-kind-icon">path</a>
-							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="_index_.matchinfo.html#matched" class="tsd-kind-icon">matched</a>
+								<a href="_index_.mismatchinfo.html#path" class="tsd-kind-icon">path</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_index_.matchinfo.html#pathstring" class="tsd-kind-icon">path<wbr>String</a>
+								<a href="_index_.mismatchinfo.html#pathstring" class="tsd-kind-icon">path<wbr>String</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_index_.matchinfo.html#toerrorstring" class="tsd-kind-icon">to<wbr>Error<wbr>String</a>
+								<a href="_index_.mismatchinfo.html#toerrorstring" class="tsd-kind-icon">to<wbr>Error<wbr>String</a>
 							</li>
 						</ul>
 					</li>

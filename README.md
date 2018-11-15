@@ -14,84 +14,104 @@ Requires Typescript version `>= 3.0`.
 
 *(Pleese, see v 1.0 API in the first place if you are not familiar with this library)*
 
-### `match(suspect: unknown, typeDescr: TypeDescription): MatchInfo`
-
-Returns a `MatchInfo` object (description is bellow) that stores an information whether `conforms(suspect, typeDescr)` and if not, why and where its invalid property is.
+### mismatch(suspect, typeDescr)
+Returns a `MismatchInfo` object (description is bellow) that stores an information
+about type incompatability for given `typeDescr`, e.g. why and where `suspect`'s invalid property is. If `exactlyConforms(suspect, typeDescr)` this function returns *null*.
 This is a powerful tool to generate useful error messages while validating value shape type.
+*Note:* this function doesn't allow `suspect` to have properties not listed in `typeDescr` which differentiates it from `duckMismatch()` (see bellow).
+
 ~~~typescript
+    import * as Vts from 'vee-type-safe';
+    const untrustedJson = /* ... */;
+    const ExpectedJsonTD: Vts.TypeDescription = /* ... */;
+    const dbDocument = /* ... */
+
+    const mismatchInfo = Vts.mismatch(untrustedJson, ExpectedJsonTD);
+    if (mismatchInfo) {
+        console.log(
+            mismatchInfo.path,
+            mismatchInfo.actualValue,
+            mismatchInfo.expectedTd
+        );
+        // logs human readable path to invalid property
+        console.log(mismatchInfo.pathString());
+
+        // mismatchInfo.toErrorString() generates human readable error message
+        throw new Vts.TypeMismatchError(mismatchInfo.toErrorString());
+    }
+    // now you may safely assign untrustedJson to dbDocument:
+    dbDocument = Object.assign(dbDocument, untrustedJson);
+~~~
+
+
+### `duckMismatch(suspect, typeDescr)`
+Works the same way as `mismatch(suspect, typeDescr)` but allows `suspect` object with excess properties to pass the match.
+
+~~~typescript
+    import * as Vts from 'vee-type-safe';
+
+    Vts.duckMismatch(
+        { name: 'Ihor', somePropertyIDontCareAbout: 42 },
+        { name: 'string' }
+    ); // returns null as suspect is allowed to have excess properties
+
     const untrustedJson = {
         client: 'John Doe',
-        walletNumber: null
+        walletNumber: null,
     };
-    const ExpectedJsonTD: TypeDescription = {
+    const ExpectedJsonTD: Vts.TypeDescrObjectMap = {
         client: 'string',
-        walletNumber: num => typeof num === 'string' && /\d{16}/.test(num)
+        walletNumber: /\d{16}/.test(num) // implies a string of the given format
     };
 
-    const typeInfo = match(untrustedJson, ExpectedJsonTD);
-    if (!typeInfo.matched) {
-        // logs: [ 'walletNumber' ] null [Function: walletNumber]
-        console.log(typeInfo.path, typeInfo.actualValue, typeInfo.expectedTd);
-
-
-        throw new Error(typeInfo.toErrorString());
+    const mismatchInfo = Vts.duckMismatch(untrustedJson, ExpectedJsonTD);
+    if (mismatchInfo) {
+        throw new Vts.TypeMismatchError(mismatchInfo);
     }
     // process client
 ~~~
 
 
-### `exactlyMatch(suspect: unknown, typeDescr: TypeDescription): ExactMatchInfo`
 
-Works the same way as `match(suspect, typeDescr)` but returns a failed match info if `suspect` or its child objects contain excess properties that are not listed in `typeDescr`.
 
-~~~typescript
-    const untrustedJson = /* ... */;
-    const ExpectedJsonTD: TypeDescription = /* ... */;
-    const dbDocument = /* ... */
+### `match(suspect: unknown, typeDescr: TypeDescription)`   **DEPRECATED**: use `duckMismatch()` instead
 
-    const typeInfo = exactlyMatch(untrustedJson, ExpectedJsonTD);
-    if (!typeInfo.matched) {
-        throw new Error(typeInfo.toErrorString());
-    }
-    // now you may safely assign untrustedJson to dbDocument:
-    dbDocument = { ...dbDocument, ...untrustedJson  }
-    // dbDocument = Object.assign(dbDocument, untrustedJson)
-~~~
+### `exactlyMatch(suspect: unknown, typeDescr: TypeDescription)` **DEPRECATED**: use `mismatch()` instead
 
-### `tryMatch(suspect: unknown, typeDescr: TypeDescription)`
-### `tryExactlyMatch(suspect: unknown, typeDescr: TypeDescription)`
+### `ensureMatch(suspect: unknown, typeDescr: TypeDescription)`
+### `ensureDuckMatch(suspect: unknown, typeDescr: TypeDescription)`
+
+**Previously**: `tryExactlyMatch()` and `tryMatch()`
 
 These functions return nothing. They throw `TypeMismatchError` if their `suspect` failed to match to the given `typeDescr`.
 
-`TypeMismatchError` is an instance of `Error` with `typeMismatch: FailedMatchInfo` property.
-
-`FailedMatchError` is just a `MatchEror` with required `path`, `actualValue` and `expectedTd` properties.
+`TypeMismatchError` is an instance of `Error` with `typeMismatch: MismatchInfo` property.
 
 
-### class MatchInfo
+### `class MatchInfo` **DEPRECATED**: use `class MismatchInfo` instead
 
-Represents the result of running `match(suspect, typeDescr)`
-or `exactlyMatch(suspect, typeDescr)` (the result of the second one is derived from `MatchInfo`) functions.
-It contains an information wether `suspect` conforms to the given `typeDescr` or not, the actual value, expected type description and a property path to unexpected value type.
+### `class MismatchInfo`
+
+Represents the result of running `mismatch(suspect, typeDescr)`
+or `duckMismatch(suspect, typeDescr)` functions.
+It contains an information about why `suspect` doesn't conform to the given `typeDescr`: the actual value, expected type description and a property path to unexpected value type.
 
 ### properties
 
-* `matched: boolean` - *true* if the match was successful (i.e. `conforms(suspect, typeDescr) === true`), *false* otherwise. If it is *true*, then no `path`, `actualValue` and `expectedTd` properties are present in this `MatchInfo` object.
+* `path: PathArray` - an array of numbers and strings which defines a path to suspect's invalid `actualValue`. E.g. if `suspect.foo.bar[3][5]` failed to match to the `expectedTd`, then `path` would be `[ 'foo', 'bar', 3, 5 ]`
 
-* `path?: PathArray` - an array of numbers and strings which defines a path to suspect's invalid `actualValue`. E.g. if `suspect.foo.bar[3][5]` failed to match to the `expectedTd`, then `path` would be `[ 'foo', 'bar', 3, 5 ]`
+* `expectedTd: TypeDescription` - `TypeDescription` that `actualValue` was expected to conform to.
 
-* `expectedTd?: TypeDescription` - `TypeDescription` that `actualValue` was expected to conform to.
-
-* `actualValue?: unknown` - value which failed to conform to the `expectedTd`.
+* `actualValue: unknown` - value which failed to conform to the `expectedTd`.
 
 ### methods
 
 ### `pathString()`
 
-Returns `path` converted to a human readable JavaScript property access notation string if match was failed. If match was successful retuns an empty string.
-Retuned string begins with the `'root'` as the root object to access the properties.
+Returns `path` converted to a human readable JavaScript property access notation string if match was failed. Returned string begins with the `'root'` as the root object to access the properties.
 ~~~typescript
-const info = match(
+import * as Vts from 'vee-type-safe';
+const mismatchInfo = Vts.mismatch(
     {
         foo: {
             bar: {
@@ -105,51 +125,56 @@ const info = match(
     { foo: { bar: { 'twenty two': [ { prop: 'string' } ] } } }
 );
 
-info.pathString() === `root.foo.bar['twenty two'][1].prop`
+mismatchInfo.pathString() === `root.foo.bar['twenty two'][1].prop`
 ~~~
 
 ### `toErrorString()`
 
 Returns a string of form:
 
-*value (`JSON.stringify(actualValue)`) at path '`pathString()`' doesn't conform to the given type description (`stringifyTd(expectedTd)`)*
+*value (`JSON.stringify(actualValue)`) at path '`pathString()`' doesn't \[exactly] conform to the given type description (`stringifyTd(expectedTd)`)*
 
-If `JSON.stringify(actualValue)` throws an error, it is excluded from the returned string. Returns an empty string if match was successful.
-
-*Note:* derived `ExactMatchInfo` class only adds a word *exactly* before *conform* in the string.
+If `JSON.stringify(actualValue)` throws an error, it is excluded from the returned string.
 
 ## vee-type-safe/express
 This is a library for *ExpressJS* routing middleware functions.
 
-### `matchType(getRequestProperty, typeDescr, makeError?)`
+### `ensureTypeMatch(getRequestProperty, typeDescr, makeError?)`
 
-Returns `express.Handler` that matches the value returned by `getRequestProperty(req)` to `typeDescr` and if it fails, calls `next(makeError(failedTypeInfo))`.
+Returns `express.Handler` that exactly matches the value returned by `getRequestProperty(req)` to `typeDescr` and if it fails, calls `next(makeError(failedTypeInfo))`.
 Thus you can be sure that the property of `express.Request` object was type checked before using it in your middleware.
 
-Does type matching via core library `match` function.
+Does type matching via core library `mismatch()` function.
 
-* `getRequestProperty: (req: express.Request) => unknown` - this function returns a suspect to match to `typeDescr`
+* `getRequestProperty: (req: express.Request) => unknown` - this function must return a suspect to match to `typeDescr`, based on the given `req` argument.
 * `typeDescr` - type description that the value returned by `getRequestProperty(req)` must match to
-* `makeError?: (failInfo: FailedMatchInfo) => unknown` - it is an optional function which makes a custom error to forward to `next()`, by default this function retuns `BadTypeStatusError`
+* `makeError?: (failInfo: MismatchInfo) => unknown` - it is an optional function which makes a custom error to forward to `next()`, by default this function retuns `BadTypeStatusError`
 
 `BadTypeStatusError` is an instance of `TypeMismatchError` that has a `status: number` property, which is http *BAD_REQUEST* by default.
 
 ~~~typescript
-    import * as express      from 'express';
-    import * as ExpressTypes from 'vee-type-safe/express'
-    import * as Types        from 'vee-type-safe';
+    import * as express from 'express';
+    import * as VtsEx   from 'vee-type-safe/express'
+    import * as Vts     from 'vee-type-safe';
     const router = express.Router();
+    interface MessagesPostRequest {
+        filters: string[];
+        limit: number;
+    }
+
     router.post('api/v1/messages',
-        ExpressTypes.matchType(
-            req => req.body, // or ExpressTypes.ReqBody
+        VtsEx.matchType(
+            VtsEx.ReqBody, // or req => req.body (your custom obtaining logic here)
             {
                 filters: ['string'],
-                limit: Types.isPositiveInteger
+                limit:   Vts.isPositiveInteger
             },
-            failInfo => new MyCustomError(failInfo.path, failInfo.actualValue)
+            mmInfo => new MyCustomError(mmInfo.path, mmInfo.actualValue)
         ),
-        (req, res, next) => {
+            // replaces standard express.Request.body type with MessagesPostRequest
+        (req: VtsEx.ReqBody<MessagesPostRequest>, res, next) => {
             /* your middleware, where you can trust to req.body */
+            // req.body has MessagesPostRequest type here
             const filters = req.body.filters.join();
             // ...
         }
@@ -167,7 +192,7 @@ There is a list of handy functions to specify as `getRequestProperty` argument:
     /* ... */
     router.get('api/v1/users/',
         ExpressTypes.matchType(ExpressTypes.ReqQuery, { title: 'string' }),
-        (req, res, next) => {
+        (req: ReqQuery<{title: string}>, res, next) => {
             const title: string = req.query.title; // now you are sure
             /* ... */
         }
@@ -175,16 +200,15 @@ There is a list of handy functions to specify as `getRequestProperty` argument:
 ~~~
 
 
-### `exactlyMatchType(getRequestProperty, typeDescr, makeError?)`
+### `ensureDuckTypeMatch(getRequestProperty, typeDescr, makeError?)`
 
-The same middleware factory as `matchType()`, but does type matching via core library `exactlyMatch` function.
+The same middleware factory as `ensureTypeMatch()`, but does type matching via core library `duckMismatch()` function.
 
 
 
 ## v 1.0
 
 ### `conforms<T>(suspect, typeDescr): suspect is T`
-  **You will use this function or `exactlyConforms()` 95% of the time interacting with this library.**
   It is a two in one: runtime type checker and static type guard.   
   Determines whether the specified suspect type satisfies the restriction of the given type
   description (TD). (Seeing example below first may be helpful).

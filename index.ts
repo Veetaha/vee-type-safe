@@ -307,24 +307,21 @@ export function isOneOf<T>(possibleValues: T[]){
 
 export type PathArray = (string | number)[];
 
-interface FailedMatchArgument {
+export interface MismatchInfoData {
     path:        PathArray;
     expectedTd:  TypeDescription;
     actualValue: unknown;
 }
 
-export class MatchInfo {
-    path?:        PathArray;
-    expectedTd?:  TypeDescription;
-    actualValue?: unknown;
+export class MismatchInfo implements MismatchInfoData {
+    path:        PathArray;
+    expectedTd:  TypeDescription;
+    actualValue: unknown;
 
-    get matched() { return !this.path; }
-    constructor(failure?: FailedMatchArgument) { 
-        if (failure) {
-            this.path        = failure.path;
-            this.expectedTd  = failure.expectedTd;
-            this.actualValue = failure.actualValue;
-        }
+    constructor(mismatchData: MismatchInfoData) { 
+        this.path        = mismatchData.path;
+        this.expectedTd  = mismatchData.expectedTd;
+        this.actualValue = mismatchData.actualValue;
     }
 
     private static isJsIdentifier(suspect: string) {
@@ -332,73 +329,110 @@ export class MatchInfo {
     }
     
     pathString() {
-        return !this.path ? '' : this.path.reduce((result, currentPart) => {
-            if (typeof currentPart === 'string') {
-                return result + (MatchInfo.isJsIdentifier(currentPart) ? 
-                        `.${currentPart}` : `['${currentPart}']`
-                       );
-            }
-            return `${result}[${currentPart}]`;
-        }, 'root');
+        return this.path.reduce((result, currentPart) => 
+            `${result}${
+                typeof currentPart === 'string'                    ? (
+                MismatchInfo.isJsIdentifier(String(currentPart)) ? 
+                `.${currentPart}`                                : 
+                `['${currentPart}']`                               ) :
+                `[${currentPart}]`
+            }`, 
+            'root'
+        );
     }
     toErrorString() {
-        if (this.matched) {
-            return '';
-        }
         try {
             return `Value (${JSON.stringify(this.actualValue)}) at '${
-                    this.pathString()
-                }' doesn't conform to the given type description (${
-                    stringifyTd(this.expectedTd!)
-                })`;
+                this.pathString()
+            }' doesn't exactly conform to the given type description (${
+                stringifyTd(this.expectedTd)
+            })`;
+        } catch (err) {
+            return `value at '${
+                this.pathString()
+            }' doesn't exactly conform to the given type description (${
+                stringifyTd(this.expectedTd)
+            })`;
+        }
+    }
+}
+
+/**
+ * @deprecated Use just class MismatchInfo
+ */
+export class FailedMatchInfo extends MismatchInfo {
+    get matched() { return false; }
+
+    constructor(failedMatch: MismatchInfoData) {
+        super(failedMatch);
+    }
+}
+
+
+
+export class DuckMismatchInfo extends MismatchInfo {
+    constructor(mismatchData: MismatchInfoData){
+        super(mismatchData);
+    }
+    toErrorString() {
+        try {
+            return `value (${JSON.stringify(this.actualValue)}) at '${
+                this.pathString()
+            }' doesn't conform to the given type description (${
+                stringifyTd(this.expectedTd)
+            })`;
         } catch (err) {
             return `value at '${
                 this.pathString()
             }' doesn't conform to the given type description (${
-                stringifyTd(this.expectedTd!)
+                stringifyTd(this.expectedTd)
             })`;
         }
     }
 }
-export type FailedMatchInfo = Required<MatchInfo>;
 
-export class ExactMatchInfo extends MatchInfo {
-    constructor(failedMatchArgument?: FailedMatchArgument){
-        super(failedMatchArgument);
+
+/**
+ * @deprecated Use MismatchInfo instead
+ */
+export class MatchInfo {
+    path?:        PathArray;
+    expectedTd?:  TypeDescription;
+    actualValue?: unknown;
+    get matched() {  
+        return !this.path;
     }
+
+    constructor(mismatchData?: MismatchInfoData) { 
+        if (mismatchData) {
+            this.path        = mismatchData.path;
+            this.expectedTd  = mismatchData.expectedTd;
+            this.actualValue = mismatchData.actualValue;
+        }
+    }
+
+    pathString() {
+        return this.matched 
+            ? ''
+            : new MismatchInfo(this as MismatchInfoData).pathString();
+    }
+
     toErrorString() {
-        if (this.matched) {
-            return '';
-        }
-        try {
-            return `value (${JSON.stringify(this.actualValue)}) at '${
-                this.pathString()
-            }' doesn't exactly conform to the given type description (${
-                stringifyTd(this.expectedTd!)
-            })`;
-        } catch (err) {
-            return `value at '${
-                this.pathString()
-            }' doesn't exactly conform to the given type description (${
-                stringifyTd(this.expectedTd!)
-            })`;
-        }
+        return this.matched
+            ? ''
+            : new MismatchInfo(this as MismatchInfoData).toErrorString();
     }
 }
 
-
-class TypeMatcher {
-    private static readonly TrueMatch = new MatchInfo;
-
+class Mismatcher {
     protected currentPath: (string | number)[] = [];
-
 
     // tslint:disable-next-line:prefer-function-over-method
     protected trueMatch() {
-        return TypeMatcher.TrueMatch;
+        return null;
     }
     protected falseMatch(actualValue: unknown, expectedTd: TypeDescription) {
-        return new MatchInfo({ 
+        return new MismatchInfo({ 
             actualValue, 
             expectedTd, 
             path: [ ...this.currentPath ] 
@@ -411,10 +445,10 @@ class TypeMatcher {
     ) {
         for (let i = 0; i < suspect.length; ++i) {
             this.currentPath.push(i);
-            const result = this.match(suspect[i], getTd(i));
+            const mismatchInfo = this.mismatch(suspect[i], getTd(i));
             this.currentPath.pop();
-            if (!result.matched) {
-                return result;
+            if (mismatchInfo) {
+                return mismatchInfo;
             }
         }
         return this.trueMatch();
@@ -422,26 +456,34 @@ class TypeMatcher {
 
     protected matchSet(suspect: unknown, typeDescr: TypeDescrSet) {
         for (const possibleTypeDescr of typeDescr) {
-            const matchRes = this.match(suspect, possibleTypeDescr);
-            if (matchRes.matched) {
-                return matchRes;
+            const mismatchInfo = this.mismatch(suspect, possibleTypeDescr);
+            if (!mismatchInfo) {
+                return mismatchInfo;
             }
         }
         return this.falseMatch(suspect, typeDescr);
     }
 
     protected matchObject(suspect: BasicObject, typeDescr: TypeDescrObjMap) {
-        for (const propName of Object.getOwnPropertyNames(typeDescr)) {
-            this.currentPath.push(propName);
-            const matchRes = this.match(suspect[propName], typeDescr[propName]);
-            this.currentPath.pop();
-            if (!matchRes.matched) {
-                return matchRes;
-            }
+        const susProps = Object.getOwnPropertyNames(suspect);
+        const tdProps  = Object.getOwnPropertyNames(typeDescr);
+        if (tdProps.length < susProps.length) {
+            return this.falseMatch(suspect, typeDescr);
         }
-        return this.trueMatch();
+        let i = susProps.length;
+        for (const propName of tdProps) {
+            this.currentPath.push(propName);
+            const mismatchInfo = this.mismatch(suspect[propName], typeDescr[propName]);
+            this.currentPath.pop();
+            if (mismatchInfo) {
+                return mismatchInfo;
+            }
+            i -= Number(propName in suspect);
+        }
+        return i ? this.falseMatch(suspect, typeDescr) : this.trueMatch();
     }
-    match(suspect: unknown, typeDescr: TypeDescription): MatchInfo {
+
+    mismatch(suspect: unknown, typeDescr: TypeDescription): null | MismatchInfo {
         if (typeof typeDescr === 'string') {
             return typeof suspect === typeDescr ?
                 this.trueMatch() : this.falseMatch(suspect, typeDescr);
@@ -479,33 +521,24 @@ class TypeMatcher {
 
 }
 
-class ExactTypeMatcher extends TypeMatcher {
-    private static readonly TrueExactMatch = new ExactMatchInfo;
-
+class DuckMismatcher extends Mismatcher {
+    /**
+     * @override
+     */
     protected matchObject(suspect: BasicObject, typeDescr: TypeDescrObjMap) {
-        const susProps = Object.getOwnPropertyNames(suspect);
-        const tdProps  = Object.getOwnPropertyNames(typeDescr);
-        if (tdProps.length < susProps.length) {
-            return this.falseMatch(suspect, typeDescr);
-        }
-        let i = susProps.length;
-        for (const propName of tdProps) {
+        for (const propName of Object.getOwnPropertyNames(typeDescr)) {
             this.currentPath.push(propName);
-            const matchRes = this.match(suspect[propName], typeDescr[propName]);
+            const mismatchInfo = this.mismatch(suspect[propName], typeDescr[propName]);
             this.currentPath.pop();
-            if (!matchRes.matched) {
-                return matchRes;
+            if (mismatchInfo) {
+                return mismatchInfo;
             }
-            i -= Number(propName in suspect);
         }
-        return i ? this.falseMatch(suspect, typeDescr) : this.trueMatch();
+        return this.trueMatch();
     }
-    // tslint:disable-next-line:prefer-function-over-method
-    protected trueMatch() {
-        return ExactTypeMatcher.TrueExactMatch;
-    }
+
     protected falseMatch(actualValue: unknown, expectedTd: TypeDescription) {
-        return new ExactMatchInfo({ 
+        return new DuckMismatchInfo({ 
             actualValue, 
             expectedTd,
             path: [ ...this.currentPath ]
@@ -515,31 +548,48 @@ class ExactTypeMatcher extends TypeMatcher {
 }
 
 export class TypeMismatchError extends Error {
-    constructor(public typeMismatch: FailedMatchInfo
-    ) { 
+    constructor(public typeMismatch: MismatchInfo) { 
         super(typeMismatch.toErrorString());
     }
 }
 
+
+/**
+ * @deprecated Use duckMismatch() instead.
+ */
 export function match(suspect: unknown, typeDescr: TypeDescription) {
-    return (new TypeMatcher).match(suspect, typeDescr);
+    const  mismatchInfo = new DuckMismatcher().mismatch(suspect, typeDescr);
+    return mismatchInfo ? new MatchInfo(mismatchInfo) : new MatchInfo;
 }
 
+/**
+ * @deprecated Use mismatch() instead.
+ */
 export function exactlyMatch(suspect: unknown, typeDescr: TypeDescription) {
-    return (new ExactTypeMatcher).match(suspect, typeDescr);
+    const  mismatchInfo = new Mismatcher().mismatch(suspect, typeDescr);
+    return mismatchInfo ? new MatchInfo(mismatchInfo) : new MatchInfo;
 }
 
-export function tryMatch(suspect: unknown, typeDescr: TypeDescription) {
-    const matched = match(suspect, typeDescr);
-    if (!matched.matched) {
-        throw new TypeMismatchError(matched as FailedMatchInfo);
+export function duckMismatch(suspect: unknown, typeDescr: TypeDescription) {
+    return (new DuckMismatcher).mismatch(suspect, typeDescr);
+}
+
+export function mismatch(suspect: unknown, typeDescr: TypeDescription) {
+    return (new Mismatcher).mismatch(suspect, typeDescr);
+    
+}
+
+export function ensureDuckMatch(suspect: unknown, typeDescr: TypeDescription) {
+    const mismatchInfo = duckMismatch(suspect, typeDescr);
+    if (mismatchInfo) {
+        throw new TypeMismatchError(mismatchInfo);
     }
 }
 
-export function tryExactlyMatch(suspect: unknown, typeDescr: TypeDescription) {
-    const matched = exactlyMatch(suspect, typeDescr);
-    if (!matched.matched) {
-        throw new TypeMismatchError(matched as FailedMatchInfo);
+export function ensureMatch(suspect: unknown, typeDescr: TypeDescription) {
+    const mismatchInfo = mismatch(suspect, typeDescr);
+    if (mismatchInfo) {
+        throw new TypeMismatchError(mismatchInfo);
     }
 }
 

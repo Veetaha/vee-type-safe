@@ -7,12 +7,11 @@ import {
     TypeDescription, 
     exactlyConforms,
     optional,
-    match,
-    exactlyMatch,
-    MatchInfo,
+    mismatch,
+    duckMismatch,
+    MismatchInfo,
     PathArray
 } from '../index';
-import { deepStrictEqual } from 'assert';
 describe('conforms', () => {
     it('should work as typeof when being forwarded a primitive type name as type description', () => {
         // tslint:disable-next-line no-magic-numbers
@@ -198,19 +197,19 @@ describe('exactlyConforms', () => {
 });
 
 
-describe('match', () => {
-    it('should return (.matched === true) result when true', () => {
+describe('mismatch and duckMatch', () => {
+    it('should return null result when good match', () => {
         // tslint:disable-next-line no-magic-numbers
-        assert.isTrue(match(23,           'number')   .matched);
-        assert.isTrue(match(true,         'boolean')  .matched);
-        assert.isTrue(match(false,        'boolean')  .matched);
-        assert.isTrue(match(null,         'object')   .matched);
-        assert.isTrue(match(undefined,    'undefined').matched);
-        assert.isTrue(match(() => {},     'function') .matched);
-        assert.isTrue(match({prop: null}, 'object')   .matched);
-        assert.isTrue(match(Symbol(),     'symbol')   .matched);
-        assert.isTrue(match({prop: 'lala'}, {prop: 'string'}).matched);
-        assert.isTrue(match(
+        assert.isNull(mismatch(23,           'number')   );
+        assert.isNull(mismatch(true,         'boolean')  );
+        assert.isNull(mismatch(false,        'boolean')  );
+        assert.isNull(mismatch(null,         'object')   );
+        assert.isNull(mismatch(undefined,    'undefined'));
+        assert.isNull(mismatch(() => {},     'function') );
+        assert.isNull(mismatch({prop: null}, 'object')   );
+        assert.isNull(mismatch(Symbol(),     'symbol')   );
+        assert.isNull(mismatch({prop: 'lala'}, {prop: 'string'}));
+        assert.isNull(duckMismatch(
             {
                 prop: 'lala',
                 prop2: true,
@@ -225,61 +224,57 @@ describe('match', () => {
                 obj: {
                     obj: ['number', 'number']
                 }
-            }).matched);
-        assert.isTrue(match(
+            }));
+        assert.isNull(mismatch(
             [{id: 22}, {id: 75}, {id: 55}],
             [{id: 'number'}]
-        ).matched);
-        assert.isTrue(match(
+        ));
+        assert.isNull(mismatch(
             [],
             [{id: 'number'}]
-        ).matched);
-        assert.isTrue(match(
+        ));
+        assert.isNull(mismatch(
             [{id: 22}],
             [{id: 'number'}]
-        ).matched);
-        assert.isTrue(match(
+        ));
+        assert.isNull(mismatch(
             // tslint:disable-next-line no-magic-numbers
             [true, null, 22, 'str'],
             ['boolean', 'object', 'number', 'string']
-        ).matched);
-        assert.isTrue(match([1, 2, null, false], []).matched);
-        assert.isTrue(match([], []).matched);
-        assert.isTrue(match([], ['string']).matched);
-        assert.isTrue(match({}, {}).matched);
-        assert.isTrue(match(
-            // tslint:disable-next-line no-magic-numbers
+        ));
+        assert.isNull(mismatch([1, 2, null, false], []));
+        assert.isNull(mismatch([], []));
+        assert.isNull(mismatch([], ['string']));
+        assert.isNull(mismatch({}, {}));
+        assert.isNull(mismatch(
             42, new Set<TypeDescription>(
                 [{obj: 'number'}, 'string', 'number', ['boolean']]
             )
-        ).matched);
-        // tslint:disable-next-line no-magic-numbers
-        assert.isTrue(match(23, suspect => suspect === 23).matched);
-        assert.isTrue(match('str', suspect => suspect === 'str').matched);
-        assert.isTrue(match({
+        ));
+        assert.isNull(mismatch(23, suspect => suspect === 23));
+        assert.isNull(mismatch('str', suspect => suspect === 'str'));
+        assert.isNull(mismatch({
             prop: 'Ruslan',
             enum: 43
         }, {
             prop: 'string',
-            // tslint:disable-next-line no-magic-numbers
             enum: suspect => typeof suspect === 'number' && [58, 4, 43].includes(suspect)
-        }).matched);
+        }));
     });
 
     it('should return (.matched === false) with the proper path', () => {
-        deepStrictEqual
-        assert.deepStrictEqual(match(true, 'number'), new MatchInfo({
+        assert.deepStrictEqual(mismatch(true, 'number'), new MismatchInfo({
             actualValue: true,
             expectedTd: 'number',
             path: []
         }));
         const obj = { someObj: true };
-        assert.deepStrictEqual(match(obj, []), new MatchInfo({
+        assert.deepStrictEqual(mismatch(obj, []), new MismatchInfo({
             actualValue: obj,
             expectedTd: [],
             path: []
         }));
-        assert.deepStrictEqual(match(obj, [{objects: 'number'}]), new MatchInfo({
+        assert.deepStrictEqual(mismatch(obj, [{objects: 'number'}]), new MismatchInfo({
             actualValue: obj,
             expectedTd:  [{ objects: 'number' }],
             path: []
@@ -287,7 +282,7 @@ describe('match', () => {
         const setTd = new Set<TypeDescription>(
             [{obj: 'number'}, 'string', 'number', ['boolean']]
         );
-        assert.deepStrictEqual(match(obj, setTd), new MatchInfo({
+        assert.deepStrictEqual(mismatch(obj, setTd), new MismatchInfo({
                 actualValue: obj,
                 expectedTd: setTd,
                 path: []
@@ -300,8 +295,8 @@ describe('match', () => {
                 }
             }
         };
-        assert.deepStrictEqual(match(nestedObj, 
-            { someProp: { nested: { moreNested: 'string' } } }), new MatchInfo({
+        assert.deepStrictEqual(mismatch(nestedObj, 
+            { someProp: { nested: { moreNested: 'string' } } }), new MismatchInfo({
             actualValue: 22,
             expectedTd: 'string',
             path: ['someProp', 'nested', 'moreNested']
@@ -311,18 +306,18 @@ describe('match', () => {
             nested: {
                 nestedArray: [{obj: 22}, {obj: 32}, {obj: 56}, {obk: 43}]
             }
-        }
-        assert.deepStrictEqual(match(nestedObjWithArray,
-            { nested: { nestedArray: [{obj: 'number'}] } }), new MatchInfo({
+        };
+        assert.deepStrictEqual(mismatch(nestedObjWithArray,
+            { nested: { nestedArray: [{obj: 'number'}] } }), new MismatchInfo({
                 actualValue: undefined,
                 expectedTd:  'number',
                 path: ['nested', 'nestedArray', 3, 'obj']
         }));
         assert.deepStrictEqual(
-            match(
+            mismatch(
                 { id: 0 }, { id: isPositiveInteger }
             ),
-            new MatchInfo({ 
+            new MismatchInfo({ 
                 actualValue: 0, 
                 expectedTd: isPositiveInteger,
                 path: ['id'] 
@@ -332,15 +327,15 @@ describe('match', () => {
 });
 
 
-describe('exactlyMatch', () => {
+describe('mismatch', () => {
     it(`should return (.matched === false) for excess properties`, () => {
-        assert.deepStrictEqual(exactlyMatch({
+        assert.deepStrictEqual(mismatch({
             prop: 1,
             ex: true
         },{
             prop: 'number'
         }),
-        new MatchInfo({
+        new MismatchInfo({
             actualValue: { prop: 1, ex: true },
             expectedTd: { prop: 'number' },
             path: []
@@ -348,31 +343,31 @@ describe('exactlyMatch', () => {
     });
 
     it(`should return (.matched === true) if TD allows optional properties`, () => {
-        assert.isTrue(exactlyMatch({ prop: 's' }, {
+        assert.isNull(mismatch({ prop: 's' }, {
             prop: s => typeof s === 'string' && s === 's',
             opt: optional('number')
-        }).matched);
+        }));
 
-        assert.isTrue(exactlyMatch({ prop: 's' }, {
+        assert.isNull(mismatch({ prop: 's' }, {
             prop: s => typeof s === 'string' && s === 's',
             opt: optional('number'),
             opt2: optional('string')
-        }).matched);
+        }));
 
-        assert.isTrue(exactlyMatch({
+        assert.isNull(mismatch({
             prop: 's',
             opt: 23
         }, {
             prop: s => typeof s === 'string' && s === 's',
             opt: optional('number')
-        }).matched);
+        }));
     });
 });
 
 
 describe('MatchInfo.pathString()', () => {
     function call(...path: PathArray) {
-        return (new MatchInfo({ path, actualValue: 0, expectedTd: 'string'}))
+        return (new MismatchInfo({ path, actualValue: 0, expectedTd: 'string'}))
                 .pathString();
     }
 
@@ -396,7 +391,7 @@ describe('MatchInfo.pathString()', () => {
         assert.strictEqual(
             call('invalid space', '  ', ' 34'), 
             `root['invalid space']['  '][' 34']`
-        )
+        );
         }
     );
 
@@ -405,12 +400,12 @@ describe('MatchInfo.pathString()', () => {
         assert.strictEqual(
             call(23, 0, NaN, Infinity, -45), 
             `root[23][0][NaN][Infinity][-45]`
-        )
+        );
         }
     );
 
     it(`should confirm the example from README.md`, () => {
-        assert.strictEqual(match(
+        assert.strictEqual(mismatch(
             {
                 foo: {
                     bar: {
@@ -422,7 +417,7 @@ describe('MatchInfo.pathString()', () => {
                 }
             },
             { foo: { bar: { 'twenty two': [ { prop: 'string' } ] } } },
-            ).pathString(),
+            )!.pathString(),
             `root.foo.bar['twenty two'][1].prop`
         );
     });
