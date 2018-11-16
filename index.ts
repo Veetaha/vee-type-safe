@@ -707,7 +707,7 @@ export function takeFromKeys<
  * The `RegExp` for this fucntion was taken from ['bson'](https://www.npmjs.com/package/bson)
  * npm package.
  */
-export function isValidBsonObjectIdString(suspect: unknown): suspect is string {
+export function isBsonObjectIdString(suspect: unknown): suspect is string {
     return typeof suspect === 'string' && /^[0-9a-fA-F]{24}$/.test(suspect);
 }
 
