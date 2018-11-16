@@ -738,8 +738,8 @@ export function isValidBsonObjectIdString(suspect: unknown): suspect is string {
  */
 export function isInEnum<
     TEnum extends BasicObjectMap<keyof TEnum, string>
->(typeStringScriptEnum: TEnum) { 
-    const enumValues = Object.values(typeStringScriptEnum);
+>(typeScriptStringEnum: TEnum) { 
+    const enumValues = Object.values(typeScriptStringEnum);
     return (suspect: unknown): suspect is TEnum[keyof TEnum] => 
         typeof suspect === 'string' && enumValues.includes(suspect);
 }
