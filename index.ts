@@ -7,8 +7,9 @@ export type BasicObjectMap<
     TKey extends string | number | symbol = string, 
     TValue = unknown
 > = {
-    [key in TKey]: TValue;
+    [key in Exclude<TKey, keyof Object>]: TValue;
 };
+
 
 export interface BasicFunctor<
     TArgs extends any[]  = unknown[],
@@ -748,6 +749,7 @@ export function isInEnum<
  * 
  * @param T Object (probably interface) type to alias `TypeDescription` for.
  */
-export type TypeDescriptionOf<T extends BasicObject> = {
-    [Key in Exclude<keyof T, keyof Object>]: TypeDescription;
-};
+export type TypeDescriptionOf<T extends BasicObject> = BasicObjectMap<keyof T, TypeDescription>;
+
+
+
