@@ -745,9 +745,24 @@ export function isInEnum<
 }
 
 /**
- * Aliases a type that maps properties of T to `TypeDescription`'s
+ * Makes an alias for the type that maps properties of T to `TypeDescription`'s
  * 
  * @param T Object (probably interface) type to alias `TypeDescription` for.
+ * 
+ * @remarks
+ * Use it like so:
+ * ```ts
+ * import * as Vts from 'vee-type-safe';
+ * export interface Human {
+ *     name: string;
+ *     age: number;
+ * }
+ * 
+ * export const HumanTD: TypeDescriptionOf<Human> = {
+ *     name: 'string',
+ *     age: Vts.isPositiveInteger // you will get better intellisense here
+ * };
+ * ```
  */
 export type TypeDescriptionOf<T extends BasicObject> = BasicObjectMap<keyof T, TypeDescription>;
 
