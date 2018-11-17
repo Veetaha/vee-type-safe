@@ -680,7 +680,6 @@ export type ReplaceProperty<
 };
 
 
-
 /**
  * The same as `take(sourceObject, Object.getOwnPropertyNames(keysObject))`,
  * but with stronger typing.
@@ -743,3 +742,12 @@ export function isInEnum<
     return (suspect: unknown): suspect is TEnum[keyof TEnum] => 
         typeof suspect === 'string' && enumValues.includes(suspect);
 }
+
+/**
+ * Aliases a type that maps properties of T to `TypeDescription`'s
+ * 
+ * @param T Object (probably interface) type to alias `TypeDescription` for.
+ */
+export type TypeDescriptionOf<T extends BasicObject> = {
+    [Key in Exclude<keyof T, keyof Object>]: TypeDescription;
+};
