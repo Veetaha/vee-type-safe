@@ -689,14 +689,13 @@ export type ReplaceProperty<
  */
 export function takeFromKeys<
     TKeysObject   extends BasicObject<any>,
-    TSourceObject extends MappedObject<TKeysObject, any>
+    TSourceObject extends MappedObject<Partial<TKeysObject>, any>
 >(sourceObject: TSourceObject, keysObj: TKeysObject) {
     return take(
         sourceObject, 
         Object.getOwnPropertyNames(keysObj) as PropNamesArray<TKeysObject>
     );
 }
-
 
 /**
  * Returns true if `suspect` is a string of BSON object id format.

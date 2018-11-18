@@ -92,7 +92,7 @@
         <span class="hljs-built_in">console</span>.log(mismatchInfo.pathString());
 
         <span class="hljs-comment">// mismatchInfo.toErrorString() generates human readable error message</span>
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Vts.TypeMismatchError(mismatchInfo.toErrorString());
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Vts.TypeMismatchError(mismatchInfo);
     }
     <span class="hljs-comment">// now you may safely assign untrustedJson to dbDocument:</span>
     dbDocument = <span class="hljs-built_in">Object</span>.assign(dbDocument, untrustedJson);</code></pre>

@@ -37,7 +37,7 @@ This is a powerful tool to generate useful error messages while validating value
         console.log(mismatchInfo.pathString());
 
         // mismatchInfo.toErrorString() generates human readable error message
-        throw new Vts.TypeMismatchError(mismatchInfo.toErrorString());
+        throw new Vts.TypeMismatchError(mismatchInfo);
     }
     // now you may safely assign untrustedJson to dbDocument:
     dbDocument = Object.assign(dbDocument, untrustedJson);
