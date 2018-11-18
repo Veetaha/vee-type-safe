@@ -109,9 +109,9 @@
         client: <span class="hljs-string">'John Doe'</span>,
         walletNumber: <span class="hljs-literal">null</span>,
     };
-    <span class="hljs-keyword">const</span> ExpectedJsonTD: Vts.TypeDescrObjectMap = {
+    <span class="hljs-keyword">const</span> ExpectedJsonTD: Vts.TypeDescriptionOf&lt;<span class="hljs-keyword">typeof</span> untrustedJson&gt; = {
         client: <span class="hljs-string">'string'</span>,
-        walletNumber: <span class="hljs-regexp">/\d{16}/</span>.test(num) <span class="hljs-comment">// implies a string of the given format</span>
+        walletNumber: <span class="hljs-regexp">/\d{16}/</span> <span class="hljs-comment">// implies a string of the given format</span>
     };
 
     <span class="hljs-keyword">const</span> mismatchInfo = Vts.duckMismatch(untrustedJson, ExpectedJsonTD);
@@ -207,10 +207,10 @@ mismatchInfo.pathString() === <span class="hljs-string">`root.foo.bar['twenty tw
 					<li><code>ReqParams(req)  =&gt; req.params</code></li>
 					<li><code>ReqQuery(req)   =&gt; req.query</code></li>
 					<li><code>ReqCookies(req) =&gt; req.cookies</code></li>
-					<li><code>ReqHeaders(req) =&gt; req.headers</code><pre><code class="language-typescript">  <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> ExpressTypes <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe/express'</span>;
+					<li><code>ReqHeaders(req) =&gt; req.headers</code><pre><code class="language-typescript">  <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> VtsEx <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe/express'</span>;
   <span class="hljs-comment">/* ... */</span>
   router.get(<span class="hljs-string">'api/v1/users/'</span>,
-      ExpressTypes.matchType(ExpressTypes.ReqQuery, { title: <span class="hljs-string">'string'</span> }),
+      VtsEx.matchType(VtsEx.ReqQuery, { title: <span class="hljs-string">'string'</span> }),
       <span class="hljs-function">(<span class="hljs-params">req: ReqQuery&lt;{title: <span class="hljs-built_in">string</span>}&gt;, res, next</span>) =&gt;</span> {
           <span class="hljs-keyword">const</span> title: <span class="hljs-built_in">string</span> = req.query.title; <span class="hljs-comment">// now you are sure</span>
           <span class="hljs-comment">/* ... */</span>
@@ -254,9 +254,9 @@ mismatchInfo.pathString() === <span class="hljs-string">`root.foo.bar['twenty tw
 						</ul>
 					</li>
 				</ul>
-				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
 
-conforms(
+Vts.conforms(
 {
        prop: <span class="hljs-string">'lala'</span>,
        prop2: <span class="hljs-literal">true</span>,
@@ -273,7 +273,7 @@ conforms(
        }
 }); <span class="hljs-comment">// true</span>
 
-conforms(
+Vts.conforms(
 {
      arr: [<span class="hljs-string">'array'</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">'of any type'</span>, <span class="hljs-number">8888</span> ],
      strArr: [<span class="hljs-string">'Pinkie'</span>, <span class="hljs-string">'Promise'</span>, <span class="hljs-string">'some'</span>, <span class="hljs-string">'strings'</span>],
@@ -288,7 +288,7 @@ conforms(
 }); <span class="hljs-comment">// true</span>
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isOddNumber</span>(<span class="hljs-params">suspect: unknown</span>): <span class="hljs-title">suspect</span> <span class="hljs-title">is</span> <span class="hljs-title">number</span> </span>{
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">typeof</span> suspect === <span class="hljs-string">'number'</span> &amp;&amp; suspect % <span class="hljs-number">2</span>; 
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">typeof</span> suspect === <span class="hljs-string">'number'</span> &amp;&amp; suspect % <span class="hljs-number">2</span>;
 }  
 
 <span class="hljs-comment">// Type argument:</span>
@@ -296,8 +296,8 @@ conforms(
     name: <span class="hljs-built_in">string</span>;
     id:   <span class="hljs-built_in">number</span>;
 }
-<span class="hljs-keyword">const</span> HumanTD = {
-    name: <span class="hljs-string">'string'</span>,
+<span class="hljs-keyword">const</span> HumanTD: Vts.TypeDescriptionOf&lt;Human&gt;  = {
+    name: <span class="hljs-string">'string'</span>,  <span class="hljs-comment">// using Vts.TypeDescriptionOf&lt;T&gt; gives you better typing</span>
     id:   <span class="hljs-string">'number'</span>
 };
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tryUseHuman</span>(<span class="hljs-params">maybeHuman: unknown</span>) </span>{
@@ -309,7 +309,8 @@ conforms(
 }</code></pre>
 				<h3 id="exactlyconformst-suspect-typedescr-suspect-is-t"><code>exactlyConforms&lt;T&gt;(suspect, typeDescr): suspect is T</code></h3>
 				<p>This function is the same as <code>conforms()</code>, but returns <em>false</em> for suspect object that has excess properties (those, that are not present in type description object).</p>
-				<pre><code class="language-typescript">conforms(<span class="hljs-number">23</span>, <span class="hljs-string">'number'</span>) === exactlyConforms(<span class="hljs-number">23</span>, <span class="hljs-string">'number'</span>);
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+Vts.conforms(<span class="hljs-number">23</span>, <span class="hljs-string">'number'</span>) === Vts.exactlyConforms(<span class="hljs-number">23</span>, <span class="hljs-string">'number'</span>);
 <span class="hljs-keyword">const</span> suspect = {
     listedInt: <span class="hljs-number">7</span>,
     listedStr: <span class="hljs-string">'readme'</span>,
@@ -319,8 +320,8 @@ conforms(
     listedInt: isPositiveInteger,
     listedStr: <span class="hljs-string">'string'</span>
 }
-conforms(suspect, td) === <span class="hljs-literal">true</span>;
-exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</code></pre>
+Vts.conforms(suspect, td) === <span class="hljs-literal">true</span>;
+Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</code></pre>
 				<h3 id="factory-functions">Factory functions</h3>
 				<p> (previously were in namespace Factory)</p>
 				<p>Factory functions return <code>TypePredicate</code>s to use as type descriptions when calling <code>conforms(suspect, typeDescr)</code>.
@@ -328,33 +329,33 @@ exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</code>
 				<p><code>(suspect: unknown): boolean</code></p>
 				<h3 id="isnumberwithinrange-min-max-"><code>isNumberWithinRange(min, max)</code></h3>
 				<p> Returns a predicate that returns <em>true</em> if its argument is a number within the range [<code>min</code>, <code>max</code>] or [<code>max</code>, <code>min</code>] if <code>min &gt; max</code>.</p>
-				<pre><code class="language-typescript"> <span class="hljs-keyword">import</span> { conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+				<pre><code class="language-typescript"> <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
 
- conforms(
+ Vts.conforms(
  {
      num: <span class="hljs-number">32</span>
  },
  {
-     num: isNumberWithinRange(<span class="hljs-number">0</span>, <span class="hljs-number">5</span>)    
+     num: Vts.isNumberWithinRange(<span class="hljs-number">0</span>, <span class="hljs-number">5</span>)
  }); <span class="hljs-comment">// false</span></code></pre>
 				<h3 id="isintegerwithinrange-min-max-"><code>isIntegerWithinRange(min, max)</code></h3>
 				<p> The same as <code>isNumberWithinRange(min, max)</code>, but its returned predicate returns <em>false</em> if forwarded argument is not an integer.</p>
 				<h3 id="optional-typedescr-typedescription-"><code>optional(typeDescr: TypeDescription)</code></h3>
 				<p>Retuns <code>TypePredicate</code> which retuns <code>typeof suspect === &#39;undefined&#39; || conforms(typeDescr)</code>, which you may use as a type description for optional object properties. This predicate is effectively the same as calling <code>conforms(suspect, new Set&lt;TypeDescription&gt;([typeDescr, &#39;undefined&#39;]));</code></p>
-				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
-conforms(
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+Vts.conforms(
 {
     prop: <span class="hljs-string">'str'</span>
 },{
-    prop: optional(<span class="hljs-string">'number'</span>)
+    prop: Vts.optional(<span class="hljs-string">'number'</span>)
 }) 
 <span class="hljs-comment">// return false because the property is not undefined, </span>
 <span class="hljs-comment">// but doesn't conform to 'number' type</span>
-conforms(
+Vts.conforms(
 {
     prop: <span class="hljs-number">-23</span>
 },{
-    prop: optional(isNegativeInteger)
+    prop: Vts.optional(Vts.isNegativeInteger)
 });
 <span class="hljs-comment">// returns true because the property is not undefined</span>
 <span class="hljs-comment">// and conforms to isNegativeInteger restriction</span></code></pre>
@@ -362,10 +363,10 @@ conforms(
 				<p>  Returns a predicate that accepts a suspect of <code>any</code> type and matches it to
 					one of the provided possible values by
 				<code>possibleValues.includes(suspect)</code>. <strong>Don&#39;t confuse it with <code>new Set(possibleValues)</code></strong> when forwarding as a type description to <code>conforms()</code> function, because <code>possibleValues</code> are not TDs, but values to match with.</p>
-				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
 
-conforms(<span class="hljs-number">2</span>, isOneOf([<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])); <span class="hljs-comment">// true</span>
-conforms(<span class="hljs-number">2</span>, <span class="hljs-keyword">new</span> Set([<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])); <span class="hljs-comment">// compile error</span>
+Vts.conforms(<span class="hljs-number">2</span>, Vts.isOneOf([<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])); <span class="hljs-comment">// true</span>
+Vts.conforms(<span class="hljs-number">2</span>,     <span class="hljs-keyword">new</span> Set([<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])); <span class="hljs-comment">// compile error</span>
 <span class="hljs-comment">// Set&lt;numbers&gt; is not a Set&lt;TypeDescritpion&gt;</span></code></pre>
 				<h3 id="maketdwithoptionalprops-srctypedescr-typedescrobjmap-"><code>makeTdWithOptionalProps(srcTypeDescr: TypeDescrObjMap)</code></h3>
 				<p>Returns a new <code>TypeDescrObjMap</code> (which is assignable to <code>TypeDescription</code>) object that is composed of <code>srcTypeDescr</code> properties wrapped as</p>
@@ -389,18 +390,18 @@ conforms(<span class="hljs-number">2</span>, <span class="hljs-keyword">new</spa
 				<h3 id="typeassertt-value-value-is-t"><code>typeAssert&lt;T&gt;(value): value is T</code></h3>
 				<p>TypeScript type guard that always returns <em>true</em>.
 				You may use it in an if statement to assert the proper type in the following code execution path.</p>
-				<pre><code class="language-typescript">    <span class="hljs-keyword">import</span> { typeAssert } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+				<pre><code class="language-typescript">    <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
     <span class="hljs-keyword">const</span> <span class="hljs-keyword">enum</span> SomeEnum {
         A = <span class="hljs-number">0</span>, B, C
     }
     <span class="hljs-keyword">const</span> numb: <span class="hljs-built_in">number</span> = <span class="hljs-number">2</span>;
-    <span class="hljs-keyword">if</span> (!typeAssert&lt;SomeEnum&gt;(numb)) { <span class="hljs-keyword">return</span>; }
+    <span class="hljs-keyword">if</span> (!Vts.typeAssert&lt;SomeEnum&gt;(numb)) { <span class="hljs-keyword">return</span>; }
     numb; <span class="hljs-comment">// deduced type is SomeEnum</span>
 </code></pre>
 				<h3 id="assertnever-suspect-never-"><code>assertNever(suspect: never)</code></h3>
 				<p>This function is no-op, but it is useful to check whether you have
 				handled all the cases and some code path is unreachable. TypeScript compiler will issue an error if you forward a value not of <a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#never"><code>never</code> type</a> to this function.</p>
-				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { assertNever } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
 <span class="hljs-keyword">const</span> <span class="hljs-keyword">enum</span> Enum {
     A, B, C
 }
@@ -409,44 +410,44 @@ conforms(<span class="hljs-number">2</span>, <span class="hljs-keyword">new</spa
         <span class="hljs-keyword">case</span> Enum.A: { <span class="hljs-comment">/***/</span> <span class="hljs-keyword">return</span>; }
         <span class="hljs-keyword">case</span> Enum.B: { <span class="hljs-comment">/***/</span> <span class="hljs-keyword">return</span>; }
         <span class="hljs-keyword">default</span>: {
-            assertNever(en); <span class="hljs-comment">// compile Error, en is of type Enum.C</span>
+            Vts.assertNever(en); <span class="hljs-comment">// compile Error, en is of type Enum.C</span>
         }
     }
 }
 <span class="hljs-comment">//-------------</span>
 <span class="hljs-keyword">const</span> num = <span class="hljs-number">23</span>;
 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> num !== <span class="hljs-string">'number'</span>){
-    assertNever(num); <span class="hljs-comment">// no error, this code is unreachable</span>
+    Vts.assertNever(num); <span class="hljs-comment">// no error, this code is unreachable</span>
     <span class="hljs-comment">// num is of type never here</span>
 }</code></pre>
 				<h3 id="isbasictypename-suspect-suspect-is-basictypename"><code>isBasicTypeName(suspect): suspect is BasicTypeName</code></h3>
 				<p>Returns <em>true</em> if suspect is a string that is inside a set of <code>BasicTypeName</code> type set.</p>
-				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { isBasicTypeName } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
 
-isBasicTypeName(<span class="hljs-string">'null'</span>);    <span class="hljs-comment">// false</span>
-isBasicTypeName(<span class="hljs-string">' number'</span>); <span class="hljs-comment">// false</span>
-isBasicTypeName(<span class="hljs-string">'number'</span>);  <span class="hljs-comment">// true</span></code></pre>
+Vts.isBasicTypeName(<span class="hljs-string">'null'</span>);    <span class="hljs-comment">// false</span>
+Vts.isBasicTypeName(<span class="hljs-string">' number'</span>); <span class="hljs-comment">// false</span>
+Vts.isBasicTypeName(<span class="hljs-string">'number'</span>);  <span class="hljs-comment">// true</span></code></pre>
 				<h3 id="isisodatestring-suspect-unknown-"><code>isIsoDateString(suspect: unknown)</code></h3>
 				<p>Checks that suspect is a string and it conforms to ISO 8601 format.
 					Internally uses <a href="https://www.npmjs.com/package/is-iso-date">&#39;is-iso-date&#39;</a> npm package. Returns <code>suspect is string</code> as a type guard.
 				Example taken from <a href="https://www.npmjs.com/package/is-iso-date">here</a>:</p>
-				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { isIsoDateString, conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
-isIsoDateString(<span class="hljs-number">8888</span>); <span class="hljs-comment">// false</span>
-isIsoDateString({
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts  <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+Vts.isIsoDateString(<span class="hljs-number">8888</span>); <span class="hljs-comment">// false</span>
+Vts.isIsoDateString({
    iso: <span class="hljs-string">'2015-02-21T00:52:43.822Z'</span>
 }); <span class="hljs-comment">// false</span>
-isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43.822Z'</span> ); <span class="hljs-comment">// true</span>
-isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43.822'</span> );  <span class="hljs-comment">// false</span>
-isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43Z'</span> );     <span class="hljs-comment">// true</span>
-isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43'</span> );      <span class="hljs-comment">// false</span>
-isIsoDateString( <span class="hljs-string">'2015-02-21T00:52Z'</span> );        <span class="hljs-comment">// true</span>
-isIsoDateString( <span class="hljs-string">'2015-02-21T00:52'</span> );         <span class="hljs-comment">// false</span>
-isIsoDateString( <span class="hljs-string">'2015-02-21T00Z'</span> );           <span class="hljs-comment">// false</span>
+Vts.isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43.822Z'</span> ); <span class="hljs-comment">// true</span>
+Vts.isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43.822'</span> );  <span class="hljs-comment">// false</span>
+Vts.isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43Z'</span> );     <span class="hljs-comment">// true</span>
+Vts.isIsoDateString( <span class="hljs-string">'2015-02-21T00:52:43'</span> );      <span class="hljs-comment">// false</span>
+Vts.isIsoDateString( <span class="hljs-string">'2015-02-21T00:52Z'</span> );        <span class="hljs-comment">// true</span>
+Vts.isIsoDateString( <span class="hljs-string">'2015-02-21T00:52'</span> );         <span class="hljs-comment">// false</span>
+Vts.isIsoDateString( <span class="hljs-string">'2015-02-21T00Z'</span> );           <span class="hljs-comment">// false</span>
 <span class="hljs-keyword">const</span> someObj = {
     date: <span class="hljs-string">'2015-02-21T00:52Z'</span>
 };
-conforms(someObj, {
-    date: isIsoDateString
+Vts.conforms(someObj, {
+    date: Vts.isIsoDateString
 }); <span class="hljs-comment">// true</span></code></pre>
 				<h3 id="self-explanatory-functions">Self explanatory functions</h3>
 				<p>All these functions take <code>unknown</code> type argument and return <code>suspect is number</code>, which is useful as a type guard or when using as a type description.</p>
@@ -459,15 +460,15 @@ conforms(someObj, {
 					<li><code>isZeroOrPositiveInteger(suspect)</code></li>
 					<li><code>isZeroOrNegativeInteger(suspect)</code></li>
 					<li><code>isZeroOrPositiveNumber(suspect)</code></li>
-					<li><code>isZeroOrNegativeNumber(suspect)</code><pre><code class="language-typescript"><span class="hljs-keyword">import</span> { conforms } <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
-conforms(
+					<li><code>isZeroOrNegativeNumber(suspect)</code><pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+Vts.conforms(
 {
   id: <span class="hljs-number">2</span>,
   volume: <span class="hljs-number">22.5</span>
 },
 {
-  id:    isPositiveInteger,
-  money: isZeroOrPositiveNumber
+  id:    Vts.isPositiveInteger,
+  money: Vts.isZeroOrPositiveNumber
 }); <span class="hljs-comment">// true</span></code></pre>
 					</li>
 				</ul>
@@ -478,11 +479,11 @@ conforms(
 					<li><code>suspect: unknown</code> value to provide default for</li>
 					<li><code>defaultVal: T</code> value that conforms to <code>typeDescr</code> that is returned by this function if <code>!conforms(suspect, typeDescr)</code>
 						~~~typescript
-					import { defaultIfNotConforms } from &#39;vee-type-safe&#39;;</li>
+					import * as Vts from &#39;vee-type-safe&#39;;</li>
 				</ul>
-				<p>const id = defaultIfNotConforms(isPositiveInteger, parseInt(&#39;-1&#39;), 0);
+				<p>const id = Vts.defaultIfNotConforms(Vts.isPositiveInteger, parseInt(&#39;-1&#39;), 0);
 					// id === 0;
-					const id2 = defaultIfNotConforms(isPositiveInteger, parseInt(&#39;444&#39;), 0);
+					const id2 = Vts.defaultIfNotConforms(Vts.isPositiveInteger, parseInt(&#39;444&#39;), 0);
 					// id2 === 444
 				~~~</p>
 			</div>
