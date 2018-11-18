@@ -211,7 +211,7 @@ mismatchInfo.pathString() === <span class="hljs-string">`root.foo.bar['twenty tw
   <span class="hljs-comment">/* ... */</span>
   router.get(<span class="hljs-string">'api/v1/users/'</span>,
       VtsEx.matchType(VtsEx.ReqQuery, { title: <span class="hljs-string">'string'</span> }),
-      <span class="hljs-function">(<span class="hljs-params">req: ReqQuery&lt;{title: <span class="hljs-built_in">string</span>}&gt;, res, next</span>) =&gt;</span> {
+      <span class="hljs-function">(<span class="hljs-params">req: VtsEx.ReqQuery&lt;{title: <span class="hljs-built_in">string</span>}&gt;, res, next</span>) =&gt;</span> {
           <span class="hljs-keyword">const</span> title: <span class="hljs-built_in">string</span> = req.query.title; <span class="hljs-comment">// now you are sure</span>
           <span class="hljs-comment">/* ... */</span>
       }
@@ -316,8 +316,8 @@ Vts.conforms(<span class="hljs-number">23</span>, <span class="hljs-string">'num
     listedStr: <span class="hljs-string">'readme'</span>,
     unlistedProp: [<span class="hljs-string">'some'</span>, <span class="hljs-string">'excess'</span>, <span class="hljs-string">'prop'</span>, <span class="hljs-string">'value'</span>]
 }
-<span class="hljs-keyword">const</span> td: TypeDescription = {
-    listedInt: isPositiveInteger,
+<span class="hljs-keyword">const</span> td: Vts.TypeDescription = {
+    listedInt: Vts.isPositiveInteger,
     listedStr: <span class="hljs-string">'string'</span>
 }
 Vts.conforms(suspect, td) === <span class="hljs-literal">true</span>;

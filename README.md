@@ -192,7 +192,7 @@ There is a list of handy functions to specify as `getRequestProperty` argument:
     /* ... */
     router.get('api/v1/users/',
         VtsEx.matchType(VtsEx.ReqQuery, { title: 'string' }),
-        (req: ReqQuery<{title: string}>, res, next) => {
+        (req: VtsEx.ReqQuery<{title: string}>, res, next) => {
             const title: string = req.query.title; // now you are sure
             /* ... */
         }
@@ -303,8 +303,8 @@ const suspect = {
     listedStr: 'readme',
     unlistedProp: ['some', 'excess', 'prop', 'value']
 }
-const td: TypeDescription = {
-    listedInt: isPositiveInteger,
+const td: Vts.TypeDescription = {
+    listedInt: Vts.isPositiveInteger,
     listedStr: 'string'
 }
 Vts.conforms(suspect, td) === true;
