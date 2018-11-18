@@ -614,7 +614,7 @@ function stringifyTdImpl(typeDescr: TypeDescription): string {
             typeDescr instanceof Set            ?
             [...typeDescr.values()].map(stringifyTd).join(' | ') :
             typeDescr instanceof RegExp         ?
-            typeDescr.source                    :
+            `/${typeDescr.source}/`             :
             JSON.stringify(typeDescr, (_key, value: TypeDescription) => 
                 value instanceof Function || 
                 value instanceof Set      ||
