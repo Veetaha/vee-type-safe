@@ -617,8 +617,9 @@ function stringifyTdImpl(typeDescr: TypeDescription): string {
             typeDescr.source                    :
             JSON.stringify(typeDescr, (_key, value: TypeDescription) => 
                 value instanceof Function || 
-                value instanceof Set       ? 
-                stringifyTdImpl(value)     :
+                value instanceof Set      ||
+                value instanceof RegExp   ? 
+                stringifyTdImpl(value)    :
                 value
             , 4);
 }
