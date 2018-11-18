@@ -247,15 +247,17 @@ export function defaultIfNotConforms<T>(
     return conforms<T>(suspect, typeDescr) ? suspect : defaultVal;
 }
 
-
-
-export function makeTdWithOptionalProps(typeDescr: TypeDescrObjMap) {
+export function makeTdWithOptionalProps<
+    TypeDescr extends TypeDescrObjMap
+>(
+    typeDescr: TypeDescr
+): BasicObjectMap<keyof TypeDescr, TypePredicate> {
     return Object.getOwnPropertyNames(typeDescr)
                  .reduce((newTd, propName) => {
                         newTd[propName] = optional(typeDescr[propName]);
                         return newTd;
                      },
-                     {} as TypeDescrObjMap
+                     {} as BasicObjectMap<keyof TypeDescr, TypePredicate>
                  );
 }
 
