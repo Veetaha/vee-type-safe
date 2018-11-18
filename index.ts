@@ -251,25 +251,23 @@ export function makeTdWithOptionalProps<
     TypeDescr extends TypeDescrObjMap
 >(
     typeDescr: TypeDescr
-): BasicObjectMap<keyof TypeDescr, TypePredicate> {
+): BasicObjectMap<keyof TypeDescr, ReturnType<typeof optional>> {
     return Object.getOwnPropertyNames(typeDescr)
                  .reduce((newTd, propName) => {
                         newTd[propName] = optional(typeDescr[propName]);
                         return newTd;
                      },
-                     {} as BasicObjectMap<keyof TypeDescr, TypePredicate>
+                     {} as BasicObjectMap<keyof TypeDescr, ReturnType<typeof optional>>
                  );
 }
 
 
 /**
- * A shorthand for `conforms(suspect, new Set<TypeDescription>('undefined', typeDescr))`
+ * A shorthand for `conforms(suspect, new Set<TypeDescription>(['undefined', typeDescr]))`
  * @param typeDescr
  */
-export function optional<T>(typeDescr: TypeDescription) {
-    return function optional_value(suspect: unknown): suspect is T {
-        return typeof suspect === 'undefined' || conforms(suspect, typeDescr);
-    };
+export function optional(typeDescr: TypeDescription) {
+    return new Set<TypeDescription>(['undefined', typeDescr]);
 }
 
 /**
@@ -768,5 +766,23 @@ export function isInEnum<
  */
 export type TypeDescriptionOf<T extends BasicObject> = BasicObjectMap<keyof T, TypeDescription>;
 
+/**
+ * Type predicate to check whether `suspect === null`
+ */
+export function isNull(suspect: unknown): suspect is null {
+    return suspect === null;
+}
 
+/**
+ * Type predicate to check whether `suspect === undefined`
+ */
+export function isUndefined(suspect: unknown): suspect is undefined {
+    return suspect === undefined;
+}
 
+/**
+ * Shorthand for `new Set<TypeDescription>([isNull, typeDescr])`
+ */
+export function isNullOr(typeDescr: TypeDescription) {
+    return new Set<TypeDescription>([isNull, typeDescr]);
+}
