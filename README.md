@@ -59,9 +59,9 @@ Works the same way as `mismatch(suspect, typeDescr)` but allows `suspect` object
         client: 'John Doe',
         walletNumber: null,
     };
-    const ExpectedJsonTD: Vts.TypeDescrObjectMap = {
+    const ExpectedJsonTD: Vts.TypeDescriptionOf<typeof untrustedJson> = {
         client: 'string',
-        walletNumber: /\d{16}/.test(num) // implies a string of the given format
+        walletNumber: /\d{16}/ // implies a string of the given format
     };
 
     const mismatchInfo = Vts.duckMismatch(untrustedJson, ExpectedJsonTD);
@@ -188,10 +188,10 @@ There is a list of handy functions to specify as `getRequestProperty` argument:
 * `ReqCookies(req) => req.cookies`
 * `ReqHeaders(req) => req.headers`
 ~~~typescript
-    import * as ExpressTypes from 'vee-type-safe/express';
+    import * as VtsEx from 'vee-type-safe/express';
     /* ... */
     router.get('api/v1/users/',
-        ExpressTypes.matchType(ExpressTypes.ReqQuery, { title: 'string' }),
+        VtsEx.matchType(VtsEx.ReqQuery, { title: 'string' }),
         (req: ReqQuery<{title: string}>, res, next) => {
             const title: string = req.query.title; // now you are sure
             /* ... */
@@ -238,9 +238,9 @@ The same middleware factory as `ensureTypeMatch()`, but does type matching via c
      * Else returns *false*.
      
 ~~~typescript  
-import { conforms } from 'vee-type-safe';
+import * as Vts from 'vee-type-safe';
 
-conforms(
+Vts.conforms(
 {
        prop: 'lala',
        prop2: true,
@@ -257,7 +257,7 @@ conforms(
        }
 }); // true
 
-conforms(
+Vts.conforms(
 {
      arr: ['array', null, 'of any type', 8888 ],
      strArr: ['Pinkie', 'Promise', 'some', 'strings'],
@@ -272,7 +272,7 @@ conforms(
 }); // true
 
 function isOddNumber(suspect: unknown): suspect is number {
-    return typeof suspect === 'number' && suspect % 2; 
+    return typeof suspect === 'number' && suspect % 2;
 }  
 
 // Type argument:
@@ -280,8 +280,8 @@ interface Human {
     name: string;
     id:   number;
 }
-const HumanTD = {
-    name: 'string',
+const HumanTD: Vts.TypeDescriptionOf<Human>  = {
+    name: 'string',  // using Vts.TypeDescriptionOf<T> gives you better typing
     id:   'number'
 };
 function tryUseHuman(maybeHuman: unknown) {
@@ -296,7 +296,8 @@ function tryUseHuman(maybeHuman: unknown) {
 ### `exactlyConforms<T>(suspect, typeDescr): suspect is T`
 This function is the same as `conforms()`, but returns *false* for suspect object that has excess properties (those, that are not present in type description object).
 ~~~typescript
-conforms(23, 'number') === exactlyConforms(23, 'number');
+import * as Vts from 'vee-type-safe';
+Vts.conforms(23, 'number') === Vts.exactlyConforms(23, 'number');
 const suspect = {
     listedInt: 7,
     listedStr: 'readme',
@@ -306,8 +307,8 @@ const td: TypeDescription = {
     listedInt: isPositiveInteger,
     listedStr: 'string'
 }
-conforms(suspect, td) === true;
-exactlyConforms(suspect, td) === false;
+Vts.conforms(suspect, td) === true;
+Vts.exactlyConforms(suspect, td) === false;
 ~~~
 
 
@@ -325,53 +326,52 @@ Factory functions return `TypePredicate`s to use as type descriptions when calli
     
  Returns a predicate that returns *true* if its argument is a number within the range \[`min`, `max`] or \[`max`, `min`] if `min > max`.
  ~~~typescript
- import { conforms } from 'vee-type-safe';
+ import * as Vts from 'vee-type-safe';
  
- conforms(
+ Vts.conforms(
  {
      num: 32
  },
  {
-     num: isNumberWithinRange(0, 5)    
+     num: Vts.isNumberWithinRange(0, 5)
  }); // false
  ~~~
- 
+
 ### `isIntegerWithinRange(min, max)`
  The same as `isNumberWithinRange(min, max)`, but its returned predicate returns *false* if forwarded argument is not an integer.
  
 ### `optional(typeDescr: TypeDescription)`
 Retuns `TypePredicate` which retuns `typeof suspect === 'undefined' || conforms(typeDescr)`, which you may use as a type description for optional object properties. This predicate is effectively the same as calling `conforms(suspect, new Set<TypeDescription>([typeDescr, 'undefined']));`
 ~~~typescript
-import { conforms } from 'vee-type-safe';
-conforms(
+import * as Vts from 'vee-type-safe';
+Vts.conforms(
 {
     prop: 'str'
 },{
-    prop: optional('number')
+    prop: Vts.optional('number')
 }) 
 // return false because the property is not undefined, 
 // but doesn't conform to 'number' type
-conforms(
+Vts.conforms(
 {
     prop: -23
 },{
-    prop: optional(isNegativeInteger)
+    prop: Vts.optional(Vts.isNegativeInteger)
 });
 // returns true because the property is not undefined
 // and conforms to isNegativeInteger restriction
 ~~~
  
-   
  
 ### `isOneOf<T>(possibleValues: T[])`
   Returns a predicate that accepts a suspect of `any` type and matches it to
     one of the provided possible values by
     `possibleValues.includes(suspect)`. **Don't confuse it with `new Set(possibleValues)`** when forwarding as a type description to `conforms()` function, because `possibleValues` are not TDs, but values to match with.
 ~~~typescript
-import { conforms } from 'vee-type-safe';
+import * as Vts from 'vee-type-safe';
 
-conforms(2, isOneOf([0, 1, 2, 3])); // true
-conforms(2, new Set([0, 1, 2, 3])); // compile error
+Vts.conforms(2, Vts.isOneOf([0, 1, 2, 3])); // true
+Vts.conforms(2,     new Set([0, 1, 2, 3])); // compile error
 // Set<numbers> is not a Set<TypeDescritpion>
 ~~~ 
 
@@ -410,12 +410,12 @@ casts like `value as any as T` when a simple `value as T` cast cannot be perform
 TypeScript type guard that always returns *true*.
 You may use it in an if statement to assert the proper type in the following code execution path.
 ~~~typescript
-    import { typeAssert } from 'vee-type-safe';
+    import * as Vts from 'vee-type-safe';
     const enum SomeEnum {
         A = 0, B, C
     }
     const numb: number = 2;
-    if (!typeAssert<SomeEnum>(numb)) { return; }
+    if (!Vts.typeAssert<SomeEnum>(numb)) { return; }
     numb; // deduced type is SomeEnum
     
 ~~~
@@ -423,7 +423,7 @@ You may use it in an if statement to assert the proper type in the following cod
 This function is no-op, but it is useful to check whether you have
  handled all the cases and some code path is unreachable. TypeScript compiler will issue an error if you forward a value not of [`never` type](https://www.typescriptlang.org/docs/handbook/basic-types.html#never) to this function.
 ~~~typescript
-import { assertNever } from 'vee-type-safe';
+import * as Vts from 'vee-type-safe';
 const enum Enum {
     A, B, C
 }
@@ -432,14 +432,14 @@ function fn(en: Enum) {
         case Enum.A: { /***/ return; }
         case Enum.B: { /***/ return; }
         default: {
-            assertNever(en); // compile Error, en is of type Enum.C
+            Vts.assertNever(en); // compile Error, en is of type Enum.C
         }
     }
 }
 //-------------
 const num = 23;
 if (typeof num !== 'number'){
-    assertNever(num); // no error, this code is unreachable
+    Vts.assertNever(num); // no error, this code is unreachable
     // num is of type never here
 }
 ~~~ 
@@ -448,11 +448,11 @@ if (typeof num !== 'number'){
 ### `isBasicTypeName(suspect): suspect is BasicTypeName`
 Returns *true* if suspect is a string that is inside a set of `BasicTypeName` type set.
 ~~~typescript
-import { isBasicTypeName } from 'vee-type-safe';
+import * as Vts from 'vee-type-safe';
 
-isBasicTypeName('null');    // false
-isBasicTypeName(' number'); // false
-isBasicTypeName('number');  // true
+Vts.isBasicTypeName('null');    // false
+Vts.isBasicTypeName(' number'); // false
+Vts.isBasicTypeName('number');  // true
 ~~~
 
 ### `isIsoDateString(suspect: unknown)`
@@ -460,23 +460,23 @@ Checks that suspect is a string and it conforms to ISO 8601 format.
 Internally uses ['is-iso-date'](https://www.npmjs.com/package/is-iso-date) npm package. Returns `suspect is string` as a type guard.
 Example taken from [here](https://www.npmjs.com/package/is-iso-date):
 ~~~typescript
-import { isIsoDateString, conforms } from 'vee-type-safe';
-isIsoDateString(8888); // false
-isIsoDateString({
+import * as Vts  from 'vee-type-safe';
+Vts.isIsoDateString(8888); // false
+Vts.isIsoDateString({
    iso: '2015-02-21T00:52:43.822Z'
 }); // false
-isIsoDateString( '2015-02-21T00:52:43.822Z' ); // true
-isIsoDateString( '2015-02-21T00:52:43.822' );  // false
-isIsoDateString( '2015-02-21T00:52:43Z' );     // true
-isIsoDateString( '2015-02-21T00:52:43' );      // false
-isIsoDateString( '2015-02-21T00:52Z' );        // true
-isIsoDateString( '2015-02-21T00:52' );         // false
-isIsoDateString( '2015-02-21T00Z' );           // false
+Vts.isIsoDateString( '2015-02-21T00:52:43.822Z' ); // true
+Vts.isIsoDateString( '2015-02-21T00:52:43.822' );  // false
+Vts.isIsoDateString( '2015-02-21T00:52:43Z' );     // true
+Vts.isIsoDateString( '2015-02-21T00:52:43' );      // false
+Vts.isIsoDateString( '2015-02-21T00:52Z' );        // true
+Vts.isIsoDateString( '2015-02-21T00:52' );         // false
+Vts.isIsoDateString( '2015-02-21T00Z' );           // false
 const someObj = {
     date: '2015-02-21T00:52Z'
 };
-conforms(someObj, {
-    date: isIsoDateString
+Vts.conforms(someObj, {
+    date: Vts.isIsoDateString
 }); // true
 ~~~
 
@@ -493,15 +493,15 @@ All these functions take `unknown` type argument and return `suspect is number`,
 * `isZeroOrPositiveNumber(suspect)`
 * `isZeroOrNegativeNumber(suspect)`
 ~~~typescript
-import { conforms } from 'vee-type-safe';
-conforms(
+import * as Vts from 'vee-type-safe';
+Vts.conforms(
 {
     id: 2,
     volume: 22.5
 },
 {
-    id:    isPositiveInteger,
-    money: isZeroOrPositiveNumber
+    id:    Vts.isPositiveInteger,
+    money: Vts.isZeroOrPositiveNumber
 }); // true
 ~~~
 
@@ -512,10 +512,10 @@ Checks whether `suspect` conforms to the given type description (`typeDescr`) an
 * `suspect: unknown` value to provide default for
 * `defaultVal: T` value that conforms to `typeDescr` that is returned by this function if `!conforms(suspect, typeDescr)`
 ~~~typescript
-import { defaultIfNotConforms } from 'vee-type-safe';
+import * as Vts from 'vee-type-safe';
 
-const id = defaultIfNotConforms(isPositiveInteger, parseInt('-1'), 0);
+const id = Vts.defaultIfNotConforms(Vts.isPositiveInteger, parseInt('-1'), 0);
 // id === 0;
-const id2 = defaultIfNotConforms(isPositiveInteger, parseInt('444'), 0);
+const id2 = Vts.defaultIfNotConforms(Vts.isPositiveInteger, parseInt('444'), 0);
 // id2 === 444
 ~~~
