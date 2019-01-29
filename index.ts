@@ -3,6 +3,9 @@ import isISODate = require('is-iso-date');
 export interface BasicObject<TValue = unknown> {
     [key: string]: TValue;
 }
+
+export type ReadonlyBasicObject<TValue = unknown> = Readonly<BasicObject<TValue>>;
+
 export type BasicObjectMap<
     TKey extends string | number | symbol = string, 
     TValue = unknown
@@ -34,7 +37,7 @@ export function isBasicObject(suspect: unknown) : suspect is BasicObject<unknown
     );
 }
 
-export function reinterpret<T>(target: any): T{
+export function reinterpret<T>(target: any): T {
     return target;
 }
 export function typeAssert<T>(_target: any): _target is T {
@@ -50,12 +53,9 @@ export function isBasicTypeName(suspect: string): suspect is BasicTypeName {
         default:       return false;
     }
 }
-export interface TypeDescrObjMap extends BasicObject<TypeDescription>
-{}
-export interface TypeDescrArray  extends Array<TypeDescription>
-{}
-export interface TypeDescrSet    extends Set<TypeDescription>
-{}
+export interface TypeDescrObjMap extends BasicObject<TypeDescription> {}
+export interface TypeDescrArray  extends Array<TypeDescription> {}
+export interface TypeDescrSet    extends Set<TypeDescription> {}
 export type TypePredicate   = (suspect: unknown) => boolean;
 export type TypeDescription = TypeDescrObjMap | TypeDescrArray | TypePredicate |
                                  TypeDescrSet | BasicTypeName  | RegExp;
@@ -254,7 +254,7 @@ export function makeTdWithOptionalProps<
 ): BasicObjectMap<keyof TypeDescr, ReturnType<typeof optional>> {
     return Object.getOwnPropertyNames(typeDescr)
                  .reduce((newTd, propName) => {
-                        newTd[propName] = optional(typeDescr[propName]);
+                        (newTd as any)[propName] = optional(typeDescr[propName]);
                         return newTd;
                      },
                      {} as BasicObjectMap<keyof TypeDescr, ReturnType<typeof optional>>
@@ -681,6 +681,12 @@ export type ReplaceProperty<
     Key extends TPropName ? TNewPropType : TSourceObject[Key];
 };
 
+export type RemoveProperties<
+    TSourceObject extends BasicObject,
+    TPropNamesUnion extends keyof TSourceObject
+> = {
+    [Key in Exclude<keyof TSourceObject, TPropNamesUnion>]: TSourceObject[Key];
+};
 
 /**
  * The same as `take(sourceObject, Object.getOwnPropertyNames(keysObject))`,
