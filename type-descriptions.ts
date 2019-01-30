@@ -244,7 +244,7 @@ export function isIntegerLessThan(target: number) {
 }
 
 /**
- * Returns a predicate that checks its suspect to be a number, such that
+ * Returns a predicate that checks its suspect to be an integer, such that
  * `suspect > target`
  * @param target Number to check inequality to. 
  */
