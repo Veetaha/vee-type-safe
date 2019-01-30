@@ -1,69 +1,97 @@
-import isISODate = require('is-iso-date');
-
-export interface BasicObject<TValue = unknown> {
-    [key: string]: TValue;
-}
-
-export type ReadonlyBasicObject<TValue = unknown> = Readonly<BasicObject<TValue>>;
-
-export type BasicObjectMap<
-    TKey extends string | number | symbol = string, 
-    TValue = unknown
-> = {
-    [key in Exclude<TKey, keyof Object>]: TValue;
-};
-
-
-export interface BasicFunctor<
-    TArgs extends any[]  = unknown[],
-    TRetval              = unknown,
-    TProps               = unknown
-    > extends BasicObject<TProps> {
-    (...args: TArgs): TRetval;
-}
-
-export type PrimitiveType = number | string | boolean  | undefined | symbol | null;
-
-export type BasicTypeName = 'number'    | 'string' | 'boolean'  |
-                            'undefined' | 'object' | 'function' | 'symbol';
+import { isBasicObject, optional } from './type-descriptions';
+import { 
+    BasicObject, 
+    TypeDescription, 
+    TypeDescrObjMap, 
+    BasicObjectMap, 
+    MismatchInfoData, 
+    PathArray, 
+    Maybe, 
+    TypeDescrSet, 
+    PropNamesArray, 
+    Take, 
+    MappedObject 
+} from './types';
+export * from './type-descriptions';
+export * from './types';
 
 /**
- * Returns true if suspect is truthy and typeof suspect === 'object' or 'function'.
- * @param suspect Value of any type to check.
+ * C++ style operator, a syntactic sugar for writing casts like 
+ * `value as any as T` when a simple `value as T` cast cannot be performed. 
+ * Use it with caution! 
+ * 
+ * @remarks 
+ * This function is actually noop at runtime, all it does, it suppresses 
+ * 'inability to cast' tsc error. It's better to use this function rather than
+ * `value as any as T` cast, because it amplifies your attention to such uneven
+ * places in code and it may be easier to do a Ctrl + F search for these.
+ * 
+ * @param target value to cast by any means to T.
  */
-export function isBasicObject(suspect: unknown) : suspect is BasicObject<unknown> {
-    return Boolean(
-        suspect && (typeof suspect === 'object' || typeof suspect === 'function')
-    );
-}
-
 export function reinterpret<T>(target: any): T {
     return target;
 }
+/**
+ * TypeScript type guard that always returns true.
+ * 
+ * @remarks 
+ * You may use it in an if statement to assert the proper type in the 
+ * following code execution path.
+ * 
+ * ```ts
+ * import * as Vts from 'vee-type-safe';
+ * const enum SomeEnum {
+ *     A = 0, B, C
+ * }
+ * const numb: number = 2;
+ * if (!Vts.typeAssert<SomeEnum>(numb)) { return; }
+ * numb; // deduced type is SomeEnum
+ * ```  
+ * 
+ * @param _target Target value, to make type assertion of.
+ */
 export function typeAssert<T>(_target: any): _target is T {
     return true;
 }
-export function assertNever(_suspect: never) {}
 
-export function isBasicTypeName(suspect: string): suspect is BasicTypeName {
-    switch (suspect) {
-        case 'number':    case 'string': case 'boolean':
-        case 'undefined': case 'object': case 'function':
-        case 'symbol': return true;
-        default:       return false;
-    }
-}
-export interface TypeDescrObjMap extends BasicObject<TypeDescription> {}
-export interface TypeDescrArray  extends Array<TypeDescription> {}
-export interface TypeDescrSet    extends Set<TypeDescription> {}
-export type TypePredicate   = (suspect: unknown) => boolean;
-export type TypeDescription = TypeDescrObjMap | TypeDescrArray | TypePredicate |
-                                 TypeDescrSet | BasicTypeName  | RegExp;
+/**
+ * This function is no-op, but it is useful to check whether 
+ * you have handled all the cases and some code path is unreachable. 
+ * 
+ * @remarks
+ * TypeScript compiler will issue an error if you forward a value 
+ * not of never type to this function.
+ * 
+ * ```ts
+ * import * as Vts from 'vee-type-safe';
+ * const enum Enum {
+ *     A, B, C
+ * }
+ * function fn(en: Enum) {
+ *     switch (en) {
+ *         case Enum.A: {  return; }
+ *         case Enum.B: {  return; }
+ *         default: {
+ *             Vts.assertNever(en); // compile Error, en is of type Enum.C
+ *         }
+ *     }
+ * }
+ * //-------------
+ * const num = 23;
+ * if (typeof num !== 'number'){
+ *     Vts.assertNever(num); // no error, this code is unreachable
+ *     // num is of type never here
+ * }
+ * ```
+ * 
+ * @param _suspect 
+ */
+export function assertNever(_suspect: never) {}
 
 /**
  * Determines whether the specified suspect type satisfies the restriction of the given type
  * description (TD).
- * @type  T         Typescript type suspect is treated as, if this function returns true.
+ * @param T         Typescript type suspect is treated as, if this function returns true.
  * @param suspect   Entity of unknown type to be tested for conformance according to TD.
  * @param typeDescr If it is a basic JavaScript typename string (should satisfy typeof operator
  *                  domain definition), then function returns "typeof suspect === typeDescr".
@@ -82,7 +110,7 @@ export type TypeDescription = TypeDescrObjMap | TypeDescrArray | TypePredicate |
  *                  returns true if suspect is Array and suspect.length === typeDescr.length
  *                  and each suspect[i] conforms to typeDescr[i] type description.
  *
- *                  Else if it is an empty Array, throws Error.
+ *                  Else if it is an empty Array, returns true if suspet is Array of any type.
  *
  *                  Else if it is an object, returns true if suspect is an object and
  *                  each typeDescr[key] is a TD for suspect[key]. (Excess properties in suspect
@@ -91,155 +119,116 @@ export type TypeDescription = TypeDescrObjMap | TypeDescrArray | TypePredicate |
  *                  Else if it is a TypePredicate, then returns typeDescr(suspect).
  *
  *                  Else returns false.
+ * @remarks
+ * ```ts
+ * import * as Vts from 'vee-type-safe';
+ * 
+ * Vts.conforms(
+ * {
+ *        prop: 'lala',
+ *        tel:  '8800-555-35-35'
+ *        prop2: true,
+ *        obj: {
+ *            obj: [23, false]
+ *        },
+ *        someIDontCareProperty: null // excess properties are ok
+ * },
+ * {
+ *        prop: 'string',
+ *        tel:  /\d{4}-\d{3}-\d{2}-\d{2}/, // claims a string of given format
+ *        prop2: 'boolean',
+ *        obj: {
+ *            obj: ['number', 'boolean'] // claims a fixed length tuple
+ *        }
+ * }); // true
+ * 
+ * Vts.conforms(
+ * {
+ *      arr: ['array', null, 'of any type', 8888 ],
+ *      strArr: ['Pinkie', 'Promise', 'some', 'strings'],
+ *      oneOf: 2,
+ *      custom: 43
+ * }, 
+ * {
+ *      arr: [],                              // claims an array of any type
+ *      strArr: ['string'],                   // claims an array of any length
+ *      oneOf: new Set(['boolean', 'number']),// claims to be one of these types
+ *      custom: isOddNumber                   // custom type predicate function
+ * }); // true
+ * 
+ * function isOddNumber(suspect: unknown): suspect is number {
+ *     return typeof suspect === 'number' && suspect % 2;
+ * }  
+ * 
+ * // Type argument:
+ * interface Human {
+ *     name: string;
+ *     id:   number;
+ * }
+ * const HumanTD: Vts.TypeDescriptionOf<Human>  = {
+ *     name: 'string',  // using Vts.TypeDescriptionOf<T> gives you better typing
+ *     id:   'number'
+ * };
+ * function tryUseHuman(maybeHuman: unknown) {
+ *     if (conforms<Human>(maybeHuman, HumanTD)) {
+ *         // maybeHuman is of type Human here
+ *         maybeHuman.name;
+ *         maybeHuman.id;
+ *     }
+ * }
+ * 
+ * ```
  */
 export function conforms<T = unknown>(suspect: unknown, typeDescr: TypeDescription)
     : suspect is T {
-    //
-    if (typeof typeDescr === 'string') {
-        return typeof suspect === typeDescr;
-    }
-    if (typeof typeDescr === 'function') {
-        return Boolean((typeDescr as TypePredicate)(suspect));
-    }
-    if (typeDescr instanceof RegExp) {
-        return typeof suspect === 'string' && typeDescr.test(suspect);
-    }
-    if (Array.isArray(typeDescr)) {
-        if (!Array.isArray(suspect)) {
-            return false;
-        }
-        if (!typeDescr.length) {
-            return true;
-        }
-        if (typeDescr.length === 1) {
-            return suspect.every((item: unknown) => conforms(item, typeDescr[0]));
-        }
-        if (typeDescr.length !== suspect.length) {
-            return false;
-        }
-        return typeDescr.every((itemDescr, i) => conforms(suspect[i], itemDescr));
-    }
-    if (typeDescr instanceof Set) {
-        for (const possibleTypeDescr of typeDescr) {
-            if (conforms(suspect, possibleTypeDescr)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    if (!isBasicObject(suspect) || Array.isArray(suspect)) {
-        return false;
-    }
-    return Object.getOwnPropertyNames(typeDescr).every(propName => conforms(
-        suspect[propName], typeDescr[propName]
-    ));
+    return !duckMismatch(suspect, typeDescr);
 }
 
+/**
+ * 
+ * Same as `conforms()`, but returns false for suspect object that has 
+ * excess properties (those, that are not present in type description object).
+ * 
+ * @param T         Typescript type suspect is treated as, if this function returns true.
+ * @param suspect   Entity of unknown type to be tested for conformance according to TD.
+ * @param typeDescr `TypeDescription` that describes limitations that must be
+ *                  applied to `suspect` to pass the match (see `conforms()` for
+ *                  more info about the structure of `TypeDescription`).
+ * 
+ * @remarks
+ * ```ts
+ * import * as Vts from 'vee-type-safe';
+ * Vts.conforms(23, 'number') === Vts.exactlyConforms(23, 'number');
+ * const suspect = {
+ *     listedInt: 7,
+ *     listedStr: 'readme',
+ *     unlistedProp: ['some', 'excess', 'prop', 'value']
+ * }
+ * // notice that if you had used Vts.TypeDescriptionOf<typeof suspect> type here,
+ * // you would have got error squiggles, that td lacks 'unlistedProp' property.
+ * const td: Vts.TypeDescription = {
+ *     listedInt: Vts.isPositiveInteger,
+ *     listedStr: 'string'
+ * }
+ * Vts.conforms(suspect, td) === true;
+ * Vts.exactlyConforms(suspect, td) === false;
+ * ```
+ */
 export function exactlyConforms<T = unknown>(suspect: unknown, typeDescr: TypeDescription)
     : suspect is T {
-    //
-    if (typeof typeDescr === 'string') {
-        return typeof suspect === typeDescr;
-    }
-    if (typeof typeDescr === 'function') {
-        return Boolean((typeDescr as TypePredicate)(suspect));
-    }
-    if (typeDescr instanceof RegExp) {
-        return typeof suspect === 'string' && typeDescr.test(suspect);
-    }
-    if (Array.isArray(typeDescr)) {
-        if (!Array.isArray(suspect)) {
-            return false;
-        }
-        if (!typeDescr.length) {
-            return true;
-        }
-        if (typeDescr.length === 1) {
-            return suspect.every((item: unknown) => exactlyConforms(item, typeDescr[0]));
-        }
-        if (typeDescr.length !== suspect.length) {
-            return false;
-        }
-        return typeDescr.every((itemDescr, i) => exactlyConforms(suspect[i], itemDescr));
-    }
-    if (typeDescr instanceof Set) {
-        for (const possibleTypeDescr of typeDescr) {
-            if (exactlyConforms(suspect, possibleTypeDescr)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    if (!isBasicObject(suspect) || Array.isArray(suspect)) {
-        return false;
-    }
-    const susProps = Object.getOwnPropertyNames(suspect);
-    const tdProps  = Object.getOwnPropertyNames(typeDescr);
-    let i = susProps.length;
-    return tdProps.length >= susProps.length &&
-        tdProps.every(propName => {
-            if (!exactlyConforms(suspect[propName], typeDescr[propName])){
-                return false;
-            }
-            i -= Number(propName in suspect);
-            return true;
-        }) && !i;
-}
-
-
-
-export function isInteger(suspect: unknown): suspect is number {
-    return typeof suspect === 'number' && Number.isInteger(suspect);
-}
-export function isPositiveInteger(suspect: unknown): suspect is number {
-    return isInteger(suspect) && suspect > 0;
-}
-export function isNegativeInteger(suspect: unknown): suspect is number {
-    return isInteger(suspect) && suspect < 0;
-}
-export function isPositiveNumber(suspect: unknown): suspect is number {
-    return typeof suspect === 'number' && suspect > 0;
-}
-export function isNegativeNumber(suspect: unknown): suspect is number {
-    return typeof suspect === 'number' && suspect < 0;
-}
-export function isZeroOrPositiveInteger(suspect: unknown): suspect is number {
-    return isPositiveInteger(suspect) || suspect === 0;
-}
-export function isZeroOrNegativeInteger(suspect: unknown): suspect is number {
-    return isNegativeInteger(suspect) || suspect === 0;
-}
-export function isZeroOrPositiveNumber(suspect: unknown): suspect is number {
-    return isPositiveNumber(suspect) || suspect === 0;
-}
-export function isZeroOrNegativeNumber(suspect: unknown): suspect is number {
-    return isNegativeNumber(suspect) || suspect === 0;
-}
-export function isZero(suspect: unknown): suspect is 0 {
-    return typeof suspect === 'number' && suspect === 0;
-}
-
-
-
-
-
-
-/**
- * Checks that suspect is a string and it conforms to ISO 8601 format.
- * @param suspect Value of unknown type to check.
- * @return True if suspect is a string containing a date in ISO 8601 format.
- * Internally uses 'is-iso-date' npm package.
- */
-export function isIsoDateString(suspect: unknown): suspect is string {
-    return typeof suspect === 'string' && isISODate(suspect);
+    return !mismatch(suspect, typeDescr);
 }
 
 /**
+ * 
  * Checks whether suspect conforms to the given type description and returns it if yes,
  * otherwise returns the default value.
- * @param typeDescr Type description suspect may conform to, defaultVal MUST conform to this TD
- * @param suspect Value of unknown type to provide default value for
- * @param defaultVal Value that conforms to typeDescr TD that is returned by this function if !conforms(suspect, typeDescr)
+ * @param T          Type of `defaultVal` and the type described by `typeDescr`
+ * @param typeDescr  Type description suspect may conform to, 
+ *                   `defaultVal` MUST conform to this TD.
+ * @param suspect    Value of unknown type to provide default value for.
+ * @param defaultVal Value that conforms to `typeDescr` TD that is 
+ *                   returned by this function if `!conforms(suspect, typeDescr)`.
  */
 export function defaultIfNotConforms<T>(
     typeDescr: TypeDescription, suspect: unknown, defaultVal: T
@@ -247,84 +236,62 @@ export function defaultIfNotConforms<T>(
     return conforms<T>(suspect, typeDescr) ? suspect : defaultVal;
 }
 
-export function makeTdWithOptionalProps<
-    TypeDescr extends TypeDescrObjMap
->(
-    typeDescr: TypeDescr
-): BasicObjectMap<keyof TypeDescr, ReturnType<typeof optional>> {
+/**
+ * Returns a new `TypeDescrObjMap` (which is assignable to `TypeDescription`) 
+ * object that is composed of `typeDescr` properties wrapped as
+ * ```ts
+ *  result[propName] = optional(typeDescr[propName])
+ * ```
+ * for each propName in `typeDescr` own property names.
+ *  
+ * @param TTD       Type of TD object, i.e an object with values of `TypeDescription` type.
+ * @param typeDescr Object to make new `TypeDescrObjMap` 
+ *                  with all optional properties from.
+ */
+export function makeTdWithOptionalProps<TTD extends TypeDescrObjMap>(
+    typeDescr: TTD
+): BasicObjectMap<keyof TTD, ReturnType<typeof optional>> {
     return Object.getOwnPropertyNames(typeDescr)
                  .reduce((newTd, propName) => {
                         (newTd as any)[propName] = optional(typeDescr[propName]);
                         return newTd;
                      },
-                     {} as BasicObjectMap<keyof TypeDescr, ReturnType<typeof optional>>
+                     {} as BasicObjectMap<keyof TTD, ReturnType<typeof optional>>
                  );
 }
 
-
 /**
- * A shorthand for `conforms(suspect, new Set<TypeDescription>(['undefined', typeDescr]))`
- * @param typeDescr
+ * Represents the result of running `mismatch(suspect, typeDescr)` or 
+ * `duckMismatch(suspect, typeDescr)` functions. 
+ * 
+ * @remarks
+ * It contains information about why suspect doesn't conform to 
+ * the given `typeDescr`: the actual value, expected type description and 
+ * a property path to unexpected value type.
  */
-export function optional(typeDescr: TypeDescription) {
-    return new Set<TypeDescription>(['undefined', typeDescr]);
-}
-
-/**
- * Returns a predicate which checks its suspect to be a number within the range [min, max].
- * @param min Minimum value suspect can be.
- * @param max Maximum value suspect can be.
- */
-export function isNumberWithinRange(min: number, max: number) {
-    return function isNumberWithinTheGivenRange(suspect: unknown): suspect is number {
-        return typeof suspect === 'number' && (
-        min > max                          ?
-        (max <= suspect && suspect <= min) :
-        (min <= suspect && suspect <= max)    );
-    };
-}
-
-/**
- * Returns a predicate which checks its suspect to be an integer within the range [min, max].
- * @param min Minimum value suspect can be.
- * @param max Maximum value suspect can be.
- */
-export function isIntegerWithinRange(min: number, max: number) {
-    return function isIntegerWithinTheGivenRange(suspect: unknown): suspect is number { 
-        return isInteger(suspect)          && (
-        min > max                          ? 
-        (max <= suspect && suspect <= min) :
-        (min <= suspect && suspect <= max)    );
-    };
-}
-
-/**
- * Returns a predicate that accepts a suspect of any type and matches it to
- * one of the provided possible values by
- * ~~~typescript
- * possibleValues.includes(suspect)
- * ~~~
- * @param possibleValues Array with values of any type, suspect is matched to.
- */
-export function isOneOf<T>(possibleValues: T[]){
-    return function isOneOfTheGivenPossibleValues(suspect: any): suspect is T { 
-        return possibleValues.includes(suspect);
-    };
-}
-
-export type PathArray = (string | number)[];
-
-export interface MismatchInfoData {
-    path:        PathArray;
-    expectedTd:  TypeDescription;
-    actualValue: unknown;
-}
-
 export class MismatchInfo implements MismatchInfoData {
-    path:        PathArray;
-    expectedTd:  TypeDescription;
+    /**
+     *  An array of numbers and strings which defines a path to suspect's 
+     *  invalid `actualValue`. 
+     *  @remarks
+     *  E.g. if suspect.foo.bar[3][5] failed to match to the `expectedTd`, 
+     *  then path would be `[ 'foo', 'bar', 3, 5 ]`.
+     */
+    path: PathArray;
+    /**
+     * TypeDescription that `actualValue` was expected to conform to.
+     */
+    expectedTd: TypeDescription;
+    /**
+     * Value that failed to conform to the `expectedTd`.
+     */
     actualValue: unknown;
 
+    /**
+     * Creates an instance of MismatchInfo, takes on object with data properties.
+     * You will never used it, it is used only internally.
+     * @param mismatchData Object which contains data about type mismatch.
+     */
     constructor(mismatchData: MismatchInfoData) { 
         this.path        = mismatchData.path;
         this.expectedTd  = mismatchData.expectedTd;
@@ -334,7 +301,33 @@ export class MismatchInfo implements MismatchInfoData {
     private static isJsIdentifier(suspect: string) {
         return /^[a-zA-Z$_][\w\d$_]*$/.test(suspect);
     }
-    
+
+    /**
+     * Returns path converted to a human readable JavaScript 
+     * property access notation string if match was failed. 
+     * Returned string begins with the 'root' as the root object to access 
+     * the properties.
+     * 
+     * @remarks
+     * ```ts
+     * import * as Vts from 'vee-type-safe';
+     * const mismatchInfo = Vts.mismatch(
+     *     {
+     *         foo: {
+     *             bar: {
+     *                 'twenty two': [
+     *                     { prop: 'str' }, 
+     *                     { prop: -23 }
+     *                 ]
+     *             }
+     *         }
+     *     },
+     *     { foo: { bar: { 'twenty two': [ { prop: 'string' } ] } } }
+     * );
+     * 
+     * mismatchInfo.pathString() === `root.foo.bar['twenty two'][1].prop`;
+     * ```
+     */
     pathString() {
         return this.path.reduce((result, currentPart) => 
             `${result}${
@@ -347,20 +340,27 @@ export class MismatchInfo implements MismatchInfoData {
             'root'
         );
     }
+
+    /**
+     * 
+     * Returns a string of form:
+     * "value (JSON.stringify(actualValue)) at path 'pathString()' doesn't 
+     *  exactly conform to the given type description (stringifyTd(expectedTd))"
+     * 
+     * @remarks
+     * If `JSON.stringify(actualValue)` throws an error, it is excluded 
+     * from the returned string.
+     */
     toErrorString() {
-        try {
-            return `Value (${JSON.stringify(this.actualValue)}) at '${
-                this.pathString()
-            }' doesn't exactly conform to the given type description (${
-                stringifyTd(this.expectedTd)
-            })`;
-        } catch (err) {
-            return `value at '${
-                this.pathString()
-            }' doesn't exactly conform to the given type description (${
-                stringifyTd(this.expectedTd)
-            })`;
-        }
+        let valueRepr: Maybe<string>;
+        try { valueRepr = JSON.stringify(this.actualValue); } 
+        finally {}
+
+        return `value${valueRepr ? ` (${valueRepr})` : ''} at '${
+            this.pathString()
+        }' doesn't exactly conform to the given type description (${
+            stringifyTd(this.expectedTd)
+        })`;
     }
 }
 
@@ -376,61 +376,32 @@ export class FailedMatchInfo extends MismatchInfo {
 }
 
 
-
+/**
+ * Inherits MismatchInfo and only overrides toErrorString() method.
+ */
 export class DuckMismatchInfo extends MismatchInfo {
     constructor(mismatchData: MismatchInfoData){
         super(mismatchData);
     }
+    /**
+     * @override
+     */
     toErrorString() {
-        try {
-            return `value (${JSON.stringify(this.actualValue)}) at '${
-                this.pathString()
-            }' doesn't conform to the given type description (${
-                stringifyTd(this.expectedTd)
-            })`;
-        } catch (err) {
-            return `value at '${
-                this.pathString()
-            }' doesn't conform to the given type description (${
-                stringifyTd(this.expectedTd)
-            })`;
-        }
+        let valueRepr: Maybe<string>;
+        try { valueRepr = JSON.stringify(this.actualValue); } 
+        finally {}
+        
+        return `value${valueRepr ? ` (${valueRepr})` : ''} at '${
+            this.pathString()
+        }' doesn't conform to the given type description (${
+            stringifyTd(this.expectedTd)
+        })`;
     }
 }
-
 
 /**
- * @deprecated Use MismatchInfo instead
+ * For internal use only.
  */
-export class MatchInfo {
-    path?:        PathArray;
-    expectedTd?:  TypeDescription;
-    actualValue?: unknown;
-    get matched() {  
-        return !this.path;
-    }
-
-    constructor(mismatchData?: MismatchInfoData) { 
-        if (mismatchData) {
-            this.path        = mismatchData.path;
-            this.expectedTd  = mismatchData.expectedTd;
-            this.actualValue = mismatchData.actualValue;
-        }
-    }
-
-    pathString() {
-        return this.matched 
-            ? ''
-            : new MismatchInfo(this as MismatchInfoData).pathString();
-    }
-
-    toErrorString() {
-        return this.matched
-            ? ''
-            : new MismatchInfo(this as MismatchInfoData).toErrorString();
-    }
-}
-
 class Mismatcher {
     protected currentPath: (string | number)[] = [];
 
@@ -527,7 +498,9 @@ class Mismatcher {
     }
 
 }
-
+/**
+ * For internal use only.
+ */
 class DuckMismatcher extends Mismatcher {
     /**
      * @override
@@ -543,7 +516,9 @@ class DuckMismatcher extends Mismatcher {
         }
         return this.trueMatch();
     }
-
+    /**
+     * @override
+     */
     protected falseMatch(actualValue: unknown, expectedTd: TypeDescription) {
         return new DuckMismatchInfo({ 
             actualValue, 
@@ -553,39 +528,118 @@ class DuckMismatcher extends Mismatcher {
     }
 
 }
-
+/**
+ * Represents an error risen by type mismatch inconsistency.
+ * Stores `MismatchInfo` that rose this error.
+ */
 export class TypeMismatchError extends Error {
-    constructor(public typeMismatch: MismatchInfo) { 
+    /**
+     * Contains information about occured type mismatch.
+     */
+    typeMismatch: MismatchInfo;
+    /**
+     * Instantiates TypeMismatchError with the given `MismatchInfo` data.
+     * @param typeMismatch `MismatchInfo` that describes an errored type.
+     */
+    constructor(typeMismatch: MismatchInfo) { 
         super(typeMismatch.toErrorString());
+        this.typeMismatch = typeMismatch;
     }
 }
 
-
 /**
- * @deprecated Use duckMismatch() instead.
+ * Same as `mismatch(suspect, typeDescr)` but allows `suspect` object with 
+ * excess properties to pass the match.
+ *
+ * @param suspect   Value of `unknown` type to be tested for conformance to `typeDescr`.
+ * @param typeDescr `TypeDescription` that describes limitations that must be
+ *                  applied to `suspect` to pass the match (see `conforms()` for
+ *                  more info about the structure of `TypeDescription`).
+ * 
+ * @remarks
+ * ```ts
+ * import * as Vts from 'vee-type-safe';
+ * 
+ * Vts.duckMismatch(
+ *     { name: 'Ihor', somePropertyIDontCareAbout: 42 },
+ *     { name: 'string' }
+ * ); // returns null as suspect is allowed to have excess properties
+ * 
+ * const untrustedJson = {
+ *     client: 'John Doe',
+ *     walletNumber: null,
+ * };
+ * const ExpectedJsonTD: Vts.TypeDescriptionOf<typeof untrustedJson> = {
+ *     client: 'string',
+ *     walletNumber: /\d{16}/ // implies a string of the given format
+ * };
+ *  
+ * const mismatchInfo = Vts.duckMismatch(untrustedJson, ExpectedJsonTD);
+ * if (mismatchInfo) {
+ *     throw new Vts.TypeMismatchError(mismatchInfo);
+ * }
+ * // or you could use `Vts.ensureDuckMatch(untrustedJson, ExpectedJsonTD)`
+ * // which does the same thing.
+ * // ...
+ * // process validated client here
+ * ```
  */
-export function match(suspect: unknown, typeDescr: TypeDescription) {
-    const  mismatchInfo = new DuckMismatcher().mismatch(suspect, typeDescr);
-    return mismatchInfo ? new MatchInfo(mismatchInfo) : new MatchInfo;
-}
-
-/**
- * @deprecated Use mismatch() instead.
- */
-export function exactlyMatch(suspect: unknown, typeDescr: TypeDescription) {
-    const  mismatchInfo = new Mismatcher().mismatch(suspect, typeDescr);
-    return mismatchInfo ? new MatchInfo(mismatchInfo) : new MatchInfo;
-}
-
 export function duckMismatch(suspect: unknown, typeDescr: TypeDescription) {
     return (new DuckMismatcher).mismatch(suspect, typeDescr);
 }
 
+/**
+ * Returns a `MismatchInfo` object that stores an information about type 
+ * incompatability for the given `typeDescr`. 
+ * 
+ * @param suspect   Value of `unknown` type to be tested for conformance to `typeDescr`.
+ * @param typeDescr `TypeDescription` that describes limitations that must be
+ *                  applied to `suspect` to pass the match (see `conforms()` for
+ *                  more info about the structure of `TypeDescription`).
+ * 
+ * @remarks
+ * `MismatchInfo` stores information about why and where 
+ * `suspect`'s invalid property is. If `exactlyConforms(suspect, typeDescr)` 
+ * this function returns `null`. This is a powerful tool to generate useful 
+ * error messages while validating value shape type. 
+ * Note: this function doesn't let pass the match for `suspect` that has 
+ * properties not listed in `typeDescr` which differentiates it 
+ * from `duckMismatch()`.
+ * ```ts
+ *   import * as Vts from 'vee-type-safe';
+ *   const untrustedJson = {}; // some value
+ *   const ExpectedJsonTD: Vts.TypeDescription = {}; //some type description
+ *   const dbDocument = {}; // some NoSQL database document
+ *
+ *   const mismatchInfo = Vts.mismatch(untrustedJson, ExpectedJsonTD);
+ *   if (mismatchInfo) {
+ *       console.log(
+ *           mismatchInfo.path,
+ *           mismatchInfo.actualValue,
+ *           mismatchInfo.expectedTd
+ *       );
+ *       // logs human readable path to invalid property
+ *       console.log(mismatchInfo.pathString());
+ *
+ *       // `mismatchInfo.toErrorString()` generates human readable error message
+ *       throw new Vts.TypeMismatchError(mismatchInfo);
+ *   }
+ *   // now you may safely assign untrustedJson to dbDocument:
+ *   dbDocument = Object.assign(dbDocument, untrustedJson);
+ * ```
+ */
 export function mismatch(suspect: unknown, typeDescr: TypeDescription) {
     return (new Mismatcher).mismatch(suspect, typeDescr);
     
 }
 
+/**
+ * This function returns nothing. It throws `TypeMismatchError` if its `suspect`
+ * failed to match to the given `typeDescr` by executing 
+ * `duckMismatch(suspect, typeDescr)`.
+ * @param suspect 
+ * @param typeDescr 
+ */
 export function ensureDuckMatch(suspect: unknown, typeDescr: TypeDescription) {
     const mismatchInfo = duckMismatch(suspect, typeDescr);
     if (mismatchInfo) {
@@ -593,6 +647,13 @@ export function ensureDuckMatch(suspect: unknown, typeDescr: TypeDescription) {
     }
 }
 
+/**
+ * This function returns nothing. It throws `TypeMismatchError` if its `suspect`
+ * failed to match to the given `typeDescr` by executing 
+ * `mismatch(suspect, typeDescr)`.
+ * @param suspect 
+ * @param typeDescr 
+ */
 export function ensureMatch(suspect: unknown, typeDescr: TypeDescription) {
     const mismatchInfo = mismatch(suspect, typeDescr);
     if (mismatchInfo) {
@@ -600,10 +661,16 @@ export function ensureMatch(suspect: unknown, typeDescr: TypeDescription) {
     }
 }
 
+/**
+ * For internal use only
+ */
 function stringifyTd(typeDescr: TypeDescription): string  {
     return stringifyTdImpl(typeDescr).replace(/\\n|\\"|"/g, substr => substr === '\\n' ? '\n' : '');
 }
 
+/**
+ * For internal use only
+ */
 function stringifyTdImpl(typeDescr: TypeDescription): string {
     return !isBasicObject(typeDescr)            ? 
             typeDescr                           : 
@@ -622,13 +689,6 @@ function stringifyTdImpl(typeDescr: TypeDescription): string {
             , 4);
 }
 
-export type PropNamesArray<TObject extends BasicObject> = (keyof TObject)[];
-export type Take<
-    TSourceObject extends BasicObject, 
-    TPropNames    extends PropNamesArray<TSourceObject>
-> = { 
-    [TProperty in TPropNames[number]]: TSourceObject[TProperty];
-};
 
 /**
  * Takes given properties from the object and returns them as a new object.
@@ -668,25 +728,7 @@ export function take<
     }, {} as Take<TSourceObject, TPropNames>);
 }
 
-export type MappedObject<TSourceObject extends BasicObject<any>, MappedValue> = {
-    [TSourceObjectKey in keyof TSourceObject]: MappedValue;
-};
 
-export type ReplaceProperty<
-    TSourceObject extends BasicObject,
-    TPropName extends keyof TSourceObject,
-    TNewPropType
-> = {
-    [Key in keyof TSourceObject]:
-    Key extends TPropName ? TNewPropType : TSourceObject[Key];
-};
-
-export type RemoveProperties<
-    TSourceObject extends BasicObject,
-    TPropNamesUnion extends keyof TSourceObject
-> = {
-    [Key in Exclude<keyof TSourceObject, TPropNamesUnion>]: TSourceObject[Key];
-};
 
 /**
  * The same as `take(sourceObject, Object.getOwnPropertyNames(keysObject))`,
@@ -700,95 +742,4 @@ export function takeFromKeys<
         sourceObject, 
         Object.getOwnPropertyNames(keysObj) as PropNamesArray<TKeysObject>
     );
-}
-
-/**
- * Returns true if `suspect` is a string of BSON object id format.
- *  
- * @param suspect - Value of unknown type to validate.
- * @remarks 
- * BSON format is the format used by MongoDB documents.
- * This function doesn't depend on any libarary at all.
- * You can safely validate id's even on the client side.
- * The `RegExp` for this fucntion was taken from ['bson'](https://www.npmjs.com/package/bson)
- * npm package.
- */
-export function isBsonObjectIdString(suspect: unknown): suspect is string {
-    return typeof suspect === 'string' && /^[0-9a-fA-F]{24}$/.test(suspect);
-}
-
-/**
- * Returns a `TypePredicate` that checks whether given string enum values include 
- * its suspect.
- * 
- * @param typeStringScriptEnum typescript string enumeration get values from
- * 
- * @remarks
- * Beware that this function accepts only string enums, e.g.:
- * ```ts
- * import * as Vts from 'vee-type-safe';
- * enum UserRole {
- *      Guest    = 'guest',
- *      Standart = 'standart',
- *      Admin    = 'admin'
- * }
- * enum UserRoleNumber {
- *      Guest, Standart, Admin // implicit values: 0, 1, 2
- * }
- * 
- * Vts.mismatch({ role: 'guest' }, { role: Vts.isInEnum(UserRole) }); // ok
- * Vts.mismatch({ role: 0 }, { role: Vts.isInEnum(UserRoleNumber) }); // compile error
- * 
- * ```
- * 
- */
-export function isInEnum<
-    TEnum extends BasicObjectMap<keyof TEnum, string>
->(typeScriptStringEnum: TEnum) { 
-    const enumValues = Object.values(typeScriptStringEnum);
-    return (suspect: unknown): suspect is TEnum[keyof TEnum] => 
-        typeof suspect === 'string' && enumValues.includes(suspect);
-}
-
-/**
- * Makes an alias for the type that maps properties of T to `TypeDescription`'s
- * 
- * @param T Object (probably interface) type to alias `TypeDescription` for.
- * 
- * @remarks
- * Use it like so:
- * ```ts
- * import * as Vts from 'vee-type-safe';
- * export interface Human {
- *     name: string;
- *     age: number;
- * }
- * 
- * export const HumanTD: TypeDescriptionOf<Human> = {
- *     name: 'string',
- *     age: Vts.isPositiveInteger // you will get better intellisense here
- * };
- * ```
- */
-export type TypeDescriptionOf<T extends BasicObject> = BasicObjectMap<keyof T, TypeDescription>;
-
-/**
- * Type predicate to check whether `suspect === null`
- */
-export function isNull(suspect: unknown): suspect is null {
-    return suspect === null;
-}
-
-/**
- * Type predicate to check whether `suspect === undefined`
- */
-export function isUndefined(suspect: unknown): suspect is undefined {
-    return suspect === undefined;
-}
-
-/**
- * Shorthand for `new Set<TypeDescription>([isNull, typeDescr])`
- */
-export function isNullOr(typeDescr: TypeDescription) {
-    return new Set<TypeDescription>([isNull, typeDescr]);
 }
