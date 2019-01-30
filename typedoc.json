@@ -6,7 +6,7 @@
     "ignoreCompilerErrors":           true,
     "excludePrivate":                 true,
     "excludeNotExported":             "true",
-    "target":                         "ES5",
+    "target":                         "ES2018",
     "moduleResolution":               "node",
     "preserveConstEnums":             "true",
     "stripInternal":                  "true",

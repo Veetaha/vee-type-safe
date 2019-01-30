@@ -1,6 +1,6 @@
 {
     "name": "vee-type-safe",
-    "version": "3.0.1",
+    "version": "3.1.0",
     "description": "Simple TypeScript type checking utility library.",
     "main": "build/index.js",
     "types": "build/index.d.ts",
@@ -19,7 +19,8 @@
     "scripts": {
         "test": "tsc && mocha build/test/tests.js",
         "build": "tsc",
-        "docs": "./node_modules/.bin/typedoc --options typedoc.json index.ts"
+        "docs": "./node_modules/.bin/typedoc --options typedoc.json index.ts",
+        "pre-deploy": "npm run build && npm run test && npm run docs"
     },
     "author": "Vitaliy Kryvenko",
     "license": "MIT",

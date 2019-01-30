@@ -110,13 +110,13 @@ export function isBsonObjectIdString(suspect: unknown): suspect is string {
 }
 
 /**
- * Type predicate to check whether `suspect === null`
+ * Returns `true` if `suspect === null`
  */
 export function isNull(suspect: unknown): suspect is null {
     return suspect === null;
 }
 /**
- * Type predicate to check whether `suspect === undefined`
+ * Returns `true` if `suspect === undefined`
  */
 export function isUndefined(suspect: unknown): suspect is undefined {
     return suspect === undefined;
@@ -129,35 +129,129 @@ export function isNullOr(typeDescr: TypeDescription) {
     return new Set<TypeDescription>([isNull, typeDescr]);
 }
 
+/**
+ * Returns `true` if `suspect` is integer, i.e. doesn't have decimal part.
+ */
 export function isInteger(suspect: unknown): suspect is number {
     return typeof suspect === 'number' && Number.isInteger(suspect);
 }
+
+/**
+ * Returns `true` if `suspect` is integer, and `suspect > 0`
+ */
 export function isPositiveInteger(suspect: unknown): suspect is number {
     return isInteger(suspect) && suspect > 0;
 }
+/**
+ * Returns `true` if `suspect` is integer, and `suspect < 0`
+ */
 export function isNegativeInteger(suspect: unknown): suspect is number {
     return isInteger(suspect) && suspect < 0;
 }
+
+/**
+ * Returns `true` if `suspect` is number, and `suspect > 0`
+ */
 export function isPositiveNumber(suspect: unknown): suspect is number {
     return typeof suspect === 'number' && suspect > 0;
 }
+
+/**
+ * Returns `true` if `suspect` is number, and `suspect < 0`
+ */
 export function isNegativeNumber(suspect: unknown): suspect is number {
     return typeof suspect === 'number' && suspect < 0;
 }
+
+/**
+ * Returns `true` if `suspect` is integer, and `suspect >= 0`
+ */
 export function isZeroOrPositiveInteger(suspect: unknown): suspect is number {
-    return isPositiveInteger(suspect) || suspect === 0;
+    return isInteger(suspect) && suspect >= 0;
 }
+/**
+ * Returns `true` if `suspect` is integer, and `suspect <= 0`
+ */
 export function isZeroOrNegativeInteger(suspect: unknown): suspect is number {
-    return isNegativeInteger(suspect) || suspect === 0;
+    return isInteger(suspect) && suspect <= 0;
 }
+
+/**
+ * Returns `true` if `suspect` is number, and `suspect >= 0`
+ */
 export function isZeroOrPositiveNumber(suspect: unknown): suspect is number {
-    return isPositiveNumber(suspect) || suspect === 0;
+    return typeof suspect === 'number' && suspect >= 0;
 }
+
+/**
+ * Returns `true` if `suspect` is number, and `suspect <= 0`
+ */
 export function isZeroOrNegativeNumber(suspect: unknown): suspect is number {
-    return isNegativeNumber(suspect) || suspect === 0;
+    return typeof suspect === 'number' && suspect <= 0;
 }
+/**
+ * Returns `true` if `suspect` is number and `suspect === 0` 
+ */
 export function isZero(suspect: unknown): suspect is 0 {
-    return typeof suspect === 'number' && suspect === 0;
+    return suspect === 0;
+}
+
+
+
+/**
+ * Returns a predicate that checks its suspect to be an integer, such that
+ * `suspect !== target`.
+ * @param target Number to check inequality to.
+ */
+export function isIntegerNotEqual(target: number) {
+    return function isIntegerNotEqualToTheGivenTarget(suspect: unknown): suspect is number {
+        return isInteger(suspect) && suspect !== target;
+    };
+}
+
+
+/**
+ * Returns a predicate that checks its suspect to be an integer, such that
+ * `suspect <= target`.
+ * @param target Number to check inequality to.
+ */
+export function isIntegerLessOrEq(target: number) {
+    return function isIntegerLessOrEqToTheGivenTarget(suspect: unknown): suspect is number {
+        return isInteger(suspect) && suspect <= target;
+    };
+}
+
+/**
+ * Returns a predicate that checks its suspect to be an integer, such that
+ * `suspect >= target`
+ * @param target Number to check inequality to.
+ */
+export function isIntegerGreaterOrEq(target: number) {
+    return function isNumberGreaterOrEqToTheGivenTarget(suspect: unknown): suspect is number {
+        return isInteger(suspect) && suspect >= target;
+    };
+}
+
+/**
+ * Returns a predicate that checks its suspect to be an integer, such that
+ * `suspect < target`
+ * @param target Number to check inequality to.
+ */
+export function isIntegerLessThan(target: number) {
+    return function isIntegerLessThanTheGivenTarget(suspect: unknown): suspect is number {
+        return isInteger(suspect) && suspect < target;
+    };
+}
+
+/**
+ * Returns a predicate that checks its suspect to be a number, such that
+ * `suspect > target`
+ * @param target Number to check inequality to. 
+ */
+export function isIntegerGreaterThan(target: number) {
+    return function isIntegerGreaterThanTheGivenTarget(suspect: unknown): suspect is number {
+        return isInteger(suspect) && suspect > target;
+    };
 }
 
 

@@ -76,6 +76,11 @@
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-external"><a href="_type_descriptions_.html#isbsonobjectidstring" class="tsd-kind-icon">is<wbr>Bson<wbr>Object<wbr>IdString</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter tsd-is-external"><a href="_type_descriptions_.html#isinenum" class="tsd-kind-icon">is<wbr>InEnum</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-external"><a href="_type_descriptions_.html#isinteger" class="tsd-kind-icon">is<wbr>Integer</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-external"><a href="_type_descriptions_.html#isintegergreateroreq" class="tsd-kind-icon">is<wbr>Integer<wbr>Greater<wbr>OrEq</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-external"><a href="_type_descriptions_.html#isintegergreaterthan" class="tsd-kind-icon">is<wbr>Integer<wbr>Greater<wbr>Than</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-external"><a href="_type_descriptions_.html#isintegerlessoreq" class="tsd-kind-icon">is<wbr>Integer<wbr>Less<wbr>OrEq</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-external"><a href="_type_descriptions_.html#isintegerlessthan" class="tsd-kind-icon">is<wbr>Integer<wbr>Less<wbr>Than</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-external"><a href="_type_descriptions_.html#isintegernotequal" class="tsd-kind-icon">is<wbr>Integer<wbr>Not<wbr>Equal</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-external"><a href="_type_descriptions_.html#isintegerwithinrange" class="tsd-kind-icon">is<wbr>Integer<wbr>Within<wbr>Range</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-external"><a href="_type_descriptions_.html#isisodatestring" class="tsd-kind-icon">is<wbr>Iso<wbr>Date<wbr>String</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-external"><a href="_type_descriptions_.html#isnegativeinteger" class="tsd-kind-icon">is<wbr>Negative<wbr>Integer</a></li>
@@ -115,7 +120,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L10">type-descriptions.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L10">type-descriptions.ts:10</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -146,7 +151,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L21">type-descriptions.ts:21</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L21">type-descriptions.ts:21</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -178,7 +183,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L108">type-descriptions.ts:108</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L108">type-descriptions.ts:108</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -218,7 +223,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L78">type-descriptions.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L78">type-descriptions.ts:78</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -271,9 +276,14 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L132">type-descriptions.ts:132</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L135">type-descriptions.ts:135</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns <code>true</code> if <code>suspect</code> is integer, i.e. doesn&#39;t have decimal part.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -281,6 +291,166 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+					<a name="isintegergreateroreq" class="tsd-anchor"></a>
+					<h3>is<wbr>Integer<wbr>Greater<wbr>OrEq</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Integer<wbr>Greater<wbr>OrEq<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">isNumberGreaterOrEqToTheGivenTarget</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L229">type-descriptions.ts:229</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a predicate that checks its suspect to be an integer, such that
+									<code>suspect &gt;= target</code></p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>target: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Number to check inequality to.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">isNumberGreaterOrEqToTheGivenTarget</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+					<a name="isintegergreaterthan" class="tsd-anchor"></a>
+					<h3>is<wbr>Integer<wbr>Greater<wbr>Than</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Integer<wbr>Greater<wbr>Than<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">isIntegerGreaterThanTheGivenTarget</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L251">type-descriptions.ts:251</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a predicate that checks its suspect to be a number, such that
+									<code>suspect &gt; target</code></p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>target: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Number to check inequality to.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">isIntegerGreaterThanTheGivenTarget</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+					<a name="isintegerlessoreq" class="tsd-anchor"></a>
+					<h3>is<wbr>Integer<wbr>Less<wbr>OrEq</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Integer<wbr>Less<wbr>OrEq<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">isIntegerLessOrEqToTheGivenTarget</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L218">type-descriptions.ts:218</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a predicate that checks its suspect to be an integer, such that
+									<code>suspect &lt;= target</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>target: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Number to check inequality to.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">isIntegerLessOrEqToTheGivenTarget</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+					<a name="isintegerlessthan" class="tsd-anchor"></a>
+					<h3>is<wbr>Integer<wbr>Less<wbr>Than</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Integer<wbr>Less<wbr>Than<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">isIntegerLessThanTheGivenTarget</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L240">type-descriptions.ts:240</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a predicate that checks its suspect to be an integer, such that
+									<code>suspect &lt; target</code></p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>target: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Number to check inequality to.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">isIntegerLessThanTheGivenTarget</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+					<a name="isintegernotequal" class="tsd-anchor"></a>
+					<h3>is<wbr>Integer<wbr>Not<wbr>Equal</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Integer<wbr>Not<wbr>Equal<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">isIntegerNotEqualToTheGivenTarget</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L206">type-descriptions.ts:206</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a predicate that checks its suspect to be an integer, such that
+									<code>suspect !== target</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>target: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Number to check inequality to.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">isIntegerNotEqualToTheGivenTarget</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -294,7 +464,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L240">type-descriptions.ts:240</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L334">type-descriptions.ts:334</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -331,7 +501,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L93">type-descriptions.ts:93</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L93">type-descriptions.ts:93</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -364,9 +534,14 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L138">type-descriptions.ts:138</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L148">type-descriptions.ts:148</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns <code>true</code> if <code>suspect</code> is integer, and <code>suspect &lt; 0</code></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -387,9 +562,14 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L144">type-descriptions.ts:144</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L162">type-descriptions.ts:162</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns <code>true</code> if <code>suspect</code> is number, and <code>suspect &lt; 0</code></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -410,12 +590,12 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L115">type-descriptions.ts:115</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L115">type-descriptions.ts:115</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Type predicate to check whether <code>suspect === null</code></p>
+									<p>Returns <code>true</code> if <code>suspect === null</code></p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -438,7 +618,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L128">type-descriptions.ts:128</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L128">type-descriptions.ts:128</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -466,7 +646,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L192">type-descriptions.ts:192</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L286">type-descriptions.ts:286</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -498,7 +678,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L214">type-descriptions.ts:214</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L308">type-descriptions.ts:308</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -530,7 +710,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L181">type-descriptions.ts:181</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L275">type-descriptions.ts:275</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -562,7 +742,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L203">type-descriptions.ts:203</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L297">type-descriptions.ts:297</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -594,7 +774,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L169">type-descriptions.ts:169</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L263">type-descriptions.ts:263</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -626,7 +806,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L226">type-descriptions.ts:226</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L320">type-descriptions.ts:320</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -664,7 +844,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L46">type-descriptions.ts:46</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L46">type-descriptions.ts:46</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -703,9 +883,14 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L135">type-descriptions.ts:135</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L142">type-descriptions.ts:142</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns <code>true</code> if <code>suspect</code> is integer, and <code>suspect &gt; 0</code></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -726,9 +911,14 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L141">type-descriptions.ts:141</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L155">type-descriptions.ts:155</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns <code>true</code> if <code>suspect</code> is number, and <code>suspect &gt; 0</code></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -749,12 +939,12 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L121">type-descriptions.ts:121</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L121">type-descriptions.ts:121</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Type predicate to check whether <code>suspect === undefined</code></p>
+									<p>Returns <code>true</code> if <code>suspect === undefined</code></p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -777,9 +967,14 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L159">type-descriptions.ts:159</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L195">type-descriptions.ts:195</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns <code>true</code> if <code>suspect</code> is number and <code>suspect === 0</code></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -800,9 +995,14 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L150">type-descriptions.ts:150</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L175">type-descriptions.ts:175</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns <code>true</code> if <code>suspect</code> is integer, and <code>suspect &lt;= 0</code></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -823,9 +1023,14 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L156">type-descriptions.ts:156</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L189">type-descriptions.ts:189</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns <code>true</code> if <code>suspect</code> is number, and <code>suspect &lt;= 0</code></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -846,9 +1051,14 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L147">type-descriptions.ts:147</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L169">type-descriptions.ts:169</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns <code>true</code> if <code>suspect</code> is integer, and <code>suspect &gt;= 0</code></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -869,9 +1079,14 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L153">type-descriptions.ts:153</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L182">type-descriptions.ts:182</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns <code>true</code> if <code>suspect</code> is number, and <code>suspect &gt;= 0</code></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -892,7 +1107,7 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/381f816/type-descriptions.ts#L34">type-descriptions.ts:34</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/7d96bed/type-descriptions.ts#L34">type-descriptions.ts:34</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -954,6 +1169,21 @@ Vts.mismatch({ role: <span class="hljs-number">0</span> }, { role: Vts.isInEnum(
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
 						<a href="_type_descriptions_.html#isinteger" class="tsd-kind-icon">is<wbr>Integer</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+						<a href="_type_descriptions_.html#isintegergreateroreq" class="tsd-kind-icon">is<wbr>Integer<wbr>Greater<wbr>OrEq</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+						<a href="_type_descriptions_.html#isintegergreaterthan" class="tsd-kind-icon">is<wbr>Integer<wbr>Greater<wbr>Than</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+						<a href="_type_descriptions_.html#isintegerlessoreq" class="tsd-kind-icon">is<wbr>Integer<wbr>Less<wbr>OrEq</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+						<a href="_type_descriptions_.html#isintegerlessthan" class="tsd-kind-icon">is<wbr>Integer<wbr>Less<wbr>Than</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
+						<a href="_type_descriptions_.html#isintegernotequal" class="tsd-kind-icon">is<wbr>Integer<wbr>Not<wbr>Equal</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-external">
 						<a href="_type_descriptions_.html#isintegerwithinrange" class="tsd-kind-icon">is<wbr>Integer<wbr>Within<wbr>Range</a>

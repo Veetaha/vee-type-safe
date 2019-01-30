@@ -69,7 +69,7 @@ export interface ROBasicFunctor<
 }
 
 /**
- * Defines a union of all possible value types defined in a language.
+ * Defines a union of all possible value types defined in the language.
  * @remarks null and undefined are considered to be primitive types.
  */
 export type PrimitiveType = 
