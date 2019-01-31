@@ -272,7 +272,7 @@ Thus you can be sure that the property of `express.Request` object was type chec
 Does type matching via core library `mismatch()` function.
 
 * `getRequestProperty: (req: express.Request) => unknown` - this function must return a suspect to match to `typeDescr`, based on the given `req` argument.
-* `typeDescr` - type description that the value returned by `getRequestProperty(req)` must match to
+* `typeDescr` - type description that the value returned by `getRequestProperty(req)` will be checked to match to
 * `makeError?: (failInfo: MismatchInfo) => unknown` - it is an optional function which makes a custom error to forward to `next()`, by default this function retuns `BadTypeStatusError`
 
 `BadTypeStatusError` is an instance of `TypeMismatchError` that has a `status: number` property, which is http *BAD_REQUEST* by default.
