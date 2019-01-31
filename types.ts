@@ -165,7 +165,7 @@ export type TypeDescription =
  *     age: number;
  * }
  * 
- * export const HumanTD: TypeDescriptionOf<Human> = {
+ * export const HumanTD: Vts.TypeDescriptionOf<Human> = {
  *     name: 'string',
  *     age: Vts.isPositiveInteger // you will get better intellisense here
  * };
