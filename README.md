@@ -11,9 +11,9 @@ Requires Typescript version `>= 3.2`.
 
 ## Quick API glance
 
-### mismatch(suspect, typeDescr)
-Returns a `MismatchInfo` object (description is bellow) that stores an information
-about type incompatability for given `typeDescr`, e.g. why and where `suspect`'s invalid property is.
+### mismatch(suspect: unknown, typeDescr: TypeDescription)
+Returns `null` or a `MismatchInfo` object that stores information
+about type incompatability with the given `TypeDescription`, e.g. why and where `suspect`'s invalid property is.
 This is a powerful tool to generate useful error messages while validating value shape type.
 *Note:* this function doesn't allow `suspect` to have properties not listed in `typeDescr` which differentiates it from `duckMismatch()` (see bellow).
 
@@ -56,7 +56,7 @@ Works the same way as `mismatch(suspect, typeDescr)` but allows `suspect` object
         client: 'John Doe',
         walletNumber: null,
     };
-    const ExpectedJsonTD: Vts.TypeDescriptionOf<typeof untrustedJson> = {
+    const ExpectedJsonTD: Vts.TypeDescriptionOf = {
         client: 'string',
         walletNumber: /\d{16}/ // implies a string of the given format
     };
@@ -67,10 +67,94 @@ Works the same way as `mismatch(suspect, typeDescr)` but allows `suspect` object
     }
     // process client
 ~~~
+### What is TypeDescription?
+Type description is a simple JavaScript object with values of `TypeDescription` type or basic typename string (`'string'`, 
+`'number'`, `'function'`...) or `Set<TypeDescription>` or `TypeDescription[]` or `RegExp` or your
+custom `TypePredicate` function. `TypeDescription` is actually a union type of all of these.
+
+Here is an example of how you may describe your type.
+~~~typescript
+import * as Vts from 'vee-type-safe';
+
+Vts.conforms(
+{
+       prop: 'lala',
+       tel:  '8800-555-35-35'
+       prop2: true,
+       obj: {
+           obj: [23, false]
+       },
+       someIDontCareProperty: null // excess properties are ok for confroms()
+},
+{
+       prop: 'string',
+       tel:  /\d{4}-\d{3}-\d{2}-\d{2}/, // claims a string of given format
+       prop2: 'boolean',
+       obj: {
+           obj: ['number', 'boolean'] // claims a fixed length tuple
+       }
+}); // true
+
+Vts.conforms(
+{
+     arr: ['array', null, 'of any type', 8888 ],
+     strArr: ['Pinkie', 'Promise', 'some', 'strings'],
+     oneOf: 2,
+     custom: 43
+}, 
+{
+     arr: [],                              // claims an array of any type
+     strArr: ['string'],                   // claims an array of any length
+     oneOf: new Set(['boolean', 'number']),// claims to be one of these types
+     custom: isOddNumber                   // custom type predicate function
+}); // true
+
+function isOddNumber(suspect: unknown): suspect is number {
+    return typeof suspect === 'number' && suspect % 2;
+}  
+
+// Type argument:
+interface Human {
+    name: string;
+    id:   number;
+}
+const HumanTD: Vts.TypeDescriptionOf<Human>  = {
+    name: 'string',  // using Vts.TypeDescriptionOf<T> gives you better typing
+    id:   'number'
+};
+function tryUseHuman(maybeHuman: unknown) {
+    if (conforms<Human>(maybeHuman, HumanTD)) {
+        // maybeHuman is of type Human here
+        maybeHuman.name;
+        maybeHuman.id;
+    }
+ }
+~~~
+
+Here is an actual algorithm how `conforms()` function interprets `TypeDescription`.
+
+* If it is a basic JavaScript typename string (should satisfy typeof operator
+domain definition), then function returns `typeof suspect === typeDescr`.
+* If it is a `RegExp`, then returns
+`typeof suspect === 'string' && typeDescr.test(suspect)`.
+* If it is a `Set<TypeDescription>`, returns `true` if suspect conforms to at
+least one of the given TDs in `Set`.
+* If it is an `Array<TypeDescription>` and it consists of one item,
+returns `true` if `suspect` is `Array` and each of its items conforms to the given
+TD at `typeDescr[0]`.
+* If it is an `Array<TypeDescription>` and it consists of more than one item,
+returns `true` if suspect is `Array` and `suspect.length === typeDescr.length`
+and each corresponding `suspect[i]` conforms to `typeDescr[i]` type description.
+* If it is an empty `Array`, returns `true` if `suspect` is `Array` of any type.
+* If it is an object, returns `true` if `suspect` is also an object and
+each `typeDescr[key]` is a TD for `suspect[key]`. Excess properties in `suspect`
+do not matter for `conforms()` function, but matter for `exactlyConforms()` and `mismatch()` functions.
+* If it is a `TypePredicate` (i.e. `(suspect: unknown) => boolean`), then returns `typeDescr(suspect)`.
+
 
 ## Predefined TypeDescriptions
   
-There are factory functions that return `TypeDescription`s (those are often `TypePredicate`s) or already defined `TypePredicates`, that you should use as type descriptions when calling `mismatch(suspect, typeDescr)`.
+There are factory functions that return `TypeDescription`s (those are often `TypePredicate`s) or already defined `TypePredicates`, that you should use as type descriptions when calling `mismatch/duckMismatch/conforms/exactlyConforms(suspect, typeDescr)`.
 `TypePredicate` is a function of type:
 
 `(suspect: unknown) => boolean`
@@ -113,6 +197,13 @@ Vts.conforms(
 });
 // returns true because the property is not undefined
 // and conforms to isNegativeInteger restriction
+Vts.conforms(
+{
+
+},{
+    prop: Vts.optional(Vts.isNegativeInteger)
+});
+// returns true because property 'prop' may be absent
 ~~~
  
 ### Self explanatory functions

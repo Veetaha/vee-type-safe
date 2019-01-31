@@ -110,7 +110,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L89">index.ts:89</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L89">index.ts:89</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -166,7 +166,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L182">index.ts:182</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L174">index.ts:174</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -256,30 +256,23 @@ Vts.conforms(
 									<h5>typeDescr: <a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>If it is a basic JavaScript typename string (should satisfy typeof operator
-										domain definition), then function returns &quot;typeof suspect === typeDescr&quot;.</p>
-										<pre><code>             <span class="hljs-keyword">If</span> it <span class="hljs-keyword">is</span> a `RegExp`, <span class="hljs-keyword">then</span> <span class="hljs-keyword">returns</span>
-             `typeof suspect === <span class="hljs-string">'string'</span> &amp;&amp; typeDescr.test(suspect)`.
-
-             <span class="hljs-keyword">Else</span> <span class="hljs-keyword">if</span> it <span class="hljs-keyword">is</span> a <span class="hljs-keyword">Set</span>&lt;TD&gt;, <span class="hljs-keyword">returns</span> <span class="hljs-keyword">true</span> <span class="hljs-keyword">if</span> suspect conforms <span class="hljs-keyword">to</span> at
-             least one <span class="hljs-keyword">of</span> the given TDs <span class="hljs-keyword">in</span> <span class="hljs-keyword">Set</span>.
-
-             <span class="hljs-keyword">Else</span> <span class="hljs-keyword">if</span> it <span class="hljs-keyword">is</span> an <span class="hljs-keyword">Array</span>&lt;TD&gt; <span class="hljs-keyword">and</span> it consists <span class="hljs-keyword">of</span> one item,
-             <span class="hljs-keyword">returns</span> <span class="hljs-keyword">true</span> <span class="hljs-keyword">if</span> suspect <span class="hljs-keyword">is</span> <span class="hljs-keyword">Array</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">each</span> <span class="hljs-keyword">of</span> its items conforms <span class="hljs-keyword">to</span> the given
-             TD at typeDescr[<span class="hljs-number">0</span>].
-
-             <span class="hljs-keyword">Else</span> <span class="hljs-keyword">if</span> it <span class="hljs-keyword">is</span> an <span class="hljs-keyword">Array</span>&lt;TD&gt; <span class="hljs-keyword">and</span> it consists <span class="hljs-keyword">of</span> more than one item,
-             <span class="hljs-keyword">returns</span> <span class="hljs-keyword">true</span> <span class="hljs-keyword">if</span> suspect <span class="hljs-keyword">is</span> <span class="hljs-keyword">Array</span> <span class="hljs-keyword">and</span> suspect.length === typeDescr.length
-             <span class="hljs-keyword">and</span> <span class="hljs-keyword">each</span> suspect[i] conforms <span class="hljs-keyword">to</span> typeDescr[i] <span class="hljs-keyword">type</span> description.
-
-             <span class="hljs-keyword">Else</span> <span class="hljs-keyword">if</span> it <span class="hljs-keyword">is</span> an empty <span class="hljs-keyword">Array</span>, <span class="hljs-keyword">returns</span> <span class="hljs-keyword">true</span> <span class="hljs-keyword">if</span> suspet <span class="hljs-keyword">is</span> <span class="hljs-keyword">Array</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">any</span> <span class="hljs-keyword">type</span>.
-
-             <span class="hljs-keyword">Else</span> <span class="hljs-keyword">if</span> it <span class="hljs-keyword">is</span> an <span class="hljs-keyword">object</span>, <span class="hljs-keyword">returns</span> <span class="hljs-keyword">true</span> <span class="hljs-keyword">if</span> suspect <span class="hljs-keyword">is</span> an <span class="hljs-keyword">object</span> <span class="hljs-keyword">and</span>
-             <span class="hljs-keyword">each</span> typeDescr[key] <span class="hljs-keyword">is</span> a TD <span class="hljs-keyword">for</span> suspect[key]. (Excess properties <span class="hljs-keyword">in</span> suspect
-             <span class="hljs-keyword">do</span> <span class="hljs-keyword">not</span> matter).
-
-             <span class="hljs-keyword">Else</span> <span class="hljs-keyword">if</span> it <span class="hljs-keyword">is</span> a TypePredicate, <span class="hljs-keyword">then</span> <span class="hljs-keyword">returns</span> typeDescr(suspect).
-
-             <span class="hljs-keyword">Else</span> <span class="hljs-keyword">returns</span> <span class="hljs-keyword">false</span>.</code></pre>
+											domain definition), then function returns <code>typeof suspect === typeDescr</code>.
+											If it is a <code>RegExp</code>, then returns
+											<code>typeof suspect === &#39;string&#39; &amp;&amp; typeDescr.test(suspect)</code>.
+											Else if it is a Set<TD>, returns true if suspect conforms to at
+												least one of the given TDs in Set.
+												Else if it is an Array<TD> and it consists of one item,
+													returns true if suspect is Array and each of its items conforms to the given
+													TD at typeDescr[0].
+													Else if it is an Array<TD> and it consists of more than one item,
+														returns true if suspect is Array and suspect.length === typeDescr.length
+														and each suspect[i] conforms to typeDescr[i] type description.
+														Else if it is an empty Array, returns true if suspet is Array of any type.
+														Else if it is an object, returns true if suspect is an object and
+														each typeDescr[key] is a TD for suspect[key]. (Excess properties in suspect
+														do not matter).
+														Else if it is a TypePredicate, then returns typeDescr(suspect).
+										Else returns false.</p>
 									</div>
 								</li>
 							</ul>
@@ -297,7 +290,7 @@ Vts.conforms(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L233">index.ts:233</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L225">index.ts:225</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -352,7 +345,7 @@ Vts.conforms(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L587">index.ts:587</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L579">index.ts:579</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -423,7 +416,7 @@ Vts.duckMismatch(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L643">index.ts:643</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L635">index.ts:635</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -458,7 +451,7 @@ Vts.duckMismatch(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L657">index.ts:657</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L649">index.ts:649</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -493,7 +486,7 @@ Vts.duckMismatch(
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L217">index.ts:217</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L209">index.ts:209</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -561,7 +554,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L251">index.ts:251</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L243">index.ts:243</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -605,7 +598,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L631">index.ts:631</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L623">index.ts:623</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -679,7 +672,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L31">index.ts:31</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L31">index.ts:31</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -726,7 +719,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L719">index.ts:719</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L711">index.ts:711</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -792,7 +785,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L737">index.ts:737</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L729">index.ts:729</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -835,7 +828,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/b059f67/index.ts#L53">index.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/6caee1d/index.ts#L53">index.ts:53</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">

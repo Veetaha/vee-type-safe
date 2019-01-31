@@ -94,30 +94,22 @@ export function assertNever(_suspect: never) {}
  * @param T         Typescript type suspect is treated as, if this function returns true.
  * @param suspect   Entity of unknown type to be tested for conformance according to TD.
  * @param typeDescr If it is a basic JavaScript typename string (should satisfy typeof operator
- *                  domain definition), then function returns "typeof suspect === typeDescr".
- *          
+ *                  domain definition), then function returns `typeof suspect === typeDescr`.
  *                  If it is a `RegExp`, then returns
  *                  `typeof suspect === 'string' && typeDescr.test(suspect)`.
- * 
  *                  Else if it is a Set<TD>, returns true if suspect conforms to at
  *                  least one of the given TDs in Set.
- *
  *                  Else if it is an Array<TD> and it consists of one item,
  *                  returns true if suspect is Array and each of its items conforms to the given
  *                  TD at typeDescr[0].
- *
  *                  Else if it is an Array<TD> and it consists of more than one item,
  *                  returns true if suspect is Array and suspect.length === typeDescr.length
  *                  and each suspect[i] conforms to typeDescr[i] type description.
- *
  *                  Else if it is an empty Array, returns true if suspet is Array of any type.
- *
  *                  Else if it is an object, returns true if suspect is an object and
  *                  each typeDescr[key] is a TD for suspect[key]. (Excess properties in suspect
  *                  do not matter).
- *
  *                  Else if it is a TypePredicate, then returns typeDescr(suspect).
- *
  *                  Else returns false.
  * @remarks
  * ```ts

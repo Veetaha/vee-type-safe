@@ -117,6 +117,66 @@
         <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Vts.TypeMismatchError(mismatchInfo);
     }
     <span class="hljs-comment">// process client</span></code></pre>
+				<h3 id="what-is-typedescription-">What is TypeDescription?</h3>
+				<p>Type description is a simple JavaScript object with values of <code>TypeDescription</code> type or basic typename string (<code>&#39;string&#39;</code>,
+					<code>&#39;number&#39;</code>, <code>&#39;function&#39;</code>...) or <code>Set&lt;TypeDescription&gt;</code> or <code>TypeDescription[]</code> or <code>RegExp</code> or your
+				custom <code>TypePredicate</code> function. <code>TypeDescription</code> is actually a union type of all of these.</p>
+				<p>Here is an example of how you may describe your type.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
+
+Vts.conforms(
+{
+       prop: <span class="hljs-string">'lala'</span>,
+       tel:  <span class="hljs-string">'8800-555-35-35'</span>
+       prop2: <span class="hljs-literal">true</span>,
+       obj: {
+           obj: [<span class="hljs-number">23</span>, <span class="hljs-literal">false</span>]
+       },
+       someIDontCareProperty: <span class="hljs-literal">null</span> <span class="hljs-comment">// excess properties are ok</span>
+},
+{
+       prop: <span class="hljs-string">'string'</span>,
+       tel:  <span class="hljs-regexp">/\d{4}-\d{3}-\d{2}-\d{2}/</span>, <span class="hljs-comment">// claims a string of given format</span>
+       prop2: <span class="hljs-string">'boolean'</span>,
+       obj: {
+           obj: [<span class="hljs-string">'number'</span>, <span class="hljs-string">'boolean'</span>] <span class="hljs-comment">// claims a fixed length tuple</span>
+       }
+}); <span class="hljs-comment">// true</span>
+
+Vts.conforms(
+{
+     arr: [<span class="hljs-string">'array'</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">'of any type'</span>, <span class="hljs-number">8888</span> ],
+     strArr: [<span class="hljs-string">'Pinkie'</span>, <span class="hljs-string">'Promise'</span>, <span class="hljs-string">'some'</span>, <span class="hljs-string">'strings'</span>],
+     oneOf: <span class="hljs-number">2</span>,
+     custom: <span class="hljs-number">43</span>
+}, 
+{
+     arr: [],                              <span class="hljs-comment">// claims an array of any type</span>
+     strArr: [<span class="hljs-string">'string'</span>],                   <span class="hljs-comment">// claims an array of any length</span>
+     oneOf: <span class="hljs-keyword">new</span> Set([<span class="hljs-string">'boolean'</span>, <span class="hljs-string">'number'</span>]),<span class="hljs-comment">// claims to be one of these types</span>
+     custom: isOddNumber                   <span class="hljs-comment">// custom type predicate function</span>
+}); <span class="hljs-comment">// true</span>
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isOddNumber</span>(<span class="hljs-params">suspect: unknown</span>): <span class="hljs-title">suspect</span> <span class="hljs-title">is</span> <span class="hljs-title">number</span> </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">typeof</span> suspect === <span class="hljs-string">'number'</span> &amp;&amp; suspect % <span class="hljs-number">2</span>;
+}  
+
+<span class="hljs-comment">// Type argument:</span>
+<span class="hljs-keyword">interface</span> Human {
+    name: <span class="hljs-built_in">string</span>;
+    id:   <span class="hljs-built_in">number</span>;
+}
+<span class="hljs-keyword">const</span> HumanTD: Vts.TypeDescriptionOf&lt;Human&gt;  = {
+    name: <span class="hljs-string">'string'</span>,  <span class="hljs-comment">// using Vts.TypeDescriptionOf&lt;T&gt; gives you better typing</span>
+    id:   <span class="hljs-string">'number'</span>
+};
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tryUseHuman</span>(<span class="hljs-params">maybeHuman: unknown</span>) </span>{
+    <span class="hljs-keyword">if</span> (conforms&lt;Human&gt;(maybeHuman, HumanTD)) {
+        <span class="hljs-comment">// maybeHuman is of type Human here</span>
+        maybeHuman.name;
+        maybeHuman.id;
+    }
+ }</code></pre>
 				<h2 id="predefined-typedescriptions">Predefined TypeDescriptions</h2>
 				<p>There are factory functions that return <code>TypeDescription</code>s (those are often <code>TypePredicate</code>s) or already defined <code>TypePredicates</code>, that you should use as type descriptions when calling <code>mismatch(suspect, typeDescr)</code>.
 				<code>TypePredicate</code> is a function of type:</p>
