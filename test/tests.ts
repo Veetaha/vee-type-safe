@@ -11,7 +11,7 @@ import {
     duckMismatch,
     MismatchInfo,
     PathArray
-} from '../index';
+} from '../lib/index';
 describe('conforms', () => {
     it('should work as typeof when being forwarded a primitive type name as type description', () => {
         // tslint:disable-next-line no-magic-numbers

@@ -22,7 +22,7 @@
     /* Module Resolution Options */
     "moduleResolution": "node"
   },
-  "files": ["index.ts"],
+  "files": ["lib/index.ts"],
   "include": [
       "**/*"
   ],
