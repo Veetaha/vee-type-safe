@@ -45,6 +45,7 @@
 .*
 !.travis.yml
 !.nojekyll
+!.npmignore
 ~*
 
 # ignore node/grunt dependency directories
