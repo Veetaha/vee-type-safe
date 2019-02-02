@@ -21,7 +21,7 @@
         "test": "mocha build/test/tests.js",
         "build": "tsc",
         "build-test": "npm run build && npm run test",
-        "bootstrap": "npm i && npm build",
+        "bootstrap": "npm i && npm run build",
         "pre-deploy": "npm run build && npm run test && npm run docs"
     },
     "author": "Vitaliy Kryvenko",
