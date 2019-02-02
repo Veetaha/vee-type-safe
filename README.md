@@ -1,5 +1,6 @@
 # vee-type-safe
 [![npm version](https://badge.fury.io/js/vee-type-safe.svg)](https://badge.fury.io/js/vee-type-safe)
+[![Build Status](https://travis-ci.com/Veetaha/vee-type-safe.svg?branch=master)](https://travis-ci.com/Veetaha/vee-type-safe)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](https://www.typescriptlang.org/)
 
 
