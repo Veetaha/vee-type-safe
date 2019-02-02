@@ -43,6 +43,8 @@
 
 # ignore all files starting with . or ~
 .*
+!.travis.yml
+!.nojekyll
 ~*
 
 # ignore node/grunt dependency directories

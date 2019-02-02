@@ -1,6 +1,6 @@
 {
     "name": "vee-type-safe",
-    "version": "3.1.1",
+    "version": "3.1.2",
     "description": "Simple TypeScript type checking utility library.",
     "main": "build/index.js",
     "types": "build/index.d.ts",
@@ -17,9 +17,13 @@
         "url": "https://github.com/Veetaha/vee-type-safe.git"
     },
     "scripts": {
-        "test": "tsc && mocha build/test/tests.js",
+        "docs":  "./node_modules/.bin/typedoc --options typedoc.json index.ts",
+        "test":  "mocha build/test/tests.js",
         "build": "tsc",
-        "docs": "./node_modules/.bin/typedoc --options typedoc.json index.ts",
+        "build-test": "npm run build && npm run test",
+        
+
+        "bootstrap":  "npm i && npm build",
         "pre-deploy": "npm run build && npm run test && npm run docs"
     },
     "author": "Vitaliy Kryvenko",
@@ -29,7 +33,7 @@
         "@types/node": "latest",
         "http-status-codes": "latest",
         "is-iso-date": "latest",
-        "typescript": "^3.2.2"
+        "typescript": "3.3.1"
     },
     "devDependencies": {
         "@types/chai": "latest",
