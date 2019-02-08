@@ -13,6 +13,11 @@ typings/
 espowered/
 
 # for https://github.com/Microsoft/TypeScript/issues/4667
+<<<<<<< HEAD
+=======
+lib/**/*.ts
+!lib/**/*.d.ts
+>>>>>>> 87f55b73824f15628db8ba9431dee6a2b4dec5a6
 
 # codes
 test/
@@ -31,6 +36,10 @@ tslint.json
 npm-debug.log
 
 docs/
+<<<<<<< HEAD
+=======
+declarations/
+>>>>>>> 87f55b73824f15628db8ba9431dee6a2b4dec5a6
 test/
 /**/test/
 typedoc.json
