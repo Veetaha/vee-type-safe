@@ -1,6 +1,6 @@
 {
     "name": "vee-type-safe",
-    "version": "3.1.4",
+    "version": "3.1.5",
     "description": "Simple TypeScript type checking utility library.",
     "main": "build/lib/index.js",
     "types": "build/lib/index.d.ts",
@@ -28,7 +28,7 @@
     "license": "MIT",
     "dependencies": {
         "@types/express": "latest",
-        "@types/node": "latest",
+        "@types/node": "10.12.22",
         "http-status-codes": "latest",
         "is-iso-date": "latest",
         "typescript": "3.3.1"
