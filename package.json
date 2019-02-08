@@ -27,7 +27,7 @@
     "author": "Vitaliy Kryvenko",
     "license": "MIT",
     "dependencies": {
-        "@types/express": "latest",
+        "@types/express": "^4.16.1",
         "@types/node": "10.12.22",
         "http-status-codes": "latest",
         "is-iso-date": "latest",
@@ -38,7 +38,7 @@
         "@types/mocha": "latest",
         "chai": "latest",
         "mocha": "latest",
-        "tslint": "^5.11.0",
+        "tslint": "^5.12.1",
         "typedoc": "^0.13.0"
     }
 }
