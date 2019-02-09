@@ -196,3 +196,44 @@ export type Take<
 > = { 
     [TProperty in TPropNames[number]]: TSourceObject[TProperty];
 };
+
+/**
+ * Defines a syncronous (if not `TRet extends Promise`) routine
+ * with arguments specified as a tuple type `TArgs` and return type as `TRet`.
+ * 
+ * @param TArgs Tuple type of arguments that defined routine accepts.
+ * @param TRet  Type of the return value of the routine.
+ */
+export type Routine<
+    TArgs extends unknown[] = [], 
+    TRet = void
+> = (...args: TArgs) => TRet;
+
+/**
+ * Defines an asyncronous routine, which is typically marked with `async` qualifier,
+ * with arguments specified as a tuple type `TArgs` and return type as `Promise<TRet>`.
+ *
+ * @param TArgs Tuple type of arguments that defined async routine accepts.
+ * @param TRet  Type of the return value of the async routine.
+ * 
+ */
+export type AsyncRoutine<
+    TArgs extends unknown[] = [], 
+    TRet = void
+> = (...args: TArgs) => Promise<TRet>;
+
+/**
+ * Defines the type of result, which is passed to `TPromise.then(cb)` `cb` callback.
+ * @param TPromise Target `Promise` to unwrap result from.
+ */
+export type PromiseResult<TPromise extends Promise<any>> = (
+    TPromise extends Promise<infer TResult> ? TResult : never
+);
+
+/**
+ * Defines the result of the `Promise` return by the specified `AsyncRoutine`
+ * @param TAsyncRoutine `AsyncRoutine` to unwrap return type `Promise` result from.
+ */
+export type AsyncReturnType<TAsyncRoutine extends AsyncRoutine<any[], any>> = (
+    PromiseResult<ReturnType<TAsyncRoutine>>
+);
