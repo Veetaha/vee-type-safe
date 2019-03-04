@@ -38,7 +38,7 @@ export function ReqHeaders(req: express.Request) {
 
 export function ensureDuckTypeMatch(
     getRequestProperty: RequestPropertyGetter, 
-    typeDescr: Vts.TypeDescription,
+    typeDescr:          Vts.TypeDescription,
     makeError: ErrorMaker = (failedMatch: Vts.MismatchInfo) => new BadTypeStatusError(failedMatch)
 ) {
     return ((req, _res, next) => {
@@ -52,7 +52,7 @@ export function ensureDuckTypeMatch(
 
 export function ensureTypeMatch(
     getRequestProperty: RequestPropertyGetter, 
-    typeDescr: Vts.TypeDescription,
+    typeDescr:          Vts.TypeDescription,
     makeError: ErrorMaker = (failedMatch: Vts.MismatchInfo) => new BadTypeStatusError(failedMatch)
 ) {
     return ((req, _res, next) => {

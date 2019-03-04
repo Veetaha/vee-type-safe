@@ -72,16 +72,19 @@
 				<h2 id="quick-api-glance">Quick API glance</h2>
 				<h3 id="mismatch-suspect-unknown-typedescr-typedescription-">mismatch(suspect: unknown, typeDescr: TypeDescription)</h3>
 				<p>Returns <code>null</code> or a <code>MismatchInfo</code> object that stores information
-					about type incompatability with the given <code>TypeDescription</code>, e.g. why and where <code>suspect</code>&#39;s invalid property is.
+					about type incompatability with the given
+					<code>TypeDescription</code>, e.g. why and where <code>suspect</code>&#39;s invalid property is.
 					This is a powerful tool to generate useful error messages while validating value shape type.
 				<em>Note:</em> this function doesn&#39;t allow <code>suspect</code> to have properties not listed in <code>typeDescr</code> which differentiates it from <code>duckMismatch()</code> (see bellow).</p>
 				<pre><code class="language-typescript">    <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
-    <span class="hljs-keyword">const</span> untrustedJson = <span class="hljs-comment">/* ... */</span>;
-    <span class="hljs-keyword">const</span> ExpectedJsonTD: Vts.TypeDescription = <span class="hljs-comment">/* ... */</span>;
-    <span class="hljs-keyword">const</span> dbDocument = <span class="hljs-comment">/* ... */</span>;
+    <span class="hljs-keyword">import</span> { Model } <span class="hljs-keyword">from</span> <span class="hljs-string">'@models/model'</span>;
+
+    <span class="hljs-keyword">const</span> untrustedJson: unknown = <span class="hljs-comment">/* ... */</span>;
+    <span class="hljs-keyword">const</span> ExpectedJsonTD: Vts.TypeDescription = <span class="hljs-comment">/* this is actually a generic type (advanced topic) */</span>;
+    <span class="hljs-keyword">const</span> dbDocument: Model = <span class="hljs-comment">/* Some object */</span>;
 
     <span class="hljs-keyword">const</span> mismatchInfo = Vts.mismatch(untrustedJson, ExpectedJsonTD);
-    <span class="hljs-keyword">if</span> (mismatchInfo) {
+    <span class="hljs-keyword">if</span> (mismatchInfo != <span class="hljs-literal">null</span>) {
         <span class="hljs-built_in">console</span>.log(
             mismatchInfo.path,
             mismatchInfo.actualValue,
@@ -94,7 +97,7 @@
         <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Vts.TypeMismatchError(mismatchInfo);
     }
     <span class="hljs-comment">// now you may safely assign untrustedJson to dbDocument:</span>
-    dbDocument = <span class="hljs-built_in">Object</span>.assign(dbDocument, untrustedJson);</code></pre>
+    <span class="hljs-built_in">Object</span>.assign(dbDocument, untrustedJson);</code></pre>
 				<h3 id="duckmismatch-suspect-typedescr-"><code>duckMismatch(suspect, typeDescr)</code></h3>
 				<p>Works the same way as <code>mismatch(suspect, typeDescr)</code> but allows <code>suspect</code> object with excess properties to pass the match.</p>
 				<pre><code class="language-typescript">    <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
@@ -108,15 +111,31 @@
         client: <span class="hljs-string">'John Doe'</span>,
         walletNumber: <span class="hljs-literal">null</span>,
     };
-    <span class="hljs-keyword">const</span> ExpectedJsonTD: Vts.TypeDescriptionOf = {
+
+    <span class="hljs-keyword">const</span> ExpectedJsonTD = Vts.td({ <span class="hljs-comment">// this noop call is needed to preserve unit types</span>
         client: <span class="hljs-string">'string'</span>,
         walletNumber: <span class="hljs-regexp">/\d{16}/</span> <span class="hljs-comment">// implies a string of the given format</span>
-    };
+    });
+
+    <span class="hljs-comment">// Here we map the given type description shape to the type that it describes statically</span>
+    <span class="hljs-keyword">type</span> ExpectedJson = Vts.TypeDescriptionTarget&lt;<span class="hljs-keyword">typeof</span> ExpectedJsonTD&gt;;
+
+    <span class="hljs-comment">/* 
+        ExpectedJson === {
+            client:       string;
+            walletNumber: string;
+        }
+    */</span>
+
 
     <span class="hljs-keyword">const</span> mismatchInfo = Vts.duckMismatch(untrustedJson, ExpectedJsonTD);
-    <span class="hljs-keyword">if</span> (mismatchInfo) {
+    <span class="hljs-keyword">if</span> (mismatchInfo != <span class="hljs-literal">null</span>) {
         <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Vts.TypeMismatchError(mismatchInfo);
     }
+    <span class="hljs-comment">// ^~~~ Vts.ensureDuckMatch() does the same</span>
+
+
+    <span class="hljs-keyword">const</span> trustedJson = untrustedJson <span class="hljs-keyword">as</span> ExpectedJson;
     <span class="hljs-comment">// process client</span></code></pre>
 				<h3 id="what-is-typedescription-">What is TypeDescription?</h3>
 				<p>Type description is a simple JavaScript object with values of <code>TypeDescription</code> type or basic typename string (<code>&#39;string&#39;</code>,
@@ -167,13 +186,14 @@ Vts.conforms(
     name: <span class="hljs-built_in">string</span>;
     id:   <span class="hljs-built_in">number</span>;
 }
-<span class="hljs-keyword">const</span> HumanTD: Vts.TypeDescriptionOf&lt;Human&gt;  = {
-    name: <span class="hljs-string">'string'</span>,  <span class="hljs-comment">// using Vts.TypeDescriptionOf&lt;T&gt; gives you better typing</span>
+<span class="hljs-keyword">const</span> HumanTD: Vts.TypeDescription&lt;Human&gt;  = {
+    name: <span class="hljs-string">'string'</span>,  <span class="hljs-comment">// using Vts.TypeDescription gives you better typing</span>
     id:   <span class="hljs-string">'number'</span>
 };
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tryUseHuman</span>(<span class="hljs-params">maybeHuman: unknown</span>) </span>{
-    <span class="hljs-keyword">if</span> (conforms&lt;Human&gt;(maybeHuman, HumanTD)) {
-        <span class="hljs-comment">// maybeHuman is of type Human here</span>
+    <span class="hljs-keyword">if</span> (conforms(maybeHuman, HumanTD)) {
+        <span class="hljs-comment">// maybeHuman is of type that is assignable to Human here</span>
+        <span class="hljs-comment">// it is inferred to be Vts.TypeDescriptionTarget&lt;typeof HumanTD&gt; exactly</span>
         maybeHuman.name;
         maybeHuman.id;
     }
@@ -202,6 +222,8 @@ Vts.conforms(
 				<p>There are factory functions that return <code>TypeDescription</code>s (those are often <code>TypePredicate</code>s) or already defined <code>TypePredicates</code>, that you should use as type descriptions when calling <code>mismatch/duckMismatch/conforms/exactlyConforms(suspect, typeDescr)</code>.
 				<code>TypePredicate</code> is a function of type:</p>
 				<p><code>(suspect: unknown) =&gt; boolean</code></p>
+				<p>If you specify a generic argument <code>TTarget</code> it becomes a true TypeScript type predicate, so that you will be able to get described type from it when using <code>Vts.TypeDescriptionTarget</code>:</p>
+				<p><code>(suspect: unknown) =&gt; suspect is TTarget</code></p>
 				<h3 id="isnumberwithinrange-min-max-"><code>isNumberWithinRange(min, max)</code></h3>
 				<p> Returns a predicate that returns <em>true</em> if its argument is a number within the range [<code>min</code>, <code>max</code>] or [<code>max</code>, <code>min</code>] if <code>min &gt; max</code>.</p>
 				<pre><code class="language-typescript"> <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
@@ -216,7 +238,7 @@ Vts.conforms(
 				<h3 id="isintegerwithinrange-min-max-"><code>isIntegerWithinRange(min, max)</code></h3>
 				<p> The same as <code>isNumberWithinRange(min, max)</code>, but its returned predicate returns <em>false</em> if forwarded argument is not an integer.</p>
 				<h3 id="optional-typedescr-typedescription-"><code>optional(typeDescr: TypeDescription)</code></h3>
-				<p>Retuns <code>Set&lt;TypeDescription&gt;([&#39;undefined&#39;, typeDescr]))</code></p>
+				<p>Retuns <code>Set([&#39;undefined&#39;, typeDescr]))</code></p>
 				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Vts <span class="hljs-keyword">from</span> <span class="hljs-string">'vee-type-safe'</span>;
 Vts.conforms(
 {
