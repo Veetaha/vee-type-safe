@@ -10,20 +10,20 @@ import {
     mismatch,
     duckMismatch,
     MismatchInfo,
-    PathArray
+    PathArray,
+    tdSet
 } from '../lib/index';
 describe('conforms', () => {
     it('should work as typeof when being forwarded a primitive type name as type description', () => {
-        // tslint:disable-next-line no-magic-numbers
-        assert.isTrue(conforms(23, 'number'));
-        assert.isTrue(conforms(true, 'boolean'));
-        assert.isTrue(conforms(false, 'boolean'));
-        assert.isTrue(conforms(null, 'object'));
-        assert.isTrue(conforms(undefined, 'undefined'));
-        assert.isTrue(conforms(() => {
-        }, 'function'));
+        assert.isTrue(conforms(23,           'number'));
+        assert.isTrue(conforms(true,         'boolean'));
+        assert.isTrue(conforms(false,        'boolean'));
+        assert.isTrue(conforms(null,         'object'));
+        assert.isTrue(conforms(undefined,    'undefined'));
+        assert.isTrue(conforms(() => {},     'function'));
         assert.isTrue(conforms({prop: null}, 'object'));
-        assert.isTrue(conforms(Symbol(), 'symbol'));
+        assert.isTrue(conforms(Symbol(),     'symbol'));
+        assert.isTrue(conforms(2323n,        'bigint'));
     });
 
     it('should work with objects as type descriptions', () => {
@@ -80,31 +80,26 @@ describe('conforms', () => {
     });
     it('should try to match each TD in a Set', () => {
         assert.isTrue(conforms(
-            // tslint:disable-next-line no-magic-numbers
-            42, new Set<TypeDescription>(
-                [{obj: 'number'}, 'string', 'number', ['boolean']]
-            )
+            42, tdSet([{obj: 'number'}, 'string', 'number', ['boolean']])
         ));
         assert.isFalse(conforms(
-            {}, new Set<TypeDescription>(
-                [{obj: 'number'}, 'string', 'number', ['boolean']]
-            )
+            {}, tdSet([{obj: 'number'}, 'string', 'number', ['boolean']])
         ));
 
     });
     it('should use given predicate to validate the suspect', () => {
-        // tslint:disable-next-line no-magic-numbers
-        assert.isTrue(conforms(23, suspect => suspect === 23));
-        assert.isTrue(conforms('str', suspect => suspect === 'str'));
+        assert.isTrue(conforms(23, (suspect): suspect is number => suspect === 23));
+        assert.isTrue(conforms('str', (suspect): suspect is string => suspect === 'str'));
         assert.isTrue(conforms({
             prop: 'Ruslan',
             enum: 43
         }, {
             prop: 'string',
-            // tslint:disable-next-line no-magic-numbers
-            enum: suspect => typeof suspect === 'number' && [58, 4, 43].includes(suspect)
+            enum: (suspect): suspect is 58 | 4 | 43 => (
+                typeof suspect === 'number' && [58, 4, 43].includes(suspect)
+            )
         }));
-        assert.isFalse(conforms(true, () => false));
+        assert.isFalse(conforms(true, _suspect => false));
         assert.isFalse(conforms({}, {
             id: 'number',
             login: 'string',

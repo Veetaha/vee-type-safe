@@ -110,7 +110,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L89">index.ts:89</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L94">index.ts:94</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -160,13 +160,13 @@
 					<a name="conforms" class="tsd-anchor"></a>
 					<h3>conforms</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">conforms&lt;T&gt;<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon">conforms&lt;TTypeDescr&gt;<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TTypeDescr</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L174">index.ts:174</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L179">index.ts:179</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -220,8 +220,8 @@ Vts.conforms(
     name: <span class="hljs-built_in">string</span>;
     id:   <span class="hljs-built_in">number</span>;
 }
-<span class="hljs-keyword">const</span> HumanTD: Vts.TypeDescriptionOf&lt;Human&gt;  = {
-    name: <span class="hljs-string">'string'</span>,  <span class="hljs-comment">// using Vts.TypeDescriptionOf&lt;T&gt; gives you better typing</span>
+<span class="hljs-keyword">const</span> HumanTD: Vts.TypeDescription&lt;Human&gt;  = {
+    name: <span class="hljs-string">'string'</span>,  <span class="hljs-comment">// using Vts.TypeDescription&lt;T&gt; gives you better typing</span>
     id:   <span class="hljs-string">'number'</span>
 };
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tryUseHuman</span>(<span class="hljs-params">maybeHuman: unknown</span>) </span>{
@@ -238,10 +238,7 @@ Vts.conforms(
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T</h4>
-									<div class="tsd-comment tsd-typography">
-										<p>Typescript type suspect is treated as, if this function returns true.</p>
-									</div>
+									<h4>TTypeDescr<span class="tsd-signature-symbol">: </span><a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -253,7 +250,7 @@ Vts.conforms(
 									</div>
 								</li>
 								<li>
-									<h5>typeDescr: <a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
+									<h5>typeDescr: <span class="tsd-signature-type">TTypeDescr</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>If it is a basic JavaScript typename string (should satisfy typeof operator
 											domain definition), then function returns <code>typeof suspect === typeDescr</code>.
@@ -284,13 +281,13 @@ Vts.conforms(
 					<a name="defaultifnotconforms" class="tsd-anchor"></a>
 					<h3>default<wbr>IfNot<wbr>Conforms</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">default<wbr>IfNot<wbr>Conforms&lt;T&gt;<span class="tsd-signature-symbol">(</span>typeDescr<span class="tsd-signature-symbol">: </span><a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a>, suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, defaultVal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+						<li class="tsd-signature tsd-kind-icon">default<wbr>IfNot<wbr>Conforms&lt;TTarget&gt;<span class="tsd-signature-symbol">(</span>typeDescr<span class="tsd-signature-symbol">: </span><a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TTarget</span><span class="tsd-signature-symbol">&gt;</span>, suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, defaultVal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TTarget</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TTarget</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L225">index.ts:225</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L232">index.ts:232</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -302,16 +299,13 @@ Vts.conforms(
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T</h4>
-									<div class="tsd-comment tsd-typography">
-										<p>Type of <code>defaultVal</code> and the type described by <code>typeDescr</code></p>
-									</div>
+									<h4>TTarget</h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>typeDescr: <a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
+									<h5>typeDescr: <a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TTarget</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Type description suspect may conform to,
 										<code>defaultVal</code> MUST conform to this TD.</p>
@@ -324,14 +318,14 @@ Vts.conforms(
 									</div>
 								</li>
 								<li>
-									<h5>defaultVal: <span class="tsd-signature-type">T</span></h5>
+									<h5>defaultVal: <span class="tsd-signature-type">TTarget</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Value that conforms to <code>typeDescr</code> TD that is
 										returned by this function if <code>!conforms(suspect, typeDescr)</code>.</p>
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TTarget</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -339,13 +333,13 @@ Vts.conforms(
 					<a name="duckmismatch" class="tsd-anchor"></a>
 					<h3>duck<wbr>Mismatch</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-						<li class="tsd-signature tsd-kind-icon">duck<wbr>Mismatch<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><a href="../classes/_index_.mismatchinfo.html" class="tsd-signature-type">MismatchInfo</a></li>
+						<li class="tsd-signature tsd-kind-icon">duck<wbr>Mismatch<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><a href="../classes/_index_.mismatchinfo.html" class="tsd-signature-type">MismatchInfo</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L579">index.ts:579</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L586">index.ts:586</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -366,7 +360,7 @@ Vts.duckMismatch(
     client: <span class="hljs-string">'John Doe'</span>,
     walletNumber: <span class="hljs-literal">null</span>,
 };
-<span class="hljs-keyword">const</span> ExpectedJsonTD: Vts.TypeDescriptionOf&lt;<span class="hljs-keyword">typeof</span> untrustedJson&gt; = {
+<span class="hljs-keyword">const</span> ExpectedJsonTD: Vts.TypeDescription&lt;<span class="hljs-keyword">typeof</span> untrustedJson&gt; = {
     client: <span class="hljs-string">'string'</span>,
     walletNumber: <span class="hljs-regexp">/\d{16}/</span> <span class="hljs-comment">// implies a string of the given format</span>
 };
@@ -391,7 +385,7 @@ Vts.duckMismatch(
 									</div>
 								</li>
 								<li>
-									<h5>typeDescr: <a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
+									<h5>typeDescr: <a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p><code>TypeDescription</code> that describes limitations that must be
 											applied to <code>suspect</code> to pass the match (see <code>conforms()</code> for
@@ -410,13 +404,13 @@ Vts.duckMismatch(
 					<a name="ensureduckmatch" class="tsd-anchor"></a>
 					<h3>ensure<wbr>Duck<wbr>Match</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-						<li class="tsd-signature tsd-kind-icon">ensure<wbr>Duck<wbr>Match<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">ensure<wbr>Duck<wbr>Match<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L635">index.ts:635</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L642">index.ts:642</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -432,7 +426,7 @@ Vts.duckMismatch(
 									<h5>suspect: <span class="tsd-signature-type">unknown</span></h5>
 								</li>
 								<li>
-									<h5>typeDescr: <a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
+									<h5>typeDescr: <a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
 									<div class="tsd-comment tsd-typography">
 									</div>
 								</li>
@@ -445,13 +439,13 @@ Vts.duckMismatch(
 					<a name="ensurematch" class="tsd-anchor"></a>
 					<h3>ensure<wbr>Match</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-						<li class="tsd-signature tsd-kind-icon">ensure<wbr>Match<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">ensure<wbr>Match<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L649">index.ts:649</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L656">index.ts:656</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -467,7 +461,7 @@ Vts.duckMismatch(
 									<h5>suspect: <span class="tsd-signature-type">unknown</span></h5>
 								</li>
 								<li>
-									<h5>typeDescr: <a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
+									<h5>typeDescr: <a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
 									<div class="tsd-comment tsd-typography">
 									</div>
 								</li>
@@ -480,13 +474,13 @@ Vts.duckMismatch(
 					<a name="exactlyconforms" class="tsd-anchor"></a>
 					<h3>exactly<wbr>Conforms</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">exactly<wbr>Conforms&lt;T&gt;<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon">exactly<wbr>Conforms&lt;TTypeDescr&gt;<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TTypeDescr</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L209">index.ts:209</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L215">index.ts:215</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -503,7 +497,7 @@ Vts.conforms(<span class="hljs-number">23</span>, <span class="hljs-string">'num
     listedStr: <span class="hljs-string">'readme'</span>,
     unlistedProp: [<span class="hljs-string">'some'</span>, <span class="hljs-string">'excess'</span>, <span class="hljs-string">'prop'</span>, <span class="hljs-string">'value'</span>]
 }
-<span class="hljs-comment">// notice that if you had used Vts.TypeDescriptionOf&lt;typeof suspect&gt; type here,</span>
+<span class="hljs-comment">// notice that if you had used Vts.TypeDescription&lt;typeof suspect&gt; type here,</span>
 <span class="hljs-comment">// you would have got error squiggles, that td lacks 'unlistedProp' property.</span>
 <span class="hljs-keyword">const</span> td: Vts.TypeDescription = {
     listedInt: Vts.isPositiveInteger,
@@ -517,10 +511,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T</h4>
-									<div class="tsd-comment tsd-typography">
-										<p>Typescript type suspect is treated as, if this function returns true.</p>
-									</div>
+									<h4>TTypeDescr<span class="tsd-signature-symbol">: </span><a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -532,7 +523,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 									</div>
 								</li>
 								<li>
-									<h5>typeDescr: <a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
+									<h5>typeDescr: <span class="tsd-signature-type">TTypeDescr</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p><code>TypeDescription</code> that describes limitations that must be
 											applied to <code>suspect</code> to pass the match (see <code>conforms()</code> for
@@ -554,7 +545,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L243">index.ts:243</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L249">index.ts:249</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -568,7 +559,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>TTD<span class="tsd-signature-symbol">: </span><a href="../interfaces/_types_.typedescrobjmap.html" class="tsd-signature-type">TypeDescrObjMap</a></h4>
+									<h4>TTD<span class="tsd-signature-symbol">: </span><a href="_type_description_types_.html#typedescrobject" class="tsd-signature-type">TypeDescrObject</a></h4>
 									<div class="tsd-comment tsd-typography">
 										<p>Type of TD object, i.e an object with values of <code>TypeDescription</code> type.</p>
 									</div>
@@ -592,13 +583,13 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 					<a name="mismatch" class="tsd-anchor"></a>
 					<h3>mismatch</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-						<li class="tsd-signature tsd-kind-icon">mismatch<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><a href="../classes/_index_.mismatchinfo.html" class="tsd-signature-type">MismatchInfo</a></li>
+						<li class="tsd-signature tsd-kind-icon">mismatch<span class="tsd-signature-symbol">(</span>suspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, typeDescr<span class="tsd-signature-symbol">: </span><a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><a href="../classes/_index_.mismatchinfo.html" class="tsd-signature-type">MismatchInfo</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L623">index.ts:623</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L630">index.ts:630</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -647,7 +638,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 									</div>
 								</li>
 								<li>
-									<h5>typeDescr: <a href="_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
+									<h5>typeDescr: <a href="_type_description_types_.html#typedescription" class="tsd-signature-type">TypeDescription</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p><code>TypeDescription</code> that describes limitations that must be
 											applied to <code>suspect</code> to pass the match (see <code>conforms()</code> for
@@ -672,7 +663,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L31">index.ts:31</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L36">index.ts:36</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -719,7 +710,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L711">index.ts:711</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L718">index.ts:718</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -785,7 +776,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L729">index.ts:729</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L736">index.ts:736</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -828,7 +819,7 @@ Vts.exactlyConforms(suspect, td) === <span class="hljs-literal">false</span>;</c
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/eb0c6d0/lib/index.ts#L53">index.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/Veetaha/vee-type-safe/blob/2bf03ac/lib/index.ts#L58">index.ts:58</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -884,6 +875,9 @@ numb; <span class="hljs-comment">// deduced type is SomeEnum</span></code></pre>
 					</li>
 					<li class="label tsd-is-external">
 						<span>Externals</span>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_type_description_types_.html">"type-<wbr>description-<wbr>types"</a>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
 						<a href="_type_descriptions_.html">"type-<wbr>descriptions"</a>

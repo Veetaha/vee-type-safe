@@ -4,12 +4,31 @@ import {
 import isISODate = require('is-iso-date');
 
 /**
+ * A noop function, that leverages literal strings of `BasicTypeName` shape to be
+ * of string literal types. 
+ * @param typeDescr Type description to return.
+ */
+export function td<TTypeDescr extends TypeDescription>(typeDescr: TTypeDescr) {
+    return typeDescr;
+}
+
+/**
+ * A shorthand for `new Set([...typeDescrs])`. It also makes TypeScript to
+ * preserve `BasicTypeName` string literal types.
+ * @param typeDescrs `TypeDescription`s that define a union of types that suspect may have.
+ */
+export function tdSet<TTypeDescrs extends TypeDescription>(typeDescrs: TTypeDescrs[]) {
+    return new Set(typeDescrs);
+}
+
+
+/**
  * Returns true if suspect is truthy and typeof suspect === 'object' or 'function'.
  * @param suspect Value of any type to check.
  */
 export function isBasicObject(suspect: unknown) : suspect is BasicObject<unknown> {
     return Boolean(
-        suspect && (typeof suspect === 'object' || typeof suspect === 'function')
+        suspect != null && (typeof suspect === 'object' || typeof suspect === 'function')
     );
 }
 
@@ -20,19 +39,26 @@ export function isBasicObject(suspect: unknown) : suspect is BasicObject<unknown
  */
 export function isBasicTypeName(suspect: string): suspect is BasicTypeName {
     switch (suspect) {
-        case 'number':    case 'string': case 'boolean':
-        case 'undefined': case 'object': case 'function':
-        case 'symbol': return true;
+        case 'number':    
+        case 'string': 
+        case 'boolean':   
+        case 'undefined': 
+        case 'object':    
+        case 'function':
+        case 'symbol':    
+        case 'bigint': return true;
         default:       return false;
     }
 }
 
 /**
- * Retuns `Set<TypeDescription>(['undefined', typeDescr]))`
+ * Retuns `tdSet(['undefined', typeDescr]))`
  * @param typeDescr `TypeDescription` that will be united with `'undefined'` TD.
  */
-export function optional(typeDescr: TypeDescription) {
-    return new Set<TypeDescription>(['undefined', typeDescr]);
+export function optional
+<TTypeDescr extends TypeDescription = TypeDescription>
+(typeDescr: TTypeDescr) {
+    return tdSet(['undefined', typeDescr]);
 }
 
 /**
@@ -75,12 +101,13 @@ export function isOneOf<T>(possibleValues: T[]){
  * ```
  * 
  */
-export function isInEnum<
-    TEnum extends BasicObjectMap<keyof TEnum, string>
->(typeScriptStringEnum: TEnum) { 
+export function isInEnum
+<TEnum extends BasicObjectMap<keyof TEnum, string>>
+(typeScriptStringEnum: TEnum) { 
     const enumValues = Object.values(typeScriptStringEnum);
-    return (suspect: unknown): suspect is TEnum[keyof TEnum] => 
-        typeof suspect === 'string' && enumValues.includes(suspect);
+    return function isInTheGivenEnumeration(suspect: unknown): suspect is TEnum[keyof TEnum] {
+        return typeof suspect === 'string' && enumValues.includes(suspect);
+    };
 }
 
 
@@ -123,10 +150,17 @@ export function isUndefined(suspect: unknown): suspect is undefined {
 }
 
 /**
- * Shorthand for `new Set<TypeDescription>([isNull, typeDescr])`
+ * Shorthand for `tdSet([isNull, typeDescr])`
  */
-export function isNullOr(typeDescr: TypeDescription) {
-    return new Set<TypeDescription>([isNull, typeDescr]);
+export function isNullOr<TTypeDescr extends TypeDescription>(typeDescr: TTypeDescr) {
+    return tdSet([isNull, typeDescr]);
+}
+
+/**
+ * Shorthand for `tdSet([isNull, isUndefined, typeDescr])`
+ */
+export function isNilOr<TTypeDescr extends TypeDescription>(typeDescr: TTypeDescr) {
+    return tdSet([isNull, isUndefined, typeDescr]);
 }
 
 /**

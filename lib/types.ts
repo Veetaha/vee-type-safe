@@ -1,3 +1,5 @@
+import { TypeDescription } from "./type-description-types";
+
 /**
  * Defines an object with string keys, and all values of TValue type.
  * @param TValue Type of values, stored in object's properties.
@@ -133,47 +135,6 @@ export type RemoveProperties<
     [Key in Exclude<keyof TSourceObject, TPropNamesUnion>]: TSourceObject[Key];
 };
 
-
-export interface TypeDescrObjMap extends BasicObject<TypeDescription> {}
-export interface TypeDescrArray  extends Array<TypeDescription> {}
-export interface TypeDescrSet    extends Set<TypeDescription> {}
-export type TypePredicate = (suspect: unknown) => boolean;
-/**
- * Defines a union type, accepted type matching functions like 
- * `mismatch(), conforms(), duckMismatch(), exactlyConforms()`.
- * This type is a meta-type, as it describes limitations over other types.
- */
-export type TypeDescription = 
-    | TypeDescrObjMap 
-    | TypeDescrArray 
-    | TypePredicate 
-    | TypeDescrSet 
-    | BasicTypeName  
-    | RegExp;
-
-/**
- * Makes an alias for the type that maps properties of T to `TypeDescription`'s
- * 
- * @param T Object (probably interface) type to alias `TypeDescription` for.
- * 
- * @remarks
- * Use it like so:
- * ```ts
- * import * as Vts from 'vee-type-safe';
- * export interface Human {
- *     name: string;
- *     age: number;
- * }
- * 
- * export const HumanTD: Vts.TypeDescriptionOf<Human> = {
- *     name: 'string',
- *     age: Vts.isPositiveInteger // you will get better intellisense here
- * };
- * ```
- */
-export type TypeDescriptionOf<T extends BasicObject> = BasicObjectMap<keyof T, TypeDescription>;
-
-
 export type PathArray = (string | number)[];
 
 export interface MismatchInfoData {
@@ -236,4 +197,70 @@ export type PromiseResult<TPromise extends Promise<any>> = (
  */
 export type AsyncReturnType<TAsyncRoutine extends AsyncRoutine<any[], any>> = (
     PromiseResult<ReturnType<TAsyncRoutine>>
+);
+
+/** 
+ * Defines constructor function type.
+ * @param TInstance Type of instances produced by this constructor.
+ * @param TArgs     Tuple type of arguments, this constructor accepts.
+ */
+export interface ClassType<
+    TInstance = unknown,
+    TArgs extends unknown[] = unknown[]
+> 
+extends Function {
+    // tslint:disable-next-line: callable-types
+    new (...args: TArgs): TInstance;
+}
+
+/**
+ * Defines constructor function prototype property type.
+ * @param TClass Target constructor function type.
+ */
+export type ClassPrototype<TClass extends ClassType = ClassType> = TClass['prototype'];
+
+/**
+ * Defines a union of property names taken from `TObj` which value type is 
+ * assignable to `TValue`.
+ * 
+ * @param TObj   Target object type to filter property names from.
+ * @param TValue Type of value that filtered propnames value type must be assignable to. 
+ */
+export type FilteredPropNames<TObj extends BasicObject, TValue> = {
+    [TKey in keyof TObj]: TObj[TKey] extends TValue ? TKey : never // never type gets filtered
+}[keyof TObj];                                                     // according to union rules
+                                                                
+
+/**
+ * Same as `FilteredPropNames`, but allows to pass properties that are of union type
+ * that contains `TValue`.
+ */
+export type FilteredPropNamesContaining<TObj extends BasicObject, TValue> = {
+    [TKey in keyof TObj]: Extract<TObj[TKey], TValue> extends never ? never : TKey
+}[keyof TObj];                                                     
+
+
+/**
+ * Defines an object type which properties are all taken from `TObj` and their values
+ * are assignable to `TValue`.
+ * 
+ * @param TObj   Target object type to filter properties from.
+ * @param TValue Type of value that filtered properties value type must be assignable to. 
+ */
+export type FilterProps<TObj extends BasicObject, TValue> = (
+    Pick<TObj, FilteredPropNames<TObj, TValue>>
+);
+
+
+/**
+ * Same as `FilterProp`, but allows to pass properties that are of union type
+ * that contains `TValue`.
+ */
+export type FilterPropsContaining<TObj extends BasicObject, TValue> = (
+    Pick<TObj, FilteredPropNamesContaining<TObj, TValue>>
+);
+
+export type MarkUndefedPropsAsOptional<TObj extends BasicObject> = (
+    & Partial<FilterPropsContaining<TObj, undefined>> 
+    & RemoveProperties<TObj, FilteredPropNamesContaining<TObj, undefined>>
 );
