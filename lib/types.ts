@@ -220,24 +220,64 @@ extends Function {
 export type ClassPrototype<TClass extends ClassType = ClassType> = TClass['prototype'];
 
 /**
+ * Defines which type of properties to filter.
+ */
+export const enum FilterOpts {
+    /**
+     * Defines properties which values are assignable to the given type.
+     */
+    Assignable, 
+
+    /**
+     * Defines properties which values are not assignable to the given type.
+     */
+    NotAssignable, 
+
+    /**
+     * Defines properties which values are assignable or if those are
+     * of a union type, that union contains a type that is assignable
+     * to the given type.
+     */
+    Containing, 
+
+    /** 
+     * Defines properties which values are not assignable or if those are
+     * of a union type, that union doesn't contain a type that is assignable
+     * to the given type.
+     */
+    NotContaining
+}
+
+/**
  * Defines a union of property names taken from `TObj` which value type is 
  * assignable to `TValue`.
  * 
- * @param TObj   Target object type to filter property names from.
- * @param TValue Type of value that filtered propnames value type must be assignable to. 
+ * @param TObj       Target object type to filter property names from.
+ * @param TValue     Type of value that filtered propnames value type must be assignable to. 
+ * @param TFilterOpt Defines which class of properties to take. See `FilterOpts` for details.
  */
-export type FilteredPropNames<TObj extends BasicObject, TValue> = {
-    [TKey in keyof TObj]: TObj[TKey] extends TValue ? TKey : never // never type gets filtered
-}[keyof TObj];                                                     // according to union rules
-                                                                
+export type FilteredPropNames<
+    TObj extends BasicObject, 
+    TValue, 
+    TFilterOpt extends FilterOpts = FilterOpts.Assignable
+> = { 
+        [TKey in keyof TObj]: (
+            TFilterOpt extends FilterOpts.Assignable    ?
+            (TObj[TKey] extends TValue ? TKey  : never) :
 
-/**
- * Same as `FilteredPropNames`, but allows to pass properties that are of union type
- * that contains `TValue`.
- */
-export type FilteredPropNamesContaining<TObj extends BasicObject, TValue> = {
-    [TKey in keyof TObj]: Extract<TObj[TKey], TValue> extends never ? never : TKey
-}[keyof TObj];                                                     
+            TFilterOpt extends FilterOpts.NotAssignable ?
+            (TObj[TKey] extends TValue ? never : TKey)  :
+
+            TFilterOpt extends FilterOpts.Containing ?
+            (Extract<TObj[TKey], TValue> extends never ? never : TKey) :
+
+            TFilterOpt extends FilterOpts.NotContaining ?
+            (Extract<TObj[TKey], TValue> extends never ? TKey : never) : 
+            
+            never
+        )
+}[keyof TObj];
+                                                                
 
 
 /**
@@ -246,21 +286,17 @@ export type FilteredPropNamesContaining<TObj extends BasicObject, TValue> = {
  * 
  * @param TObj   Target object type to filter properties from.
  * @param TValue Type of value that filtered properties value type must be assignable to. 
+ * @param TFilterOpt Defines which class of properties to take. See `FilterOpts` for details
  */
-export type FilterProps<TObj extends BasicObject, TValue> = (
-    Pick<TObj, FilteredPropNames<TObj, TValue>>
-);
-
-
-/**
- * Same as `FilterProp`, but allows to pass properties that are of union type
- * that contains `TValue`.
- */
-export type FilterPropsContaining<TObj extends BasicObject, TValue> = (
-    Pick<TObj, FilteredPropNamesContaining<TObj, TValue>>
+export type FilterProps<
+    TObj extends BasicObject, 
+    TValue, 
+    FilterOpt extends FilterOpts = FilterOpts.Assignable
+> = (
+    Pick<TObj, FilteredPropNames<TObj, TValue, FilterOpt>>
 );
 
 export type MarkUndefedPropsAsOptional<TObj extends BasicObject> = (
-    & Partial<FilterPropsContaining<TObj, undefined>> 
-    & RemoveProperties<TObj, FilteredPropNamesContaining<TObj, undefined>>
+    & Partial<FilterProps<TObj, undefined, FilterOpts.Containing>> 
+    & RemoveProperties<TObj, FilteredPropNames<TObj, undefined, FilterOpts.Containing>>
 );
