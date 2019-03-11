@@ -17,7 +17,7 @@
         "url": "https://github.com/Veetaha/vee-type-safe.git"
     },
     "scripts": {
-        "docs": "./node_modules/.bin/typedoc --options typedoc.json lib/index.ts",
+        "docs": "./node_modules/.bin/typedoc --options typedoc.json lib/index.ts && touch docs/.nojekyll",
         "test": "mocha build/test/tests.js",
         "build": "tsc",
         "clean": "rm -rf build docs",
