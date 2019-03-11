@@ -206,7 +206,7 @@ export type AsyncReturnType<TAsyncRoutine extends AsyncRoutine<any[], any>> = (
  */
 export interface ClassType<
     TInstance = unknown,
-    TArgs extends unknown[] = unknown[]
+    TArgs extends unknown[] = any[]
 > 
 extends Function {
     // tslint:disable-next-line: callable-types
@@ -217,7 +217,39 @@ extends Function {
  * Defines constructor function prototype property type.
  * @param TClass Target constructor function type.
  */
-export type ClassPrototype<TClass extends ClassType = ClassType> = TClass['prototype'];
+export type ClassPrototype<TClass extends ClassType> = (
+    TClass['prototype']
+);
+
+export type MethodDescriptor
+<
+    TArgs   extends any[] = unknown[],
+    TRetval extends any = unknown
+> = (
+    <TProto extends BasicObject = BasicObject>(
+        classPrototype: TProto,
+        propName:       string | symbol,
+        propDescriptor: TypedPropertyDescriptor<(this: TProto, ...args: TArgs) => TRetval>
+    ) => void |         TypedPropertyDescriptor<(this: TProto, ...args: TArgs) => TRetval>
+);
+
+
+export type ClassDecorator = (
+    <TClassType extends ClassType = ClassType>
+    (target: TClassType) => TClassType | void
+);
+
+export type PropertyDecorator<TPropType = unknown> = (
+    <TPropName extends string | symbol>
+    (classPrototype: { [TKey in TPropName]: TPropType }, propName: TPropName) => void
+);
+
+export type ParameterDecorator = (
+    classPrototype: BasicObject, 
+    methodName:     string, 
+    parameterIndex: number
+) => void;
+
 
 /**
  * Defines which type of properties to filter.
