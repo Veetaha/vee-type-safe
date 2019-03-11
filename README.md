@@ -90,7 +90,7 @@ Works the same way as `mismatch(suspect, typeDescr)` but allows `suspect` object
 ### What is TypeDescription?
 Type description is a simple JavaScript object with values of `TypeDescription` type or basic typename string (`'string'`, 
 `'number'`, `'function'`...) or `Set<TypeDescription>` or `TypeDescription[]` or `RegExp` or your
-custom `TypePredicate` function. `TypeDescription` is actually a union type of all of these.
+custom `TypePredicate` function. `TypeDescription` is actually a conditional (dependent on type argument) union type of all of these.
 
 Here is an example of how you may describe your type.
 ~~~typescript
