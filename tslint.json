@@ -5,7 +5,7 @@
     "rules": {
         "no-var-keyword": true,
         "no-arg": true,
-        "triple-equals": true,
+        "triple-equals": [true, "allow-null-check"],
         "semicolon": true,
         "adjacent-overload-signatures": true,
         "await-promise": true,

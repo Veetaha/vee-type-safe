@@ -1,19 +1,24 @@
 import { isBasicObject, optional } from './type-descriptions';
 import { 
-    BasicObject, 
-    TypeDescription, 
-    TypeDescrObjMap, 
+    BasicObject,  
     BasicObjectMap, 
     MismatchInfoData, 
     PathArray, 
-    Maybe, 
-    TypeDescrSet, 
+    Maybe,  
     PropNamesArray, 
     Take, 
     MappedObject 
 } from './types';
+import { 
+    TypeDescription, 
+    TypeDescrObject, 
+    TypeDescrSet, 
+    TypeDescriptionTarget
+} from './type-description-types';
 export * from './type-descriptions';
 export * from './types';
+export * from './type-description-types';
+
 
 /**
  * C++ style operator, a syntactic sugar for writing casts like 
@@ -91,7 +96,7 @@ export function assertNever(_suspect: never) {}
 /**
  * Determines whether the specified suspect type satisfies the restriction of the given type
  * description (TD).
- * @param T         Typescript type suspect is treated as, if this function returns true.
+ * @param TTarget   Typescript type suspect is treated as, if this function returns true.
  * @param suspect   Entity of unknown type to be tested for conformance according to TD.
  * @param typeDescr If it is a basic JavaScript typename string (should satisfy typeof operator
  *                  domain definition), then function returns `typeof suspect === typeDescr`.
@@ -157,8 +162,8 @@ export function assertNever(_suspect: never) {}
  *     name: string;
  *     id:   number;
  * }
- * const HumanTD: Vts.TypeDescriptionOf<Human>  = {
- *     name: 'string',  // using Vts.TypeDescriptionOf<T> gives you better typing
+ * const HumanTD: Vts.TypeDescription<Human>  = {
+ *     name: 'string',  // using Vts.TypeDescription<T> gives you better typing
  *     id:   'number'
  * };
  * function tryUseHuman(maybeHuman: unknown) {
@@ -171,8 +176,9 @@ export function assertNever(_suspect: never) {}
  * 
  * ```
  */
-export function conforms<T = unknown>(suspect: unknown, typeDescr: TypeDescription)
-    : suspect is T {
+export function conforms
+<TTypeDescr extends TypeDescription>
+(suspect: unknown, typeDescr: TTypeDescr): suspect is TypeDescriptionTarget<TTypeDescr> {
     return !duckMismatch(suspect, typeDescr);
 }
 
@@ -196,7 +202,7 @@ export function conforms<T = unknown>(suspect: unknown, typeDescr: TypeDescripti
  *     listedStr: 'readme',
  *     unlistedProp: ['some', 'excess', 'prop', 'value']
  * }
- * // notice that if you had used Vts.TypeDescriptionOf<typeof suspect> type here,
+ * // notice that if you had used Vts.TypeDescription<typeof suspect> type here,
  * // you would have got error squiggles, that td lacks 'unlistedProp' property.
  * const td: Vts.TypeDescription = {
  *     listedInt: Vts.isPositiveInteger,
@@ -206,8 +212,9 @@ export function conforms<T = unknown>(suspect: unknown, typeDescr: TypeDescripti
  * Vts.exactlyConforms(suspect, td) === false;
  * ```
  */
-export function exactlyConforms<T = unknown>(suspect: unknown, typeDescr: TypeDescription)
-    : suspect is T {
+export function exactlyConforms
+<TTypeDescr extends TypeDescription>
+(suspect: unknown, typeDescr: TTypeDescr): suspect is TypeDescriptionTarget<TTypeDescr> {
     return !mismatch(suspect, typeDescr);
 }
 
@@ -222,10 +229,9 @@ export function exactlyConforms<T = unknown>(suspect: unknown, typeDescr: TypeDe
  * @param defaultVal Value that conforms to `typeDescr` TD that is 
  *                   returned by this function if `!conforms(suspect, typeDescr)`.
  */
-export function defaultIfNotConforms<T>(
-    typeDescr: TypeDescription, suspect: unknown, defaultVal: T
-): T {
-    return conforms<T>(suspect, typeDescr) ? suspect : defaultVal;
+export function defaultIfNotConforms<TTarget> 
+(typeDescr: TypeDescription<TTarget>, suspect: unknown, defaultVal: TTarget): TTarget {
+    return conforms(suspect, typeDescr) ? suspect as TTarget : defaultVal;
 }
 
 /**
@@ -240,16 +246,17 @@ export function defaultIfNotConforms<T>(
  * @param typeDescr Object to make new `TypeDescrObjMap` 
  *                  with all optional properties from.
  */
-export function makeTdWithOptionalProps<TTD extends TypeDescrObjMap>(
+export function makeTdWithOptionalProps<TTD extends TypeDescrObject>(
     typeDescr: TTD
 ): BasicObjectMap<keyof TTD, ReturnType<typeof optional>> {
-    return Object.getOwnPropertyNames(typeDescr)
-                 .reduce((newTd, propName) => {
-                        (newTd as any)[propName] = optional(typeDescr[propName]);
-                        return newTd;
-                     },
-                     {} as BasicObjectMap<keyof TTD, ReturnType<typeof optional>>
-                 );
+    return Object
+        .getOwnPropertyNames(typeDescr)
+            .reduce((newTd, propName) => {
+                    newTd[propName] = optional(typeDescr[propName]);
+                    return newTd;
+                },
+                {} as { [TKey in keyof TTD]: Set<'undefined' | TTD[TKey]>; }
+            );
 }
 
 /**
@@ -434,7 +441,7 @@ class Mismatcher {
         return this.falseMatch(suspect, typeDescr);
     }
 
-    protected matchObject(suspect: BasicObject, typeDescr: TypeDescrObjMap) {
+    protected matchObject(suspect: BasicObject, typeDescr: TypeDescrObject) {
         const susProps = Object.getOwnPropertyNames(suspect);
         const tdProps  = Object.getOwnPropertyNames(typeDescr);
         if (tdProps.length < susProps.length) {
@@ -497,7 +504,7 @@ class DuckMismatcher extends Mismatcher {
     /**
      * @override
      */
-    protected matchObject(suspect: BasicObject, typeDescr: TypeDescrObjMap) {
+    protected matchObject(suspect: BasicObject, typeDescr: TypeDescrObject) {
         for (const propName of Object.getOwnPropertyNames(typeDescr)) {
             this.currentPath.push(propName);
             const mismatchInfo = this.mismatch(suspect[propName], typeDescr[propName]);
@@ -561,7 +568,7 @@ export class TypeMismatchError extends Error {
  *     client: 'John Doe',
  *     walletNumber: null,
  * };
- * const ExpectedJsonTD: Vts.TypeDescriptionOf<typeof untrustedJson> = {
+ * const ExpectedJsonTD: Vts.TypeDescription<typeof untrustedJson> = {
  *     client: 'string',
  *     walletNumber: /\d{16}/ // implies a string of the given format
  * };

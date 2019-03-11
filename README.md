@@ -14,18 +14,21 @@ Requires Typescript version `>= 3.2`.
 
 ### mismatch(suspect: unknown, typeDescr: TypeDescription)
 Returns `null` or a `MismatchInfo` object that stores information
-about type incompatability with the given `TypeDescription`, e.g. why and where `suspect`'s invalid property is.
+about type incompatability with the given 
+`TypeDescription`, e.g. why and where `suspect`'s invalid property is.
 This is a powerful tool to generate useful error messages while validating value shape type.
 *Note:* this function doesn't allow `suspect` to have properties not listed in `typeDescr` which differentiates it from `duckMismatch()` (see bellow).
 
 ~~~typescript
     import * as Vts from 'vee-type-safe';
-    const untrustedJson = /* ... */;
-    const ExpectedJsonTD: Vts.TypeDescription = /* ... */;
-    const dbDocument = /* ... */;
+    import { Model } from '@models/model';
+
+    const untrustedJson: unknown = /* ... */;
+    const ExpectedJsonTD: Vts.TypeDescription = /* this is actually a generic type (advanced topic) */;
+    const dbDocument: Model = /* Some object */;
 
     const mismatchInfo = Vts.mismatch(untrustedJson, ExpectedJsonTD);
-    if (mismatchInfo) {
+    if (mismatchInfo != null) {
         console.log(
             mismatchInfo.path,
             mismatchInfo.actualValue,
@@ -38,7 +41,7 @@ This is a powerful tool to generate useful error messages while validating value
         throw new Vts.TypeMismatchError(mismatchInfo);
     }
     // now you may safely assign untrustedJson to dbDocument:
-    dbDocument = Object.assign(dbDocument, untrustedJson);
+    Object.assign(dbDocument, untrustedJson);
 ~~~
 
 
@@ -57,15 +60,31 @@ Works the same way as `mismatch(suspect, typeDescr)` but allows `suspect` object
         client: 'John Doe',
         walletNumber: null,
     };
-    const ExpectedJsonTD: Vts.TypeDescriptionOf = {
+
+    const ExpectedJsonTD = Vts.td({ // this noop call is needed to preserve unit types
         client: 'string',
         walletNumber: /\d{16}/ // implies a string of the given format
-    };
+    });
+
+    // Here we map the given type description shape to the type that it describes statically
+    type ExpectedJson = Vts.TypeDescriptionTarget<typeof ExpectedJsonTD>;
+
+    /* 
+        ExpectedJson === {
+            client:       string;
+            walletNumber: string;
+        }
+    */
+
 
     const mismatchInfo = Vts.duckMismatch(untrustedJson, ExpectedJsonTD);
-    if (mismatchInfo) {
+    if (mismatchInfo != null) {
         throw new Vts.TypeMismatchError(mismatchInfo);
     }
+    // ^~~~ Vts.ensureDuckMatch() does the same
+ 
+
+    const trustedJson = untrustedJson as ExpectedJson;
     // process client
 ~~~
 ### What is TypeDescription?
@@ -119,13 +138,14 @@ interface Human {
     name: string;
     id:   number;
 }
-const HumanTD: Vts.TypeDescriptionOf<Human>  = {
-    name: 'string',  // using Vts.TypeDescriptionOf<T> gives you better typing
+const HumanTD: Vts.TypeDescription<Human>  = {
+    name: 'string',  // using Vts.TypeDescription gives you better typing
     id:   'number'
 };
 function tryUseHuman(maybeHuman: unknown) {
-    if (conforms<Human>(maybeHuman, HumanTD)) {
-        // maybeHuman is of type Human here
+    if (conforms(maybeHuman, HumanTD)) {
+        // maybeHuman is of type that is assignable to Human here
+        // it is inferred to be Vts.TypeDescriptionTarget<typeof HumanTD> exactly
         maybeHuman.name;
         maybeHuman.id;
     }
@@ -160,6 +180,11 @@ There are factory functions that return `TypeDescription`s (those are often `Typ
 
 `(suspect: unknown) => boolean`
 
+If you specify a generic argument `TTarget` it becomes a true TypeScript type predicate, so that you will be able to get described type from it when using `Vts.TypeDescriptionTarget`:
+
+
+`(suspect: unknown) => suspect is TTarget `
+
 ### `isNumberWithinRange(min, max)`
     
  Returns a predicate that returns *true* if its argument is a number within the range \[`min`, `max`] or \[`max`, `min`] if `min > max`.
@@ -179,7 +204,7 @@ There are factory functions that return `TypeDescription`s (those are often `Typ
  The same as `isNumberWithinRange(min, max)`, but its returned predicate returns *false* if forwarded argument is not an integer.
  
 ### `optional(typeDescr: TypeDescription)`
-Retuns `Set<TypeDescription>(['undefined', typeDescr]))`
+Retuns `Set(['undefined', typeDescr]))`
 ~~~typescript
 import * as Vts from 'vee-type-safe';
 Vts.conforms(
