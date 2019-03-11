@@ -1,18 +1,18 @@
-import { TypeDescription, td, TypeDescriptionTarget, optional } from "../lib";
+import { TypeDescription, td, TypeDescriptionTarget, optional, isInteger } from "../lib";
 
-const ruslan = {
+export const ruslan = {
     prop: 'Ruslan',
     enum: 43
 };
 
-const RuslanTD: TypeDescription<typeof ruslan> = {
+export const RuslanTD: TypeDescription<typeof ruslan> = {
     prop: 'string',
     enum: suspect => (
         typeof suspect === 'number' && [58, 4, 43].includes(suspect)
     )
 };
 
-const UserTD = td({
+export const UserTD = td({
     id: 'number',
     login: optional('string'),
     fullname: 'string',
@@ -21,7 +21,7 @@ const UserTD = td({
     isDisabled: 'boolean',
 });
 
-const user: TypeDescriptionTarget<typeof UserTD> = {
+export const user: TypeDescriptionTarget<typeof UserTD> = {
     avaUrl: 'asdads',
     fullname: 'sadasd',
     id: 232,
@@ -29,4 +29,15 @@ const user: TypeDescriptionTarget<typeof UserTD> = {
     registeredAt: new Date
 };
 
-if (user || RuslanTD) {}
+export const JsonUserTD = td({
+    name:     /[a-zA-Z]{3,32}/,
+    password: /[a-zA-Z]{3,32}/,
+    email:    (_suspect): _suspect is string => {
+        // instert custom logic to check that suspect is an email string here
+        return true;
+    },
+    cash:       isInteger,
+    isDisabled: 'boolean'
+});
+
+export type JsonUser = TypeDescriptionTarget<typeof JsonUserTD>;

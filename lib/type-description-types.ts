@@ -66,6 +66,50 @@ export type TypePredicate<TTarget = unknown> = (
  * If you want to get the described type from the given `TypeDescription`,
  * see `TypeDescriptionTarget`.
  * 
+ * Example:
+ * ```ts
+ * import * as Vts from 'vee-type-safe';
+ * 
+ * const NameTD = Vts.td({
+ *     first: 'string',
+ *     last:  'string'
+ * });
+ * 
+ * type Name = Vts.TypeDescriptionTarget<typeof NameTD>;
+ * 
+ * // statically generated TypeScript type:
+ * // Name === {
+ * //     first: string;
+ * //     last:  string;
+ * // }
+ * 
+ * const JsonUserTD = Vts.td({
+ *     name:     NameTD,
+ *     password: /[a-zA-Z]{3,32}/,
+ *     email:    (suspect): suspect is string => {
+ *         // instert custom logic to check that suspect is an email string here
+ *         return true;
+ *     },
+ *     cash:       Vts.isInteger,
+ *     isDisabled: 'boolean'
+ * });
+ * 
+ * type JsonUser = Vts.TypeDescriptionTarget<typeof JsonUserTD>;
+ * 
+ * // statically generated TypeScript
+ * // JsonUser === {
+ * //     name:       Name;
+ * //     password:   string;
+ * //     email:      string;
+ * //     cash:       number;
+ * //     isDisabled: boolean;
+ * // }
+ * 
+ * 
+ * ```
+ * 
+ * 
+ * 
  */
 export type TypeDescription<TTarget = any> = 
     | TypePredicate<TTarget>
