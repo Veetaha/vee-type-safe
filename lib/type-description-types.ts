@@ -78,7 +78,7 @@ export type TypePredicate<TTarget = unknown> = (
  * type Name = Vts.TypeDescriptionTarget<typeof NameTD>;
  * 
  * // statically generated TypeScript type:
- * // Name === {
+ * // type Name === {
  * //     first: string;
  * //     last:  string;
  * // }
@@ -97,7 +97,7 @@ export type TypePredicate<TTarget = unknown> = (
  * type JsonUser = Vts.TypeDescriptionTarget<typeof JsonUserTD>;
  * 
  * // statically generated TypeScript
- * // JsonUser === {
+ * // type JsonUser === {
  * //     name:       Name;
  * //     password:   string;
  * //     email:      string;

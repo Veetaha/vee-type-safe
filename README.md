@@ -133,15 +133,20 @@ function isOddNumber(suspect: unknown): suspect is number {
     return typeof suspect === 'number' && suspect % 2;
 }  
 
-// Type argument:
-interface Human {
-    name: string;
-    id:   number;
-}
-const HumanTD: Vts.TypeDescription<Human>  = {
-    name: 'string',  // using Vts.TypeDescription gives you better typing
+
+const HumanTD = Vts.td({  // noop function that preserves unit types
+    name: 'string',
     id:   'number'
-};
+});
+
+// generate static TypeScript type:
+type Human = Vts.TypeDescriptionTarget<typeof HumanTD>;
+
+// type Human === {              
+//     name: string;
+//     id:   number;
+// }
+
 function tryUseHuman(maybeHuman: unknown) {
     if (conforms(maybeHuman, HumanTD)) {
         // maybeHuman is of type that is assignable to Human here
