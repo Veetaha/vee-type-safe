@@ -1,4 +1,4 @@
-import { TypeDescription, td, TypeDescriptionTarget, optional, isInteger } from "../lib";
+import { MethodDecorator, TypeDescription, td, TypeDescriptionTarget, optional, isInteger, ClassDecorator, PropertyDecorator } from "../lib";
 
 export const ruslan = {
     prop: 'Ruslan',
@@ -41,3 +41,28 @@ export const JsonUserTD = td({
 });
 
 export type JsonUser = TypeDescriptionTarget<typeof JsonUserTD>;
+
+function methodDecorator(): MethodDecorator<[number], boolean> {
+    return () => {};
+}
+
+function classDecorator(): ClassDecorator {
+    return () => {};
+}
+
+function propertyDecorator(): PropertyDecorator<number> {
+    return () => {};
+}
+
+
+@classDecorator()
+export class Cl {
+
+    @propertyDecorator()
+    prop!: number;
+
+    @methodDecorator()
+    method(_str: number) {
+        return true;
+    }
+}

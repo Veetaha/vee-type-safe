@@ -221,10 +221,14 @@ export type ClassPrototype<TClass extends ClassType> = (
     TClass['prototype']
 );
 
-export type MethodDescriptor
-<
-    TArgs   extends any[] = unknown[],
-    TRetval extends any = unknown
+export type ClassDecorator = (
+    <TClassType extends ClassType = ClassType>
+    (target: TClassType) => TClassType | void
+);
+
+export type MethodDecorator<
+    TArgs   extends any[] = any[], 
+    TRetval extends any   = any
 > = (
     <TProto extends BasicObject = BasicObject>(
         classPrototype: TProto,
@@ -233,20 +237,14 @@ export type MethodDescriptor
     ) => void |         TypedPropertyDescriptor<(this: TProto, ...args: TArgs) => TRetval>
 );
 
-
-export type ClassDecorator = (
-    <TClassType extends ClassType = ClassType>
-    (target: TClassType) => TClassType | void
-);
-
 export type PropertyDecorator<TPropType = unknown> = (
     <TPropName extends string | symbol>
-    (classPrototype: { [TKey in TPropName]: TPropType }, propName: TPropName) => void
+    (classPrototype: Record<TPropName, TPropType>, propName: TPropName) => void
 );
 
 export type ParameterDecorator = (
     classPrototype: BasicObject, 
-    methodName:     string, 
+    methodName:     string | symbol, 
     parameterIndex: number
 ) => void;
 
@@ -294,11 +292,11 @@ export type FilteredPropNames<
     TFilterOpt extends FilterOpts = FilterOpts.Assignable
 > = { 
         [TKey in keyof TObj]: (
-            TFilterOpt extends FilterOpts.Assignable    ?
+            TFilterOpt  extends FilterOpts.Assignable   ?
             (TObj[TKey] extends TValue ? TKey  : never) :
 
-            TFilterOpt extends FilterOpts.NotAssignable ?
-            (TObj[TKey] extends TValue ? never : TKey)  :
+            TFilterOpt  extends FilterOpts.NotAssignable ?
+            (TObj[TKey] extends TValue ? never : TKey)   :
 
             TFilterOpt extends FilterOpts.Containing ?
             (Extract<TObj[TKey], TValue> extends never ? never : TKey) :
