@@ -62,6 +62,7 @@ export class Cl {
     prop!: number;
 
     @methodDecorator()
+    // tslint:disable-next-line: prefer-function-over-method
     method(_str: number) {
         return true;
     }
