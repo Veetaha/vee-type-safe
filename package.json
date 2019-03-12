@@ -23,23 +23,25 @@
         "clean": "rm -rf build docs",
         "build-test": "npm run build && npm run test",
         "bootstrap": "npm i && npm run build",
-        "pre-deploy": "npm run clean && npm run build && npm run test"
+        "pre-deploy": "npm run clean && npm run build && npm run test",
+        "update-deps": "ncu -u && npm i"
     },
     "author": "Vitaliy Kryvenko",
     "license": "MIT",
     "dependencies": {
         "@types/express": "^4.16.1",
-        "@types/node": "10.12.22",
+        "@types/node": "11.11.2",
         "http-status-codes": "latest",
         "is-iso-date": "latest",
-        "typescript": "3.3.1"
+        "typescript": "3.3.3333"
     },
     "devDependencies": {
         "@types/chai": "latest",
         "@types/mocha": "latest",
         "chai": "latest",
         "mocha": "latest",
-        "tslint": "^5.12.1",
-        "typedoc": "^0.13.0"
+        "npm-check-updates": "^3.0.4",
+        "tslint": "^5.13.1",
+        "typedoc": "^0.14.2"
     }
 }
