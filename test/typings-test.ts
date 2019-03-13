@@ -1,4 +1,15 @@
-import { MethodDecorator, TypeDescription, td, TypeDescriptionTarget, optional, isInteger, ClassDecorator, PropertyDecorator } from "../lib";
+import { 
+    MethodDecorator, 
+    TypeDescription, 
+    td, 
+    TypeDescriptionTarget,
+    optional,
+    isInteger,
+    ClassDecorator,
+    PropertyDecorator,
+    AccessorDecorator,
+    ParameterDecorator
+} from "../lib";
 
 export const ruslan = {
     prop: 'Ruslan',
@@ -42,18 +53,27 @@ export const JsonUserTD = td({
 
 export type JsonUser = TypeDescriptionTarget<typeof JsonUserTD>;
 
-function methodDecorator(): MethodDecorator<[number], boolean> {
+function methodDecorator(): MethodDecorator<[number, boolean], boolean> {
     return () => {};
 }
 
 function classDecorator(): ClassDecorator {
-    return () => {};
+    return (cls) => {
+        return cls;
+    };
 }
 
 function propertyDecorator(): PropertyDecorator<number> {
     return () => {};
 }
 
+function accessorDecorator(): AccessorDecorator<number> {
+    return () => {};
+}
+
+function parameterDecorator(): ParameterDecorator<number> {
+    return () => {};
+}
 
 @classDecorator()
 export class Cl {
@@ -61,9 +81,22 @@ export class Cl {
     @propertyDecorator()
     prop!: number;
 
+
+    @accessorDecorator()
+    get val() {
+        return 22;
+    }
+
     @methodDecorator()
     // tslint:disable-next-line: prefer-function-over-method
-    method(_str: number) {
+    method(
+        _str: number, 
+        @parameterDecorator()
+        _bool: boolean
+    ) {
         return true;
     }
 }
+
+
+

@@ -281,10 +281,6 @@ Vts.conforms(2,     new Set([0, 1, 2, 3])); // compile error
 ### `interface BasicObject<T>`
 A shorthand for `{ [key: string]: T; }` type.
 
-### `interface BasicFunctor`<TArgs, TRetval, TProps>`
-This interface implies a callable `BasicObject<TProps>`, where 
-`TArgs` is a tuple of argument types, `TRetval` is the return type of this function.
-
 ### `type PrimitiveType`
 A union of all primitive types (`null` is treated as a primitive type).
 

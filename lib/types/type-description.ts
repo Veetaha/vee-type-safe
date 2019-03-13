@@ -1,4 +1,4 @@
-import { BasicObject, BasicFunctor, MarkUndefedPropsAsOptional } from "./types";
+import { BasicObject, BasicFunction, MarkUndefedPropsAsOptional } from "./index";
 
 // Type to type description:
 
@@ -186,7 +186,7 @@ type TypeDescriptionTargetWithoutSet<TTypeDescr extends TypeDescription> = (
     TTypeDescr extends 'bigint'        ? bigint                                 :
     TTypeDescr extends 'undefined'     ? undefined                              :
     TTypeDescr extends 'object'        ? BasicObject | null                     :
-    TTypeDescr extends 'function'      ? BasicFunctor                           :
+    TTypeDescr extends 'function'      ? BasicFunction                          :
     TTypeDescr extends 'symbol'        ? symbol                                 :    
     TTypeDescr extends TypeDescrArray  ? TypeDescriptionArrayTarget<TTypeDescr> :
     TTypeDescr extends TypePredicate   ? TypePredicateTarget<TTypeDescr>        :

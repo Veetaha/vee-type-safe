@@ -1,4 +1,6 @@
-import { TypeDescription } from "./type-description-types";
+import { TypeDescription } from "./type-description";
+export * from './type-description';
+export * from './decorators';
 
 /**
  * Defines an object with string keys, and all values of TValue type.
@@ -46,12 +48,14 @@ export type BasicObjectMap<
  * @param TArgs   Tuple of argument types that this functor accepts.
  * @param TRetval Type that this functor returns.
  * @param TProps  Type of values stored by string keys on this object type.
+ * 
+ * @deprecated use BasicFunction<> & BasicObject<> instead
  */
 export interface BasicFunctor<
-    TArgs extends any[]  = unknown[],
-    TRetval              = unknown,
-    TProps               = unknown
-    > extends BasicObject<TProps> {
+    TArgs extends any[] = unknown[],
+    TRetval             = unknown,
+    TProps              = unknown
+> extends BasicObject<TProps> {
     (...args: TArgs): TRetval;
 }
 
@@ -61,13 +65,32 @@ export interface BasicFunctor<
  * @param TArgs   Tuple of argument types that this functor accepts.
  * @param TRetval Type that this functor returns.
  * @param TProps  Type of readonly values stored by string keys on this object type.
+ * 
+ * @deprecated use BasicFunction<> & ROBasicObject<> instead
  */
 export interface ROBasicFunctor<
-    TArgs extends any[]  = unknown[],
-    TRetval              = unknown,
-    TProps               = unknown
-    > extends ROBasicObject<TProps> {
+    TArgs extends any[] = unknown[],
+    TRetval             = unknown,
+    TProps              = unknown
+> extends ROBasicObject<TProps> {
     (...args: TArgs): TRetval;
+}
+
+/**
+ * Defines a Function subtype with the given arguments, return value and `this` context.
+ * 
+ * @param TArgs   Tuple of argument types that this function accepts.
+ * @param TRetval Type that this function returns.
+ * @param TThis   Type `this` function context.
+ * 
+ */
+export interface BasicFunction<
+    TArgs extends unknown[] = unknown[],
+    TRetval                 = unknown,
+    TThis                   = unknown
+> extends Function {
+    // tslint:disable-next-line: callable-types
+    (this: TThis, ...args: TArgs): TRetval;
 }
 
 /**
@@ -221,34 +244,6 @@ export type ClassPrototype<TClass extends ClassType> = (
     TClass['prototype']
 );
 
-export type ClassDecorator = (
-    <TClassType extends ClassType = ClassType>
-    (target: TClassType) => TClassType | void
-);
-
-export type MethodDecorator<
-    TArgs   extends any[] = any[], 
-    TRetval extends any   = any
-> = (
-    <TProto extends BasicObject = BasicObject>(
-        classPrototype: TProto,
-        propName:       string | symbol,
-        propDescriptor: TypedPropertyDescriptor<(this: TProto, ...args: TArgs) => TRetval>
-    ) => void |         TypedPropertyDescriptor<(this: TProto, ...args: TArgs) => TRetval>
-);
-
-export type PropertyDecorator<TPropType = unknown> = (
-    <TPropName extends string | symbol>
-    (classPrototype: Record<TPropName, TPropType>, propName: TPropName) => void
-);
-
-export type ParameterDecorator = (
-    classPrototype: BasicObject, 
-    methodName:     string | symbol, 
-    parameterIndex: number
-) => void;
-
-
 /**
  * Defines which type of properties to filter.
  */
@@ -298,10 +293,10 @@ export type FilteredPropNames<
             TFilterOpt  extends FilterOpts.NotAssignable ?
             (TObj[TKey] extends TValue ? never : TKey)   :
 
-            TFilterOpt extends FilterOpts.Containing ?
+            TFilterOpt extends FilterOpts.Containing                   ?
             (Extract<TObj[TKey], TValue> extends never ? never : TKey) :
 
-            TFilterOpt extends FilterOpts.NotContaining ?
+            TFilterOpt extends FilterOpts.NotContaining                ?
             (Extract<TObj[TKey], TValue> extends never ? TKey : never) : 
             
             never
@@ -329,4 +324,24 @@ export type FilterProps<
 export type MarkUndefedPropsAsOptional<TObj extends BasicObject> = (
     & Partial<FilterProps<TObj, undefined, FilterOpts.Containing>> 
     & RemoveProperties<TObj, FilteredPropNames<TObj, undefined, FilterOpts.Containing>>
+);
+
+
+type PackIntoFunctionParam<T> = T extends any ? (param: T) => void : never;
+
+/**
+ * Defines an intersection type of all union items.
+ * 
+ * @param TUnion Union of any types that will be intersected.
+ * 
+ * @remarks
+ * Because of TypeScript boolean representation as `type boolean = true | false`
+ * you get the following result:
+ * `UnionToIntersection<boolean> === true & false`
+ * 
+ * @copyright
+ * https://stackoverflow.com/a/50375286/9259330
+ */
+export type UnionToIntersection<TUnion> = (
+    PackIntoFunctionParam<TUnion> extends (param: infer TItem) => void ? TItem : never
 );

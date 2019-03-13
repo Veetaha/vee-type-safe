@@ -7,17 +7,15 @@ import {
     Maybe,  
     PropNamesArray, 
     Take, 
-    MappedObject 
-} from './types';
-import { 
+    MappedObject,
     TypeDescription, 
     TypeDescrObject, 
     TypeDescrSet, 
     TypeDescriptionTarget
-} from './type-description-types';
+} from './types';
+
 export * from './type-descriptions';
 export * from './types';
-export * from './type-description-types';
 
 
 /**
